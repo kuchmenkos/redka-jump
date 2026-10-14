@@ -345,16 +345,34 @@ function makeCloth(zi){
   clothZone=zi;
 }
 function resize(){const r=wrap.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,2);cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);scale=r.width/W;H=r.height/scale;ctx.imageSmoothingEnabled=false}
-function fontFor(t,maxW){let s=16;ctx.font='800 '+s+'px Manrope, system-ui, sans-serif';while(s>11&&ctx.measureText(t).width>maxW){s--;ctx.font='800 '+s+'px Manrope, system-ui, sans-serif'}return s}
+const PFONT=13,PH=26;
+function fontFor(t,maxW){let s=PFONT;ctx.font='800 '+s+'px Manrope, system-ui, sans-serif';while(s>9&&ctx.measureText(t).width>maxW){s--;ctx.font='800 '+s+'px Manrope, system-ui, sans-serif'}return s}
+// Labels peel off after a few landings, so standing still eventually drops Redka into the abyss.
+const platLife=gs=>gs<30000?4:gs<200000?3:2;
 function makePlat(type,y,label,extra){
-  ctx.font='800 16px Manrope, system-ui, sans-serif';
-  const w=Math.max(86,Math.min(230,ctx.measureText(label).width+32));
-  return Object.assign({type,label,x:rnd(4,W-w-4),y,w,h:30,vx:type==='moving'?(Math.random()<.5?-1:1)*rnd(.6,.8+diff()*1.6):0,broken:false,fy:0,alpha:1,visited:false,fs:fontFor(label,w-20)},extra||{});
+  ctx.font='800 '+PFONT+'px Manrope, system-ui, sans-serif';
+  const d=diff(),w=Math.round(Math.max(60,Math.min(160-30*d,ctx.measureText(label).width+20)));
+  return Object.assign({type,label,x:rnd(4,W-w-4),y,w,h:PH,vx:type==='moving'?(Math.random()<.5?-1:1)*rnd(.6,.8+d*1.6):0,broken:false,fy:0,alpha:1,visited:false,hits:0,life:4,fs:fontFor(label,w-12)},extra||{});
 }
 const ramp=(v,a,b)=>Math.max(0,Math.min(1,(v-a)/(b-a)));
 /* obstacles in order of strength: weakest first */
 const EUNLOCK={stuk:60000,threads:150000,lang:220000,cancel:320000,koms:450000};
-let streak=0,mult=1,shownCnt={},million=false,stepN=0,lastItemStep=-99,lastExpressGs=-1e9,seenNew=new Set();
+let streak=0,mult=1,shownCnt={},million=false,stepN=0,lastItemStep=-99,lastExpressGs=-1e9,seenNew=new Set(),lastCx=W/2,lastW=130,centreHist=[1,1,1];
+// A standing-still Redka must not find a ledge on every jump: a new label never overlaps the previous one
+// horizontally, and at most one in four crosses the middle of the field.
+function placePlat(p,calm){
+  const lo=p.w/2+4,hi=W-p.w/2-4,need=calm?40:(p.w+lastW)/2+22,mid=c=>Math.abs(c-W/2)<p.w/2+18;
+  const centreOk=!centreHist.some(Boolean);
+  let best=null,bs=-1e9;
+  for(let i=0;i<10;i++){
+    const cx=rnd(lo,hi),gap=Math.abs(cx-lastCx);
+    let s=Math.min(gap,need)*2-Math.abs(gap-need-30)*.2;
+    if(mid(cx)&&!centreOk&&!calm)s-=1000;
+    if(s>bs){bs=s;best=cx}
+  }
+  p.x=best-p.w/2;centreHist.push(mid(best)?1:0);if(centreHist.length>3)centreHist.shift();
+  lastCx=best;lastW=p.w;
+}
 const GORDON_AT=777000,GORDON_P=.34,GORDON_FLY=768,EXPRESS_FLY=450;
 function genStep(){
   stepN++;
@@ -367,7 +385,10 @@ function genStep(){
   if(calm)type=Math.random()<.12?'spring':'normal';
   if(!calm&&type==='normal'&&gs>100000&&Math.random()<.015+.08*ramp(gs,100000,850000))type='minus';
   const label=calmStart?'АНТРАКТ':type==='spring'?pick(z.springs):type==='minus'?'− '+pick(MINUS[Math.max(1,zi)]):type==='moving'?pickFresh(MOVERS):pickFresh((z.labels.length&&Math.random()<.75)?z.labels:COMMON);
-  const p=makePlat(type,topY,label,type==='minus'?{pen:Math.round((2500+gs*.01)/500)*500}:null);plats.push(p);
+  const p=makePlat(type,topY,label,type==='minus'?{pen:Math.round((2500+gs*.01)/500)*500}:null);
+  p.life=type==='spring'?2:platLife(gs);
+  placePlat(p,calm);
+  plats.push(p);
   // One Gordon roll per run: first ordinary platform after 777k, and only while Redka is not already flying.
   if(!gordonDecided&&gs>=GORDON_AT&&player.fly<=0&&type==='normal'&&!p.vx&&!calm){
     gordonDecided=true;
@@ -385,8 +406,8 @@ function genStep(){
   if(!calm&&enemies.filter(e=>!e.dead).length<ecap&&gs>EUNLOCK.stuk&&Math.random()<.015+.12*ramp(gs,EUNLOCK.stuk,900000)){
     const ks=Object.keys(EUNLOCK).filter(k=>gs>EUNLOCK[k]),ws=ks.map(k=>.15+.85*ramp(gs,EUNLOCK[k],EUNLOCK[k]+80000));
     let t=Math.random()*ws.reduce((a,b)=>a+b,0),kind=ks[0];for(let i=0;i<ks.length;i++){t-=ws[i];if(t<=0){kind=ks[i];break}}
-    const mv=kind==='koms'||kind==='cancel'||kind==='threads';
-    enemies.push({kind,v:Math.floor(Math.random()*2),x:kind==='stuk'?(Math.random()<.5?36:W-36):rnd(40,W-40),y:topY-gap*.5,vx:mv?(Math.random()<.5?-1:1)*rnd(.6,.7+1.2*d)*(kind==='koms'?1.15:.8):0,t:Math.random()*6,dead:false,fy:0,cool:rnd(120,200),d});
+    const mv=kind==='koms'||kind==='cancel'||kind==='threads',centre=gs>150000&&Math.random()<.45;
+    enemies.push({kind,v:Math.floor(Math.random()*2),x:kind==='stuk'?(Math.random()<.5?36:W-36):centre?rnd(W/2-50,W/2+50):rnd(40,W-40),y:topY-gap*.5,vx:mv?(Math.random()<.5?-1:1)*rnd(.6,.7+1.2*d)*(kind==='koms'?1.15:.8):0,t:Math.random()*6,dead:false,fy:0,cool:rnd(120,200),d});
     if(enemies.filter(e=>!e.dead).length<ecap&&gs>700000&&Math.random()<.35*ramp(gs,700000,1000000)){const k2=pick(ks);enemies.push({kind:k2,v:Math.floor(Math.random()*2),x:k2==='stuk'?(Math.random()<.5?36:W-36):rnd(40,W-40),y:topY-gap*.5-90,vx:(k2==='koms'||k2==='cancel'||k2==='threads')?(Math.random()<.5?-1:1)*rnd(.6,.7+1.2*d):0,t:Math.random()*6,dead:false,fy:0,cool:rnd(160,240),d})}
   }
 }
@@ -395,8 +416,9 @@ function reset(){
   gordonDecided=false;gordonBits=[];stopGordonMusic();
   floats=[];plats=[];enemies=[];envs=[];items=[];waves=[];
   const sy=H*.8;player0=sy;
-  plats.push({type:'normal',label:'ПЕРШИЙ ЖАРТ',x:W/2-75,y:sy,w:150,h:30,vx:0,broken:false,fy:0,alpha:1,visited:true,fs:16});
-  player={x:W/2,y:sy-FEET+10,vx:0,vy:-10.3,face:1,sq:0,fly:0,flyMax:0,flyKind:null,push:0};
+  lastCx=W/2;lastW=130;centreHist=[1,1,1];
+  plats.push({type:'normal',label:'ПЕРШИЙ ЖАРТ',x:W/2-65,y:sy,w:130,h:PH,vx:0,broken:false,fy:0,alpha:1,visited:true,hits:0,life:4,fs:PFONT});
+  player={x:W/2,y:sy-FEET+10,vx:0,vy:-10.3,face:1,sq:0,fly:0,flyMax:0,flyKind:null,push:0,idle:0};
   topY=sy;while(topY>camY-160)genStep();makeCloth(0);
 }
 function addFloat(text,x,y,color,size){const t=floats.filter(f=>!f.puff);if(t.length>=3){const o=t[0];floats.splice(floats.indexOf(o),1)}floats.push({text,x,y,life:1,color:color||'#2a1722',size:size||14})}
@@ -406,6 +428,7 @@ function update(dt){
   tick+=dt;
   const dir=mode==='play'?(input.r?1:0)-(input.l?1:0):0,p=player;
   p.vx+=(dir*6-p.vx)*Math.min(1,.22*dt);if(dir)p.face=dir;
+  if(mode==='play'){p.idle=dir?0:p.idle+dt;if(p.idle>180&&mult>1){breakCombo(p);addFloat('стоїш на місці',p.x,p.y-30,'#6f5a52',13)}}
   p.x+=(p.vx+p.push)*dt;p.push*=Math.pow(.9,dt);if(p.x<-26)p.x=W+26;if(p.x>W+26)p.x=-26;
   const prevB=p.y+FEET;
   if(p.fly>0){
@@ -429,6 +452,7 @@ function update(dt){
         }
         p.y=pl.y-FEET;p.vy=pl.type==='spring'?-16.5:-10.3;p.sq=1;
         sfx(pl.type==='spring'?'spring':pl.type==='minus'&&!pl.visited?'minus':'jump');
+        pl.hits++;if(pl.hits>=pl.life){pl.broken=true;pl.peeled=true;sfx('break')}
         if(!pl.visited&&mode==='play'){pl.visited=true;if(pl.type!=='minus'){streak++;const nm=Math.min(5,1+Math.floor(streak/12));if(nm>mult){mult=nm;addFloat('КОМБО ×'+mult,p.x,pl.y-60,'#1c7a4a',16);sfx('stage')}bonus+=100*mult;if(pl.label==='АНТРАКТ')addFloat('антракт: видихни',p.x,pl.y-40,'#6f5a52',14)}else breakCombo(p);if(pl.type==='spring'){bonus+=1800;addFloat(pick(SPRING_Q),p.x,pl.y-40,'#4a2fb0')}
           if(pl.type==='minus'){bonus-=pl.pen;addFloat('−'+fmt(pl.pen)+' відписались',p.x,pl.y-40,'#3c434e',15);pl.dim=1}}
         break;
@@ -502,15 +526,17 @@ function stitches(w,h,col){ctx.fillStyle=col;for(let x=6;x<w-6;x+=7){ctx.fillRec
 function drawPlat(pl){
   const sy=Math.round(pl.y-camY),w=Math.round(pl.w),h=pl.h;
   ctx.save();ctx.globalAlpha=pl.alpha;ctx.translate(Math.round(pl.x),sy);
+  if(pl.broken)ctx.rotate(pl.fy*(pl.peeled?-.015:.02));
   if(pl.type==='breaking'){
-    if(pl.broken)ctx.rotate(pl.fy*.02);
     stitches(w,h,pl.city?'#b02020':'#d63434');ctx.fillStyle='rgba(214,52,52,.08)';ctx.fillRect(3,3,w-6,h-6);
     ctx.fillStyle=pl.city?'#9a1818':'#c23030';
   }else{
     const C={spring:['#6b4fd8','#3e2a99'],minus:[pl.dim?'#8a919c':'#4f5866','#2a3038'],normal:['#d63434','#8c1a1e'],moving:['#e0473a','#8c1a1e']}[pl.type]||['#d63434','#8c1a1e'];
     patch(w,h,C[0],C[1]);
     ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(2,2,w-4,2);
-    stitches(w,h,'rgba(255,255,255,.85)');
+    const wear=Math.min(1,(pl.hits||0)/(pl.life||4));
+    stitches(w,h,'rgba(255,255,255,'+(.85-.65*wear).toFixed(2)+')');
+    if(wear>0&&!pl.broken){ctx.fillStyle='rgba(0,0,0,.35)';const t=Math.round(6+wear*14);for(let i=0;i<t;i+=3)ctx.fillRect(w-4-i,i,2,2)}
     if(pl.type==='spring'){ctx.fillStyle='#3e2a99';const cx=Math.round(w/2);for(let i=0;i<4;i++){ctx.fillRect(cx-8+(i%2)*8,-4-i*4,8,3)}}
     if(pl.type==='moving'){ctx.fillStyle='#ffffff';for(const [x,d] of [[8,1],[w-8,-1]]){ctx.fillRect(x,h/2-1,2*d,2);ctx.fillRect(x+2*d,h/2-3,2*d,6)}}
     if(pl.type==='minus'){ctx.fillStyle='#ffffff';ctx.fillRect(9,h/2-1,8,3)}
