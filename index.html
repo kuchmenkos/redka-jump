@@ -1170,7 +1170,7 @@ function jumpTo(gs){
   const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
   topY=player.y+FEET+2;while(topY>camY-160)genStep();
 }
-window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon,jumpTo,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},setInput(l,r){input.l=!!l;input.r=!!r}};
+window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},setInput(l,r){input.l=!!l;input.r=!!r}};
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode!=='over')update(dt);draw();requestAnimationFrame(loop)}
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});
