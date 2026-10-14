@@ -1,4 +1,10 @@
+<!doctype html>
+<html lang="uk">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#2b1e19">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Редька Джамп</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,12 +19,16 @@
   color-scheme:light;
 }
 [hidden]{display:none!important}
-html,body{height:100%}
-body{box-sizing:border-box;background:var(--frame);color:var(--ink);font-family:var(--body);overflow:hidden;padding-block:0;
-  padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
-#wrap{position:relative;height:100%;max-width:460px;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none}
-canvas{display:block;width:100%;height:100%}
-.hud{position:absolute;top:10px;left:max(14px,env(safe-area-inset-left,0px));right:max(14px,env(safe-area-inset-right,0px));display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none}
+html,body{height:100%;margin:0;overscroll-behavior:none}
+body{box-sizing:border-box;background:var(--frame);color:var(--ink);font-family:var(--body);overflow:hidden;position:fixed;inset:0;
+  -webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-tap-highlight-color:transparent;
+  padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+#wrap{position:relative;height:100vh;height:100dvh;max-width:460px;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow:hidden}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+.hud{position:absolute;top:max(8px,env(safe-area-inset-top,0px));left:10px;right:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
+.hud .mid{background:none!important;box-shadow:none!important;padding:0!important;display:flex;justify-content:center;flex:1}
+.demo{pointer-events:auto;flex:none;min-width:0;padding:7px 10px;font-size:11px;font-weight:800;border-radius:6px;background:linear-gradient(#ffe48a,#e2a91c);color:#2a1722;box-shadow:inset 0 0 0 1.5px #2a1722,0 2px 0 rgba(43,30,25,.35);letter-spacing:.04em}
+.demo:disabled{opacity:.45}
 .hud .lab{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:800}
 .hud .val{font-family:var(--pixel);font-size:16px;margin-top:4px;color:var(--ink)}
 .hud .right{text-align:right}
@@ -56,6 +66,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
   <canvas id="cv" aria-label="Ігрове поле: Редька стрибає по ярликах угору"></canvas>
   <div class="hud" id="hud" hidden>
     <div><div class="lab">Підписники</div><div class="val" id="score">0</div><div class="combo" id="combo"></div></div>
+    <div class="mid"><button id="demoBtn" class="demo" hidden aria-label="Демо: увімкнути режим Гордона">DEMO · ГОРДОН</button></div>
     <div class="right"><div class="lab">Рекорд</div><div class="val" id="best">0</div><button id="muteBtn" class="mute" aria-label="Вимкнути звук">ЗВУК: ТАК</button></div>
   </div>
 
@@ -492,8 +503,16 @@ function startGordonMusic(){
   a.playbackRate=1.2;a.preservesPitch=false;
   if(muted){a.pause();return}
   try{a.currentTime=0}catch(e){}
-  const go=()=>a.play().catch(()=>{});
-  if(a.readyState>=1)go();else a.addEventListener('loadedmetadata',go,{once:true});
+  a.muted=false;a.play().catch(()=>{});
+}
+// iOS Safari only lets an <audio> play outside a tap once it has been played inside one.
+let gordonPrimed=false;
+function primeGordonAudio(){
+  if(gordonPrimed)return;gordonPrimed=true;
+  const a=ensureGordonAudio();a.muted=true;
+  const p=a.play();
+  const done=()=>{if(player&&player.flyKind==='gordon')return;a.pause();try{a.currentTime=0}catch(e){}a.muted=false};
+  if(p&&p.then)p.then(done,()=>{a.muted=false;gordonPrimed=false});else done();
 }
 function stopGordonMusic(){if(!gordonAudio)return;gordonAudio.pause();try{gordonAudio.currentTime=0}catch(e){}}
 function syncGordonFly(p,dt){
@@ -666,7 +685,14 @@ function gameOver(){
 }
 function start(){reset();mode='play';$('startScr').hidden=true;$('overScr').hidden=true;$('hud').hidden=false;$('score').textContent='0';$('best').textContent=fmt(best);banner={top:'Етап 1 / '+ZONES.length,text:ZONES[0].name,life:1}}
 
-$('playBtn').onclick=()=>{audioOn();start()};$('againBtn').onclick=()=>{audioOn();start()};
+$('playBtn').onclick=()=>{audioOn();primeGordonAudio();start()};$('againBtn').onclick=()=>{audioOn();primeGordonAudio();start()};
+const DEMO=true;
+$('demoBtn').hidden=!DEMO;
+$('demoBtn').onclick=function(e){
+  e.stopPropagation();this.blur();
+  if(mode!=='play'||player.flyKind==='gordon')return;
+  audioOn();gordonDecided=true;items=items.filter(it=>it.kind!=='gordon');beginGordon(player);
+};
 let shareCard=null,DL=null;
 try{window.claude&&window.claude.use&&window.claude.use('downloads').then(d=>{DL=d}).catch(()=>{})}catch(e){}
 function makeCard(sc,s){
@@ -714,7 +740,10 @@ $('muteBtn').onclick=function(e){
 $('muteBtn').textContent='ЗВУК: '+(muted?'НІ':'ТАК');
 
 function setPtr(){input.l=false;input.r=false;const r=wrap.getBoundingClientRect();for(const x of pointers.values()){if(x-r.left<r.width/2)input.l=true;else input.r=true}}
-wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.card,.mute'))return;audioOn();pointers.set(e.pointerId,e.clientX);setPtr()});
+wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.card,.mute,.demo'))return;audioOn();pointers.set(e.pointerId,e.clientX);setPtr()});
+wrap.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('touchmove',e=>{if(!e.target.closest('.card'))e.preventDefault()},{passive:false});
+document.addEventListener('gesturestart',e=>e.preventDefault());
 wrap.addEventListener('pointermove',e=>{if(pointers.has(e.pointerId)){pointers.set(e.pointerId,e.clientX);setPtr()}});
 ['pointerup','pointercancel','pointerleave'].forEach(n=>wrap.addEventListener(n,e=>{pointers.delete(e.pointerId);setPtr()}));
 const KL=['ArrowLeft','a','A','ф','Ф'],KR=['ArrowRight','d','D','в','В'];
@@ -724,7 +753,10 @@ addEventListener('keydown',e=>{
   if((e.key===' '||e.key==='Enter')&&mode!=='play'&&document.activeElement.tagName!=='BUTTON'){audioOn();start();e.preventDefault()}
 });
 addEventListener('keyup',e=>{if(KL.includes(e.key))input.l=false;if(KR.includes(e.key))input.r=false});
-addEventListener('resize',resize);addEventListener('blur',()=>{input.l=input.r=false;pointers.clear()});
+addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,250));
+if(window.visualViewport)visualViewport.addEventListener('resize',resize);
+addEventListener('blur',()=>{input.l=input.r=false;pointers.clear()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&gordonAudio)gordonAudio.pause();else if(!document.hidden&&gordonAudio&&player&&player.flyKind==='gordon'&&!muted)gordonAudio.play().catch(()=>{})});
 
 loadFaces();
 resize();reset();$('best').textContent=fmt(best);
