@@ -598,6 +598,7 @@ function update(dt){
   if(mode==='play'){
     const zi=zoneAt(hs());
     if(zi!==zoneIdx){zoneIdx=zi;sfx('stage');const rw=6000*zi;bonus+=rw;banner={top:'Етап '+(zi+1)+' / '+ZONES.length+' · +'+fmt(rw),text:ZONES[zi].name,life:1}}
+    if(!recordShown&&bestAtStart>0&&score()>bestAtStart){recordShown=true;sfx('unlock');banner={top:'Ти обігнав себе',text:'Новий рекорд!',life:1};addFloat('+1 до самооцінки',p.x,p.y-60,'#8f5f08',15)}
     if(!million&&score()>=1000000){million=true;banner={top:'Ви зробили це',text:'1 000 000!',life:1};sfx('express');addFloat('МІЛЬЙОН ПІДПИСНИКІВ!',W/2,p.y-90,'#8f5f08',20)}
     const li=lookAt(score());
     if(li>lookIdx){lookIdx=li;sfx('unlock');addFloat('Новий образ: '+LOOKS[li].name.toLowerCase(),W/2,p.y-80,'#a8801a',15)}
@@ -892,7 +893,8 @@ function fillHatePanel(){
   }
   $('hateExtra').innerHTML='<span>Відписок: <b>'+minusCnt+'</b></span><span>Фейків розпорото: <b>'+fakeCnt+'</b></span>';
 }
-function start(){reset();mode='play';$('startScr').hidden=true;$('overScr').hidden=true;$('hud').hidden=false;$('score').textContent='0';$('best').textContent=fmt(best);banner={top:'Етап 1 / '+ZONES.length,text:ZONES[0].name,life:1}}
+let bestAtStart=0,recordShown=false;
+function start(){reset();bestAtStart=best;recordShown=false;mode='play';$('startScr').hidden=true;$('overScr').hidden=true;$('hud').hidden=false;$('score').textContent='0';$('best').textContent=fmt(best);banner={top:'Етап 1 / '+ZONES.length,text:ZONES[0].name,life:1}}
 
 $('playBtn').onclick=()=>{audioOn();primeGordonAudio();start()};$('againBtn').onclick=()=>{audioOn();primeGordonAudio();start()};
 document.querySelectorAll('.tabs').forEach(t=>t.addEventListener('click',e=>{
