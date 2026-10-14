@@ -41,11 +41,11 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 h1{font-family:var(--pixel);font-size:22px;line-height:1.35;margin:0;font-weight:400}
 .sub{font-size:14px;line-height:1.45;color:var(--muted);margin:0;font-weight:600;text-wrap:balance}
 .hero{display:flex;justify-content:center}
-.hero img{image-rendering:auto;width:96px;height:auto}
-.scene{width:100%;border-radius:6px;image-rendering:auto;display:block}
+.hero img{image-rendering:pixelated;height:128px;width:auto}
+.scene{width:100%;border-radius:6px;image-rendering:pixelated;display:block}
 .legend{display:grid;grid-template-columns:44px 1fr;gap:8px 10px;text-align:left;font-size:13px;font-weight:700;align-items:center}
 .legend .ic{display:flex;justify-content:center}
-.legend img{image-rendering:pixelated;height:34px;width:auto}
+.legend img{image-rendering:pixelated;height:38px;width:auto}
 .patch{width:40px;height:16px;border-radius:3px;box-sizing:border-box;outline:1.5px dashed rgba(255,255,255,.85);outline-offset:-4px}
 .big{font-family:var(--pixel);font-size:26px;margin:0;font-variant-numeric:tabular-nums}
 .cause{font-size:15px;font-weight:800;margin:0;color:var(--stamp)}
@@ -227,25 +227,72 @@ function lookPal(L){
   return p;
 }
 const lookGrid=L=>{const g=L.mic?REDKA:REDKA_NOMIC;if(!L.J)return g;return g.map((r,y)=>r.split('').map((c,x)=>c==='Y'&&(x+y)%L.sh===0?'Z':c).join(''))};
-const SPX=4,SSC=.72,SFEET=(REDKA.length+1)*SPX;
+const SPX=4,SSC=.72,CK=3;
 const hl=g=>g.map((r,y)=>r.split('').map((c,x)=>c==='R'&&((y===11&&(x===11||x===12))||(y===12&&x===10))?'h':c).join(''));
-const REDKA_SPR=LOOKS.map(L=>buildSprite(hl(lookGrid(L)),Object.assign(lookPal(L),{h:'#ff9a7a'}),SPX,L.out||'#ffffff'));
+// Redka's radish head and leaves give way to the photo face; the red tip below the collar stays as his shirt.
+const headlessRedka=g=>g.map((r,y)=>r.split('').map((c,x)=>{
+  if(y<=11)return '.';
+  if(y<=19)return x>=7?'.':c;
+  if(y<=21&&x>=7&&c!=='.'&&c!=='Y'&&c!=='y')return c==='r'?'r':'R';
+  return c;
+}).join(''));
+const headlessEnemy=(g,rows)=>g.map((r,y)=>y<rows?'.'.repeat(r.length):r);
+const FACES={};
+function silhouette(img,col){const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const g=c.getContext('2d');g.drawImage(img,0,0);g.globalCompositeOperation='source-in';g.fillStyle=col;g.fillRect(0,0,c.width,c.height);return c}
+// Characters are composed at CK× resolution so the face keeps whole pixels next to the body grid.
+// o.ax: face centre column, o.chin: grid row the face bottom rests on, o.sink: cells it overlaps the collar, o.cells: face width in grid cells.
+function makeChar(grid,pal,px,outline,face,o){
+  const u=px*CK,body=buildSprite(grid,pal,u,outline);
+  let fw=0,fh=0;
+  if(face){const fs=Math.max(1,Math.round(o.cells*u/face.width));fw=face.width*fs;fh=face.height*fs}
+  const ol=Math.max(2,Math.round(u*.45)),rest=face?(o.chin+1+o.sink)*u:0,head=face?Math.max(0,fh+ol-rest):0;
+  const c=document.createElement('canvas');c.width=body.width;c.height=body.height+head;
+  const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(body,0,head);
+  if(face){
+    const fx=Math.round((o.ax+1)*u-fw/2),fy=Math.round(head+rest-fh),sil=silhouette(face,outline||'#ffffff');
+    for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]])g.drawImage(sil,fx+dx*ol,fy+dy*ol,fw,fh);
+    g.drawImage(face,fx,fy,fw,fh);
+  }
+  return {c,k:CK,cx:body.width/2,cy:head+body.height/2,fy:head+(grid.length+1)*u,top:0};
+}
+function drawChar(g,ch,x,y,sx,sy,anchor,rot){
+  g.save();g.translate(x,y);if(rot)g.rotate(rot);g.scale(sx/ch.k,sy/ch.k);g.imageSmoothingEnabled=false;
+  g.drawImage(ch.c,-ch.cx,anchor==='feet'?-ch.fy:-ch.cy);g.restore();
+}
+const REDKA_FACE={ax:15.5,chin:20,sink:1.5,cells:24};
+const REDKA_CH={};
+function redkaChar(li,px){
+  const key=li+':'+px;if(REDKA_CH[key])return REDKA_CH[key];
+  const L=LOOKS[li],f=FACES.felix,grid=f?headlessRedka(lookGrid(L)):hl(lookGrid(L));
+  const ch=makeChar(grid,Object.assign(lookPal(L),{h:'#ff9a7a'}),px,L.out||'#ffffff',f,REDKA_FACE);
+  if(f)REDKA_CH[key]=ch;return ch;
+}
 const EGRID={"stuk":[".....KKHHHHHHKK.....","....KHHHHHHHHHHK....","...KHHHHHHHHHHHHK...","...KHHHHHHHHHHHHK...","..KKhhhhhhhhhhhhKK..",".KHHHHHHHHHHHHHHHHK.","..KKFFKFFFFFFFKfKK..","..KFFFFKFFFFFKfffK..","..KFFFFWKFFFWKfffK..","...KFFFFFFFFFFffK...","...KFpFFFFFFFFfpK...","....KFFFKFFFFFfK....","....KFFFFKKKKFfK....",".....KKCCCCCCKK.....",".....KCCSSSSCcKKKKK.","....KCCCSSSSCcPPPPPK","...KCCCCCccCCcPLLLPK","...KCCCCCccCCFPPPPPK","..KCCCCCCccCCFPLLLPK","...KCCCCCccCCcPPPPPK","...KCCCCCccCCcPPPPPK","....KCCCCccCCccKKKK.",".....KCCCccCCcK.....",".....KnnnCCnnnK.....",".....KnnnKKnnnK.....",".....KKKK..KKKK....."],"koms":["....KKAAAAAAAAKK....","...KAAAAAAAAAAAAK...","..KAAAAAAAAAAAAAAK..","..KAAAAAAAAAAAAAAK..","...KAAAAAAAAAAAAAK..","...KAFAAAAAAAAfAK...","...KFFKFFFFFFFKfK...","..KFFFFKFFFFFKfffK..","..KFFFFWKFFFWKfffK..","...KFFFKKFFFKKffK...","...KFpFFFFFFFFfpK...","....KFFFKKKKFFfK....","....KFFFKTTKFFfK....",".....KKFKTTKFKK..KKK","......KSSSSSsK.KKMMM",".....KSSTTTTTsKMMMMM","....KSSSSTTTsssMMMMM","...KSSSSSTTTssFMMMMM","...KSSSSSStSsssMMmmm","...KSSSSSSSSsssMMmmm","...KSSSSSSSSssssKmmm","....KSSSSSSSsssK.KKK",".....KSSSSSSssK.....",".....KNNNSSNNNK.....",".....KNNNKKNNNK.....",".....KKKK..KKKK....."],"cancel":[".....KKKKKKKKKK.....","....KBBBBBBBBBBK....","...KGGGGGGGGGGGGK...","...KBBBBBBBBBBBBBK..","..KGBBBBBBBBBBBBGK..","..KGFFBBBBBBBBffGK..","..KGFFKFFFFFFFKfGK..","..KGFFFKFFFFFKffGK..","..KGFFFWKFFFWKffGK..","..KGFFFKKFFFKKffGK..","..KGFpFFFFFFFFfpGK..","...KKFFFFFFFFFGGK...","....KFFFKKKKFKfYYK..",".....KKFFFFFFKKYYK..","......KDSSSSdKKYYK..",".....KDDDddDddFYYK..","....KDDDDddDddFYYK..","...KDDDDDddDdddYYKKK","...KDDDDDddDdRRRRRRR","...KDDDDDddDdRRRRRRR","...KDDDDDddDdRRRRRRR","....KDDDDddDdrrrrrrr",".....KDDDddDddKKKKKK",".....KdddDDdddK.....",".....KdddKKdddK.....",".....KKKK..KKKK....."],"lang":[".......KOOOoK.......","....KKKOOOOOOKKK....","...KOOOOOOOOOOooK...","..KOOOOOOOOOOOoooK..","..KOOOOOOOOOOOoooK..","..KOOOOOOOOOOOoooK..","..KOOOKKOOOOKKoooK..","..KOOFVVVVOVVVVfoK..","..KOOFVWKVFVWKVfoK..","..KOOFVKKVFVKKVfoK..","..KOOpVVVVFVVVVpoK..","..KOOFFFKKKKFFfKoK..","...KKFFFKTTKFFfKFK..",".....KKFKTTKFKKFFK..",".KKKK.KKXSSSKKKFFK..","KUZZUKXXXSSSXxKFFK..","KUPPPXXXXXXXXxxKK...","KUPPPFXXXXXXXxxxK...","KUPPPXXXXXXXXxxxxK..","KUPPPXXXXXXXXxxxxK..",".KKKXXXXXXXXXxxxK...","...KXXXXXXXXXxxxK...","....KXXXXXXXXxxK....",".....KxxxXXxxxK.....",".....KxxxKKxxxK.....",".....KKKK..KKKK....."],"threads":[".....KKKJJJJKKK.....","...KKJJJJJJJJJjKK...","..KJJJJJJJJJJJjjjK..","..KJJJJJJJJJJJjjjK..","..KJJJJJJJJJJJjjjKK.","..KJJJJJJJJJJJjjjjjK","...KFFFFJJJJFFffKKK.","..KFFFFFFFFFFFfffK..","..KFFFFKKFFFKKfffK..","...KFFFFFFFFFFffK...","...KFpFFFFFFFFfpK...","....KFFFKFFFFFfK....","....KFFFFKKKKFfK....",".....KKFFFFFFKK.....",".....KKIIIIIIIKKKK..","....KIIIWIIIWiEEEEK.","...KIIIIIIIIIiEeeEK.","...KIIIIIWWWIFEeeEK.","..KIIIIIWIeIWFEeeEK.","..KIIIIIIWWWWiEeeEK.","..KIIIIIIIIIIiEEEEK.","...KIIIIIIIIIiiiKK..","....KIIIIIIIIiiK....",".....KiiiIIiiiK.....",".....KiiiKKiiiK.....",".....KKKK..KKKK....."]};
 const EPAL={"K":"#1e1820","F":"#f3c6a0","f":"#d99c72","p":"#f08f86","W":"#ffffff","H":"#4a4a55","h":"#22222a","C":"#c9a46a","c":"#9c7a44","P":"#fbfbf2","L":"#8aa0c8","n":"#3b3b46","A":"#5a3a22","T":"#d9302c","t":"#9e1b1b","S":"#f4f4ee","s":"#c4c8d0","M":"#f0b93a","m":"#b07d16","N":"#2c3a66","B":"#2a2320","G":"#59606c","R":"#d63434","r":"#8f1c1c","D":"#5e6675","d":"#3f4552","Y":"#a8743e","O":"#ecc062","o":"#b98a2c","V":"#c22a3a","Q":"#c0303a","X":"#2a9a8c","x":"#1b6660","Z":"#9a9aa4","U":"#9a6a3a","J":"#2b6fd6","j":"#1b4a99","I":"#2c2c36","i":"#17171d","E":"#3a3a44","e":"#7cd2ff"};
 const IGRID={"ROCKET":["....KRRK....","...KRRRRK...","...KRRRRK...","..KWWWWwwK..","..KWWWWwwK..","..KWBbbBwK..","..KWBbbBwK..","..KWBBBBwK..","..KWBBBBwK..",".KKWRRRRwKK.","KRRWWWWwwRRK","KRRWWWWwwRRK","KRRRRRRRRRRK","KRRRRRRRRRRK","KRRRRRRRRRRK",".KKKKKKKKKK.","...KOOOOK...","....KYYK....","....KYYK...."],"TRAIN":["...KKKKK......KKKKKKKKK.","..KkkkkkK....KkkkkkkkkkK","...KkkkK.KKK..KZZZZZZZK.","...KkkkKKZZZK.KYYYYYYyK.","...KkkkKKYYYKKKYYLLLYyK.","..KZZZZZyZZZyZZYYLLLYyK.","..KZZZZZyZZZyZZYYLLLYyK.","..KYYYYYyYYYyYYYYYYYYyK.",".KKYYYYYyYYYyYYYYYYYYyK.","KkkYYYYYyYYYyYYYYYYYYyK.","kkkyyyyyyyyyyyyYYYYYYyK.","kkkkkkkkkkkkkkkkkkkkkkkK","KKKKKkZZkKkZZkKKKKkZkKK.","....KkZZkKkZZkK..KkZkK..","....KkkkkKkkkkK..KkkkK.."],"ENV":["WWWWWWWWWWWWWW","WKWWWWWWWWWWKW","WWKWWWWWWWWKWW","WWWKWWWWWWKWWW","WWWWKWWWWKWWWW","WWWWWKWWKWWWWW","WWWWWWRRWWWWWW","WWWWWWRRWWWWWW","WWWWWWWWWWWWWW","ssssssssssssss"],"THREAD":["KIIIIIIIIIIIIIIIIIIIIIIIIK","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","KIIIIIIIIIIIIIIIIIIIIIIIIK",".KKIIIKKKKKKKKKKKKKKKKKKK.","..KIKK....................","...K......................"]};
-const MOTIF={"pavilion":["....XXXX....","..XXXXXXXX..",".XXXXXXXXXX.","XXXXXXXXXXXX","............","X.X.X..X.X.X","X.X.X..X.X.X","X.X.X..X.X.X","X.X.X..X.X.X","XXXXXXXXXXXX","............","............"],"mic":["....XXXX....","...X.XX.X...","...XX..XX...","...X.XX.X...","....XXXX....",".....XX.....",".....XX.....",".....XX.....",".....XX.....","....XXXX....","...XXXXXX...","............"],"tower":[".....XX.....","....XXXX....","....X..X....","....XXXX....","...XXXXXX...","...X.XX.X...","...XXXXXX...","...X.XX.X...","..XXXXXXXX..","..X.XX.X.X..","..XXXXXXXX..","XXXXXXXXXXXX"],"lion":["..XXXX......",".XX..XX.....","XX.X..XX....","X......X....","XX.XX.XX....",".XXXXXXXXXX.","...XXXXXXXXX","...XX....XX.","...XX....XX.","..XXX...XXX.","............","............"],"crown":["............","X....X....X.","XX..XXX..XX.","XXXXXXXXXXX.","X.X.X.X.X.X.","XXXXXXXXXXX.","XXXXXXXXXXX.","............","...X.X.X....","....X.X.....","............","............"],"shield":["XXXXXXXXXXX.","X.........X.","X..X.X.X..X.","X..X.X.X..X.","X..XXXXX..X.","X....X....X.",".X...X...X..",".X.......X..","..X.....X...","...X...X....","....XXX.....","............"],"helmet":["............","....XXXX....","..XXXXXXXX..",".XXXXXXXXXX.",".XX.XX.XXXX.","XXXXXXXXXXXX","XXXXXXXXXXXX","X..........X","............","............","............","............"],"headph":["...XXXXXX...","..X......X..",".X........X.",".X........X.","XX........XX","XXX......XXX","XXX......XXX","XXX......XXX",".X........X.","............","............","............"],"candle":[".....X......","....XXX.....","....XXX.....",".....X......","....XXXX....","....X.XX....","....XXXX....","....XXXX....","....X.XX....","....XXXX....","..XXXXXXXX..","............"],"chestnut":["....X.X.....","...XX.XX....","X.XXX.XXX.X.","XXXXX.XXXXX.",".XXXX.XXXX..","..XXX.XXX...","XX..X.X..XX.","XXXX...XXXX.",".XXXX.XXXX..","....XXX.....",".....X......",".....X......"],"ship":[".....X......",".....XX.....",".....XXX....",".....XXXX...",".....XXXXX..",".....X......","XXXXXXXXXXXX",".XXXXXXXXXX.","..XXXXXXXX..","............","XX.XX.XX.XX.","............"],"ticket":["............","XXXXXXXXXXXX","X....X.....X","X.XX.X.XXX.X","X....X.....X","X.XX.X.XX..X","X....X.....X","XXXXXXXXXXXX","............","............","............","............"],"spot":["XX..........","XXX.........","XXXX........",".XXXX.......","..XXXX......","...X..X.....","...X...X....","....X...X...",".....X...X..","......X...X.",".......XXXX.","............"],"star":[".....X......",".....X......","....XXX.....","XXXXXXXXXXX.",".XXXXXXXXX..","..XXXXXXX...","..XXXXXXX...",".XXX...XXX..",".XX.....XX..","............","............","............"]};
 const IPAL={R:'#d63434',W:'#f6f6f0',w:'#c9ccd4',B:'#2b6fd6',b:'#9fd6ff',O:'#ff9a2a',Y:'#ffd23a',K:'#1e1820',Z:'#fff3b0',y:'#a8740f',L:'#7cc4f0',k:'#4a320a',s:'#c9c2b0',I:'#1e1e26',e:'#7cd2ff'};
-const ESPR={};for(const k in EGRID)ESPR[k]=buildSprite(EGRID[k],EPAL,3,'#ffffff');
-const TRAIN_SPR=buildSprite(IGRID.TRAIN,Object.assign({},IPAL,{Y:'#e8b524'}),3,'#fff6c8');
+const EPAL_X={cancel:{D:'#4a5fd6',d:'#2c3a96',G:'#e0473a',B:'#2a2320'},koms:{A:'#8a4a1e',S:'#fff7e6',s:'#e0cfae',M:'#ffcc33',m:'#d18f00'}};
+const EFACE={
+  stuk:{img:'stuk',rows:13,o:{ax:9.5,chin:13,sink:.6,cells:15}},
+  lang:{img:'lang',rows:14,o:{ax:9.5,chin:14,sink:.6,cells:18}},
+  threads:[{img:'threads-a',rows:14,o:{ax:9.5,chin:14,sink:.6,cells:15}},{img:'threads-b',rows:14,o:{ax:9.5,chin:14,sink:.6,cells:16}}]
+};
+const ECH={};
+function enemyChar(kind,v){
+  const key=kind+':'+(v||0);if(ECH[key])return ECH[key];
+  const spec=EFACE[kind],s=Array.isArray(spec)?spec[(v||0)%spec.length]:spec,face=s&&FACES[s.img];
+  const ch=makeChar(face?headlessEnemy(EGRID[kind],s.rows):EGRID[kind],Object.assign({},EPAL,EPAL_X[kind]||{}),3,'#ffffff',face,s&&s.o);
+  if(face||!s)ECH[key]=ch;return ch;
+}
 const ROCKET_SPR=buildSprite(IGRID.ROCKET,IPAL,3,'#ffffff');
-const STUK_SPR=ESPR.stuk,KOMS_SPR=ESPR.koms;
 const ENV_SPR=buildSprite(IGRID.ENV,IPAL,2,null);
 const THREAD_SPR=buildSprite(IGRID.THREAD,IPAL,2,'#ffffff');
-const MOTIF_SPR={};for(const k in MOTIF)MOTIF_SPR[k]=buildSprite(MOTIF[k],{X:'#7a5a3e'},3,null);
-$('heroImg').src=buildSprite(REDKA,lookPal(LOOKS[2]),5,'#ffffff').toDataURL();
-$('icStuk').src=ESPR.stuk.toDataURL();
-$('icKoms').src=ESPR.koms.toDataURL();
-$('icThreads').src=ESPR.threads.toDataURL();$('icLang').src=ESPR.lang.toDataURL();$('icCancel').src=ESPR.cancel.toDataURL();$('icRocket').src=ROCKET_SPR.toDataURL();
+function paintIcons(){
+  $('heroImg').src=redkaChar(2,4).c.toDataURL();
+  for(const [id,k] of [['icStuk','stuk'],['icKoms','koms'],['icThreads','threads'],['icLang','lang'],['icCancel','cancel']]){const el=$(id);if(el)el.src=enemyChar(k,0).c.toDataURL()}
+  const r=$('icRocket');if(r)r.src=ROCKET_SPR.toDataURL();
+}
+paintIcons();
 
 /* ---------- content ---------- */
 const COMMON=['МАЛОРОС','ЗРАДНИК','ІПСО','АГЕНТ КРЕМЛЯ','ХАЙПОЖЕР','ВАТНИК','СКАСУВАТИ!','НЕ СМІШНО','НАСТУКАТИ!','ПИШЕМО СКАРГУ','ЗАПРОДАНЕЦЬ','РУСОФІЛ','КЛОУН','ГАНЬБА!','ПРОВОКАТОР','ТОКСИК','ДЕГРАДАНТ','НЕПАТРІОТ','ЯК НЕ СОРОМНО?','ДЕ ТВОЯ ПОЗИЦІЯ?','ПРОПАГАНДИСТ','ВІДПИШІТЬСЯ!','ДОКОНАНИЙ РАБ','МАНКУРТ','ЯНИЧАР','КРЕОЛ','ЗРОСІЙЩЕНИЙ','НЕДОУКРАЇНЕЦЬ','СОВОК','ВАТЯРА','ХАТА СКРАЮ','ХТО ЗАМОВИВ?','ГРОШІ З МОСКВИ','ЗАПЛАЧЕНИЙ','БОТЯРА','КОЛОНІЗОВАНИЙ','ІНФОДИВЕРСАНТ','РОСІЙСЬКОМОВНИЙ','МАЛОРОСІЙСЬКИЙ КОМІК','ЗАКРИЙ РОТА','ТИ ХТО ТАКИЙ?','ВІДПИСАЛАСЬ!','НЕ ВСТИДНО?'];
@@ -259,16 +306,15 @@ const ZONES=[
   {from:750000,name:'Стадіон',cloth:'#f3ead9',labels:[],springs:['СКАНДАЛ!','СБУ, ПЕРЕВІРТЕ!','РОЗСЛІДУВАННЯ','ВСЕ, ВІН ЗАКІНЧИВСЯ','БОЙКОТ!']}
 ];
 const MINUS=[[],['МАСОВА ВІДПИСКА','КОНЦЕРТ МАЙЖЕ ЗІРВАЛИ'],['ЦИРК НЕ ДАВ ЗАЛ','МАСОВА ВІДПИСКА'],['МАСОВА ВІДПИСКА','ВІДПИСКА-ДЕМАРШ'],['РЕКЛАМУ РОЗІРВАНО','МАСОВА ВІДПИСКА'],['КВИТКИ ПОВЕРТАЮТЬ','РЕКЛАМУ РОЗІРВАНО'],['МАСОВА ВІДПИСКА','РЕКЛАМУ РОЗІРВАНО','КВИТКИ ПОВЕРТАЮТЬ']];
-const ZMOTIF=[['pavilion','mic'],['tower','lion'],['crown','shield'],['helmet','headph'],['candle','chestnut'],['ship','ticket'],['spot','star']];
 const CITIES=['ЛЬВІВ СКАСОВАНО','ХМЕЛЬНИЦЬКИЙ СКАСОВАНО','ФРАНКІВСЬК СКАСОВАНО'];
 const FAKES=['ФЕЙК','ВИРВАНО З КОНТЕКСТУ','СКРІН БЕЗ ДЖЕРЕЛА','«ВСІ ЗНАЮТЬ»','ІНСАЙД ВІД КУМА','НЕПЕРЕВІРЕНЕ','ЗМОНТОВАНЕ ВІДЕО','КОЛАЖ ЗІ СТРІЛКАМИ'];
 const MOVERS=['ПЕРЕВЗУВСЯ','ТО ЗРАДА, ТО ПЕРЕМОГА','ЗМІНИВ ПОЗИЦІЮ','ТО ТАК, ТО СЯК','ГОЙДАЛКА ХЕЙТУ','ВЧОРА ЛАЙКАВ','СЬОГОДНІ ХЕЙТИТЬ','ДУМКА ДНЯ','ФЛЮГЕР','ТРЕД ПО КОЛУ'];
 const ENEMIES={
-  stuk:{name:'Стукач',spr:STUK_SPR,bubble:'ПИШУ СКАРГУ!',cause:'На тебе настукали'},
-  koms:{name:'Комсомол',spr:KOMS_SPR,bubble:'ВСІ НА РЕДЬКУ!',cause:'Тебе зацькував комсомол'},
-  cancel:{name:'Скасовувач',spr:ESPR.cancel,bubbles:['СКАСУЮ ВСЕ!','ЗАЛ НЕ ДАМО!','ДЗВОНЮ В ПАЛАЦ!','ПОВЕРНІТЬ КВИТКИ!','ДЕ ДИРЕКТОР?!'],cause:'Твій концерт скасовано'},
-  lang:{name:'Мовна інспекторка',spr:ESPR.lang,bubbles:['ПЕРЕЙДИ НА МОВУ!','СУРЖИК!','НЕ ТАК КАЖЕШ!','ДОКОНАНИЙ РАБ!','ЯЗИЧІЄ!','ЖЕБРАК ІЗ СУМ!'],cause:'Тебе перекричала мовна інспекторка'},
-  threads:{name:'Тредс-блогер',spr:ESPR.threads,bubbles:['ТРЕД 1/47','ВІН ЯК АЛХІМ!','ДОБРОГО РАНКУ, ЗРАДА','ВІДПИСУЮСЬ (8-Й РАЗ)','ЗБЕРІГАЮ СКРІНИ'],cause:'Тебе затредили'}
+  stuk:{name:'Стукач',bubble:'ПИШУ СКАРГУ!',cause:'На тебе настукали'},
+  koms:{name:'Комсомол',bubble:'ВСІ НА РЕДЬКУ!',cause:'Тебе зацькував комсомол'},
+  cancel:{name:'Скасовувач',bubbles:['СКАСУЮ ВСЕ!','ЗАЛ НЕ ДАМО!','ДЗВОНЮ В ПАЛАЦ!','ПОВЕРНІТЬ КВИТКИ!','ДЕ ДИРЕКТОР?!'],cause:'Твій концерт скасовано'},
+  lang:{name:'Мовна інспекторка',bubbles:['ПЕРЕЙДИ НА МОВУ!','СУРЖИК!','НЕ ТАК КАЖЕШ!','ДОКОНАНИЙ РАБ!','ЯЗИЧІЄ!','ЖЕБРАК ІЗ СУМ!'],cause:'Тебе перекричала мовна інспекторка'},
+  threads:{name:'Тредс-блогер',bubbles:['ТРЕД 1/47','ВІН ЯК АЛХІМ!','ДОБРОГО РАНКУ, ЗРАДА','ВІДПИСУЮСЬ (8-Й РАЗ)','ЗБЕРІГАЮ СКРІНИ'],cause:'Тебе затредили'}
 };
 ENEMIES.stuk.bubbles=['ПИШУ СКАРГУ!','ДЕ ТУТ СБУ?','Я ВСЕ ЗАПИСАВ','ЛИСТ У МІНКУЛЬТ','ДОНОШУ АНОНІМНО'];ENEMIES.koms.bubbles=['ВСІ НА РЕДЬКУ!','ЦЬКУЄМО РАЗОМ!','ВІДПИСУЙТЕСЬ!','СХІД ПРОТИ ЗАХОДУ!','ГОЛОСУЄМО: ГАНЬБА!'];
 const EPOOL=[[],['stuk','cancel'],['stuk','cancel','koms'],['stuk','cancel','koms','lang'],['stuk','cancel','koms','lang','threads'],['stuk','cancel','koms','lang','threads'],['stuk','cancel','koms','lang','threads']];
@@ -277,7 +323,7 @@ const STOMP_Q={stuk:['скаргу порвано','стукач у мюті'],k
 const FEET=22*PX;
 
 let items=[],waves=[],causeKind='fall',mode='start',player,plats,enemies,envs,floats,camY,topY,bonus,zoneIdx,lookIdx,banner,cities,stomps,hat,cause,best=0,input={l:false,r:false},pointers=new Map(),player0=0,tick=0,recent=[];
-let FELIX=null,gordonAudio=null,gordonBits=[],gordonDecided=false;
+let gordonAudio=null,gordonBits=[],gordonDecided=false;
 const GORDON_IMGS=[];
 try{best=parseInt(localStorage.getItem('redkaBest')||'0',10)||0}catch(e){}
 const rnd=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -340,8 +386,8 @@ function genStep(){
     const ks=Object.keys(EUNLOCK).filter(k=>gs>EUNLOCK[k]),ws=ks.map(k=>.15+.85*ramp(gs,EUNLOCK[k],EUNLOCK[k]+80000));
     let t=Math.random()*ws.reduce((a,b)=>a+b,0),kind=ks[0];for(let i=0;i<ks.length;i++){t-=ws[i];if(t<=0){kind=ks[i];break}}
     const mv=kind==='koms'||kind==='cancel'||kind==='threads';
-    enemies.push({kind,x:kind==='stuk'?(Math.random()<.5?36:W-36):rnd(40,W-40),y:topY-gap*.5,vx:mv?(Math.random()<.5?-1:1)*rnd(.6,.7+1.2*d)*(kind==='koms'?1.15:.8):0,t:Math.random()*6,dead:false,fy:0,cool:rnd(120,200),d});
-    if(enemies.filter(e=>!e.dead).length<ecap&&gs>700000&&Math.random()<.35*ramp(gs,700000,1000000)){const k2=pick(ks);enemies.push({kind:k2,x:k2==='stuk'?(Math.random()<.5?36:W-36):rnd(40,W-40),y:topY-gap*.5-90,vx:(k2==='koms'||k2==='cancel'||k2==='threads')?(Math.random()<.5?-1:1)*rnd(.6,.7+1.2*d):0,t:Math.random()*6,dead:false,fy:0,cool:rnd(160,240),d})}
+    enemies.push({kind,v:Math.floor(Math.random()*2),x:kind==='stuk'?(Math.random()<.5?36:W-36):rnd(40,W-40),y:topY-gap*.5,vx:mv?(Math.random()<.5?-1:1)*rnd(.6,.7+1.2*d)*(kind==='koms'?1.15:.8):0,t:Math.random()*6,dead:false,fy:0,cool:rnd(120,200),d});
+    if(enemies.filter(e=>!e.dead).length<ecap&&gs>700000&&Math.random()<.35*ramp(gs,700000,1000000)){const k2=pick(ks);enemies.push({kind:k2,v:Math.floor(Math.random()*2),x:k2==='stuk'?(Math.random()<.5?36:W-36):rnd(40,W-40),y:topY-gap*.5-90,vx:(k2==='koms'||k2==='cancel'||k2==='threads')?(Math.random()<.5?-1:1)*rnd(.6,.7+1.2*d):0,t:Math.random()*6,dead:false,fy:0,cool:rnd(160,240),d})}
   }
 }
 function reset(){
@@ -475,16 +521,16 @@ function drawPlat(pl){
   ctx.restore();
 }
 function drawEnemy(en){
-  const E=ENEMIES[en.kind],x=en.x,y=en.y-camY+(en.dead?0:Math.sin(en.t)*5),s=E.spr,bub=E.bubbles?E.bubbles[(en.bi||0)%E.bubbles.length]:E.bubble;
-  ctx.save();ctx.translate(x,y);if(en.dead)ctx.rotate(en.fy*.08);
-  const flip=en.vx?(en.vx<0?-1:1):(en.x>W/2?-1:1);ctx.scale(flip,1);
-  ctx.drawImage(s,-s.width/2,-s.height/2);ctx.restore();
+  const E=ENEMIES[en.kind],x=en.x,y=en.y-camY+(en.dead?0:Math.sin(en.t)*5),ch=enemyChar(en.kind,en.v),bub=E.bubbles?E.bubbles[(en.bi||0)%E.bubbles.length]:E.bubble;
+  const flip=en.vx?(en.vx<0?-1:1):(en.x>W/2?-1:1);
+  drawChar(ctx,ch,x,y,flip,1,'center',en.dead?en.fy*.08:0);
+  const top=ch.cy/ch.k,bottom=(ch.c.height-ch.cy)/ch.k;
   if(!en.dead&&Math.abs(en.y-player.y)<300){
     ctx.save();ctx.font='800 11px Manrope, sans-serif';const tw=ctx.measureText(bub).width+14;
-    const bx=Math.min(W-tw-4,Math.max(4,x-tw/2)),by=y-s.height/2-24;
+    const bx=Math.min(W-tw-4,Math.max(4,x-tw/2)),by=y-top-26;
     const bxr=Math.round(bx),byr=Math.round(by);ctx.fillStyle='#1a141a';ctx.fillRect(bxr-2,byr,tw+4,20);ctx.fillRect(bxr,byr-2,tw,24);ctx.fillStyle='#ffffff';ctx.fillRect(bxr,byr,tw,20);ctx.fillStyle='#1a141a';const tx=Math.round(Math.max(bxr+6,Math.min(bxr+tw-10,x-3)));ctx.fillRect(tx,byr+22,6,2);ctx.fillRect(tx+2,byr+24,2,2);
     ctx.fillStyle='#b02020';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(bub,bx+tw/2,by+10.5);
-    if(en.showName){ctx.font='800 10px Manrope, sans-serif';ctx.fillStyle='#2a1722';ctx.fillText(E.name.toUpperCase(),x,y+s.height/2+8)}ctx.restore();
+    if(en.showName){ctx.font='800 10px Manrope, sans-serif';ctx.fillStyle='#2a1722';ctx.fillText(E.name.toUpperCase(),x,y+bottom+8)}ctx.restore();
   }
 }
 function drawEnv(e){ctx.save();ctx.translate(e.x,e.y-camY);ctx.rotate(Math.sin(e.rot)*.4);
@@ -544,38 +590,10 @@ function beginGordon(p){
   addFloat('В ГОСТЯХ У ГОРДОНА!',W/2,p.y-70,'#8f5f08',18);
   banner={top:'Рідкісний гість',text:'В гостях у Гордона',life:1.6};
 }
-function trimCutout(img,maxEdge){
-  const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
-  const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(img,0,0);
-  const im=g.getImageData(0,0,c.width,c.height),d=im.data,w=c.width,h=c.height;
-  let minx=w,miny=h,maxx=0,maxy=0,any=false;
-  for(let y=0;y<h;y+=2)for(let x=0;x<w;x+=2)if(d[(y*w+x)*4+3]>24){any=true;if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y}
-  if(!any)return img;
-  minx=Math.max(0,minx-2);miny=Math.max(0,miny-2);maxx=Math.min(w-1,maxx+2);maxy=Math.min(h-1,maxy+2);
-  const tw=maxx-minx+1,th=maxy-miny+1,scale=Math.min(1,maxEdge/Math.max(tw,th));
-  const o=document.createElement('canvas');o.width=Math.max(1,Math.round(tw*scale));o.height=Math.max(1,Math.round(th*scale));
-  const og=o.getContext('2d');og.imageSmoothingEnabled=true;og.drawImage(c,minx,miny,tw,th,0,0,o.width,o.height);return o;
-}
-function paintFelix(g,spr,left,top){
-  if(!FELIX)return;
-  const gw=REDKA[0].length+2,gh=REDKA.length+2,cw=spr.width/gw,ch=spr.height/gh;
-  const x=left+cw*7.2,y=top+ch*0.15,w=cw*19.2,h=ch*20.4;
-  const aspect=FELIX.width/Math.max(1,FELIX.height);
-  const dw=w*1.08,dh=dw/aspect;
-  const dx=x+(w-dw)/2,dy=y+h*0.34-dh*0.40;
-  g.save();g.beginPath();g.rect(x-cw*.2,y,w+cw*.6,h);g.clip();
-  g.imageSmoothingEnabled=true;g.drawImage(FELIX,dx,dy,dw,dh);g.restore();
-}
-function paintHero(){
-  const spr=buildSprite(REDKA,lookPal(LOOKS[2]),5,'#ffffff');
-  const c=document.createElement('canvas');c.width=spr.width;c.height=spr.height;
-  const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(spr,0,0);paintFelix(g,spr,0,0);
-  $('heroImg').src=c.toDataURL();
-}
 function loadFaces(){
-  const felix=new Image();
-  felix.onload=()=>{FELIX=trimCutout(felix,560);paintHero()};
-  felix.src='art/felix-face.png';
+  const names=['felix','threads-a','threads-b','lang','stuk'];let left=names.length;
+  const done=()=>{if(--left)return;for(const k in REDKA_CH)delete REDKA_CH[k];for(const k in ECH)delete ECH[k];paintIcons()};
+  for(const n of names){const im=new Image();im.onload=()=>{FACES[n]=im;done()};im.onerror=done;im.src='art/faces/'+n+'.png'}
   for(let n=1;n<=5;n++){const im=new Image();im.src='art/gordon/'+n+'.webp';GORDON_IMGS.push(im)}
 }
 function drawItem(it){
@@ -600,9 +618,8 @@ function drawGordonBits(){
   ctx.filter='none';ctx.restore();
 }
 function drawRedka(){
-  const p=player,L=LOOKS[lookIdx],s=REDKA_SPR[lookIdx],sx=1+.15*p.sq,sy=1-.15*p.sq,py=p.y-camY;
-  ctx.save();ctx.translate(p.x,py+FEET);ctx.scale(sx*p.face*SSC,sy*SSC);ctx.imageSmoothingEnabled=false;
-  ctx.drawImage(s,-s.width/2,-SFEET);paintFelix(ctx,s,-s.width/2,-SFEET);ctx.restore();
+  const p=player,L=LOOKS[lookIdx],sx=1+.15*p.sq,sy=1-.15*p.sq,py=p.y-camY;
+  drawChar(ctx,redkaChar(lookIdx,SPX),p.x,py+FEET,sx*p.face*SSC,sy*SSC,'feet');
   const star=(x,y,sz,c)=>{ctx.fillStyle=c;ctx.fillRect(x-1,y-sz,3,sz*2+1);ctx.fillRect(x-sz,y-1,sz*2+1,3)};
   if(L.gold){const a=tick*.06;for(let i=0;i<4;i++){const ang=a+i*1.57,x=Math.round(p.x+Math.cos(ang)*42),y=Math.round(py+20+Math.sin(ang)*44);star(x,y,4+Math.round(2*Math.sin(tick*.2+i)),'#f5c542')}}
   if(p.flyKind==='gordon'){const a=tick*.1;for(let i=0;i<8;i++){const ang=a+i*.785,x=Math.round(p.x+Math.cos(ang)*54),y=Math.round(py+20+Math.sin(ang)*58);star(x,y,5,i%2?'#fff3b0':'#e2a91c')}}
@@ -611,9 +628,6 @@ function drawRedka(){
 function draw(){
   ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);ctx.imageSmoothingEnabled=false;
   ctx.save();const off=((-camY*.4)%24+24)%24;ctx.translate(0,off-24);ctx.fillStyle=ctx.createPattern(cloth,'repeat');ctx.fillRect(0,0,W,H+48);ctx.restore();
-  {const pc=camY*.4,step=150,a=Math.floor((-pc-20)/step),b=Math.ceil((H-pc+60)/step);ctx.save();ctx.globalAlpha=.16;
-   for(let i=a;i<=b;i++){const y=Math.round(H-i*step-pc),k=ZMOTIF[zoneIdx][((i%2)+2)%2],m=MOTIF_SPR[k],j=((i%4)+4)%4,x=j%2===0?14+j*6:W-m.width-14-j*4;ctx.drawImage(m,Math.round(x),y)}
-   ctx.restore()}
   if(player.flyKind==='gordon'){ctx.save();ctx.globalAlpha=.78;ctx.fillStyle=goldCloth();ctx.fillRect(0,0,W,H);ctx.globalAlpha=.25;ctx.fillStyle='#fff3b0';for(let i=0;i<10;i++){ctx.save();ctx.translate(W/2,H*.45);ctx.rotate(tick*.004+i*.628);ctx.fillRect(-14,0,28,H);ctx.restore()}ctx.restore();drawGordonBits()}
   for(const w of waves){ctx.save();ctx.globalAlpha=w.life;ctx.strokeStyle='#b02020';ctx.lineWidth=3;ctx.setLineDash([6,5]);ctx.beginPath();ctx.arc(w.x,w.y-camY,w.r,0,7);ctx.stroke();ctx.restore()}
   for(const pl of plats)drawPlat(pl);
@@ -641,9 +655,10 @@ function scene(kind,li){
   const c=document.createElement('canvas'),Wd=320,Hd=200,k=2;c.width=Wd*k;c.height=Hd*k;const g=c.getContext('2d');g.scale(k,k);g.imageSmoothingEnabled=false;
   g.fillStyle=g.createPattern(cloth,'repeat');g.fillRect(0,0,Wd,Hd);
   let seed=7;const rn=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
-  const L=LOOKS[li],R=buildSprite(lookGrid(L),lookPal(L),3,L.out||'#ffffff');
+  const R=redkaChar(li,3);
   const spr=(im,x,y,sc,rot,flip)=>{g.save();g.translate(x,y);g.rotate(rot||0);g.scale((flip?-1:1)*sc,sc);g.drawImage(im,-im.width/2,-im.height/2);g.restore()};
-  const sprRedka=(x,y,sc,rot,flip)=>{g.save();g.translate(x,y);g.rotate(rot||0);g.scale((flip?-1:1)*sc,sc);g.imageSmoothingEnabled=false;g.drawImage(R,-R.width/2,-R.height/2);paintFelix(g,R,-R.width/2,-R.height/2);g.restore()};
+  const sprRedka=(x,y,sc,rot,flip)=>drawChar(g,R,x,y,(flip?-1:1)*sc,sc,'center',rot);
+  const sprEnemy=(kind,v,x,y,sc,flip)=>drawChar(g,enemyChar(kind,v),x,y,(flip?-1:1)*sc,sc,'center',0);
   const stamp=(t,x,y,rot)=>{g.save();g.translate(x,y);g.rotate(rot);g.font='800 15px Manrope, sans-serif';const w=g.measureText(t).width+18;g.strokeStyle='#c42626';g.lineWidth=3;g.strokeRect(-w/2,-14,w,28);g.fillStyle='#c42626';g.textAlign='center';g.textBaseline='middle';g.fillText(t,0,1);g.restore()};
   const bubble=(t,x,y)=>{g.font='800 11px Manrope, sans-serif';const w=g.measureText(t).width+14;const bx=Math.max(4,Math.min(Wd-w-4,x-w/2));g.fillStyle='#fff';g.fillRect(bx,y,w,20);g.strokeStyle='#1a141a';g.lineWidth=2;g.strokeRect(bx,y,w,20);g.fillStyle='#b02020';g.textAlign='center';g.textBaseline='middle';g.fillText(t,bx+w/2,y+10.5)};
   if(kind==='fall'){
@@ -655,15 +670,14 @@ function scene(kind,li){
   }else if(kind==='stuk'){
     sprRedka(150,104,1,0,false);
     for(let i=0;i<46;i++)spr(ENV_SPR,95+rn()*120,128+rn()*70,1.5,(rn()-.5)*1.2,false);
-    spr(STUK_SPR,272,128,1.3,0,true);
+    sprEnemy('stuk',0,272,128,1.3,true);
     for(let i=0;i<3;i++)spr(ENV_SPR,226-i*16,70+i*14,1.3,(rn()-.5),false);
     bubble('ЩЕ ОДНУ СКАРГУ!',262,62);
     stamp('СКАРГУ ПРИЙНЯТО',82,34,-.12);
   }else{
-    sprRedka(160,112,1,0,false);
-    g.fillStyle='#7cc4f0';g.fillRect(196,58,6,10);g.fillRect(198,68,4,4);
-    const E=ENEMIES[kind]||ENEMIES.koms,S=E.spr,bb=E.bubbles||[E.bubble];
-    spr(S,48,128,1.4,0,false);spr(S,272,128,1.4,0,true);spr(S,40,52,1,0,false);spr(S,282,50,1,0,true);
+    sprRedka(160,118,1,0,false);
+    const ek=ENEMIES[kind]?kind:'koms',E=ENEMIES[ek],bb=E.bubbles||[E.bubble];
+    sprEnemy(ek,0,48,132,1.4,false);sprEnemy(ek,1,272,132,1.4,true);sprEnemy(ek,1,40,58,1,false);sprEnemy(ek,0,282,56,1,true);
     g.strokeStyle='#c42626';g.lineWidth=2;
     [[78,124,1],[242,124,-1],[60,48,1],[262,46,-1]].forEach(([x,y,dir])=>{for(let r=8;r<=20;r+=6){g.beginPath();g.arc(x,y,r,dir>0?-.7:Math.PI-.7,dir>0?.7:Math.PI+.7);g.stroke()}});
     bubble(bb[0],70,170);bubble(bb[1%bb.length],252,172);bubble(bb[2%bb.length],160,8);
@@ -703,7 +717,7 @@ function makeCard(sc,s){
   g.textAlign='center';g.textBaseline='middle';
   g.fillStyle='#d63434';g.font='800 34px Manrope, sans-serif';g.fillText('ХРОНОЛОГІЯ КЕНСЕЛІВ · 2022–2026',540,140);
   g.fillStyle='#2a1722';g.font='56px "Press Start 2P", monospace';g.fillText('РЕДЬКА ДЖАМП',540,215);
-  g.imageSmoothingEnabled=true;g.drawImage(sc,100,270,880,550);g.imageSmoothingEnabled=false;g.strokeStyle='#2a1722';g.lineWidth=6;g.strokeRect(100,270,880,550);
+  g.imageSmoothingEnabled=false;g.drawImage(sc,100,270,880,550);g.strokeStyle='#2a1722';g.lineWidth=6;g.strokeRect(100,270,880,550);
   g.fillStyle='#c42626';g.font='800 46px Manrope, sans-serif';g.fillText(cause,540,885,880);
   g.fillStyle='#2a1722';g.font='72px "Press Start 2P", monospace';g.fillText(fmt(s),540,990,900);
   g.fillStyle='#6f5a52';g.font='700 36px Manrope, sans-serif';g.fillText('підписників на хейті',540,1060);
