@@ -28,7 +28,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 .hud{position:absolute;top:max(6px,env(safe-area-inset-top,0px));left:8px;right:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:6px;pointer-events:none}
 .hud .scorebox{background:rgba(248,241,227,.92);padding:6px 10px 5px;border-radius:6px;box-shadow:0 2px 0 rgba(43,30,25,.25);min-width:92px}
 .hud .val{font-family:var(--pixel);font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums}
-.hud .combo{font-size:12px;font-weight:800;color:#1c7a4a;margin-top:2px;min-height:14px}
+.hud .combo{font-size:12px;font-weight:800;color:#1a7a32;margin-top:2px;min-height:14px}
 .hud .right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .hud .best{background:rgba(248,241,227,.88);padding:5px 8px;border-radius:6px;box-shadow:0 2px 0 rgba(43,30,25,.25);font-family:var(--pixel);font-size:12px;color:var(--muted)}
 .demo{pointer-events:auto;flex:none;min-width:0;margin-top:2px;padding:5px 8px;font-size:10px;font-weight:800;border-radius:5px;background:linear-gradient(#ffe48a,#e2a91c);color:#2a1722;box-shadow:inset 0 0 0 1.5px #2a1722,0 2px 0 rgba(43,30,25,.35);letter-spacing:.04em}
@@ -61,8 +61,8 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .overlay{padding-top:max(12px,env(safe-area-inset-top,0px));padding-bottom:max(12px,env(safe-area-inset-bottom,0px));overscroll-behavior:contain}
 .card{max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 10px 0 rgba(20,10,16,.35)}
 .card.start{gap:9px;padding:18px 18px 14px}
-.cta{flex:none;width:100%;font-size:18px;padding:14px;letter-spacing:.02em;box-shadow:0 4px 0 #8e1b1f;transition:transform .08s}
-.cta:active{transform:translateY(3px);box-shadow:0 1px 0 #8e1b1f}
+.cta{flex:none;width:100%;font-size:18px;padding:14px;letter-spacing:.02em;background:#2ea043;box-shadow:0 4px 0 #1a6b32;transition:transform .08s}
+.cta:active{transform:translateY(3px);box-shadow:0 1px 0 #1a6b32}
 .bestline{margin:-2px 0 0;font-size:12px;font-weight:700;color:var(--muted)}
 .bestline b{color:var(--ink)}
 .achbtn{width:100%;flex:none;min-width:0;padding:10px;font-size:14px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line)}
@@ -91,7 +91,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .patch.worn{opacity:.7;outline-color:rgba(255,255,255,.35)}
 .keys{display:flex;gap:3px}
 .keys i{font-style:normal;font-size:11px;background:var(--ink);color:var(--card);border-radius:4px;padding:3px 5px}
-.badge{font-family:var(--pixel);font-size:9px;padding:6px 5px;border-radius:5px;background:#1c7a4a;color:#fff}
+.badge{font-family:var(--pixel);font-size:9px;padding:6px 5px;border-radius:5px;background:#1a7a32;color:#fff}
 .badge.red{background:#c62828}
 .badge.gold{background:linear-gradient(#ffe48a,#e2a91c);color:var(--ink)}
 @media (max-height:720px){.hero img{height:88px}h1{font-size:19px}.card.start{gap:7px}.card.start .sub{font-size:13px}.panels{height:196px}.panels .legend img{height:30px}}
@@ -143,12 +143,12 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
       <div class="panels">
         <div class="legend" role="tabpanel" data-panel="how">
           <span class="ic"><span class="keys"><i>◀</i><i>▶</i></span></span><span>Тримай ліву або праву половину</span>
-          <span class="ic"><span class="patch" style="background:#e53935"></span></span><span>Ярлик — стрибай по ньому</span>
-          <span class="ic"><span class="patch" style="background:#7c4dff"></span></span><span>Скандал підкидає вище</span>
+          <span class="ic"><span class="patch" style="background:#2ea043"></span></span><span>Ярлик — стрибай по ньому</span>
+          <span class="ic"><span class="patch" style="background:#7bcf3a"></span></span><span>Скандал підкидає вище</span>
           <span class="ic"><span class="patch" style="background:#ff7a1a"></span></span><span>Перевзувалка повзає</span>
           <span class="ic"><span class="patch" style="background:#4f5866"></span></span><span>Відписка мінусує рахунок</span>
           <span class="ic"><span class="patch fake"></span></span><span>Фейк рветься під ногами</span>
-          <span class="ic"><span class="patch worn" style="background:#e53935"></span></span><span>Ярлик відклеюється — не стій</span>
+          <span class="ic"><span class="patch worn" style="background:#2ea043"></span></span><span>Ярлик відклеюється — не стій</span>
         </div>
         <div class="legend" role="tabpanel" data-panel="haters" hidden>
           <span class="ic"><img id="icStuk" alt=""></span><span><b>Стукач</b> — скарги збивають стрибок</span>
@@ -796,7 +796,7 @@ function update(dt){
         p.y=pl.y-FEET;p.vy=pl.type==='spring'?-16.5:-10.3;p.sq=1;
         sfx(pl.type==='spring'?'spring':pl.type==='minus'&&!pl.visited?'minus':'jump');
         pl.hits++;if(pl.hits>=pl.life){pl.broken=true;pl.peeled=true;sfx('break')}
-        if(!pl.visited&&mode==='play'){pl.visited=true;logHate(pl);if(/МАЛОРОС/.test(pl.label))malorosN++;if(pl.type!=='minus'){streak++;const nm=Math.min(5,1+Math.floor(streak/12));if(nm>mult){mult=nm;addFloat('КОМБО ×'+mult,p.x,pl.y-60,'#1c7a4a',16);sfx('stage')}bonus+=100*mult}else breakCombo(p);if(pl.type==='spring'){bonus+=1800;addFloat(pick(SPRING_Q),p.x,pl.y-40,'#4a2fb0')}
+        if(!pl.visited&&mode==='play'){pl.visited=true;logHate(pl);if(/МАЛОРОС/.test(pl.label))malorosN++;if(pl.type!=='minus'){streak++;const nm=Math.min(5,1+Math.floor(streak/12));if(nm>mult){mult=nm;addFloat('КОМБО ×'+mult,p.x,pl.y-60,'#1a7a32',16);sfx('stage')}bonus+=100*mult}else breakCombo(p);if(pl.type==='spring'){bonus+=1800;addFloat(pick(SPRING_Q),p.x,pl.y-40,'#3d8a18')}
           if(pl.type==='minus'){bonus-=pl.pen;addFloat('−'+fmt(pl.pen),p.x,pl.y-40,'#3c434e',15);pl.dim=1}}
         break;
       }
@@ -836,9 +836,9 @@ function update(dt){
         else if(en.kind==='threads'){envs.push({x:en.x,y:ey+10,vx:(p.x-en.x)*.003,vy:1,rot:0,kind:'thread'});en.cool=rnd(230,300)-en.d*100}
         else en.cool=999;
       }}
-    if(mode==='play'&&p.fly>0&&Math.abs(en.x-p.x)<36&&Math.abs(ey-(p.y+22))<46){en.dead=true;sfx('stomp');bonus+=2500;stomps++;stompKind[en.kind]=(stompKind[en.kind]||0)+1;addFloat('+2500',en.x,ey-40,'#1c7a4a');continue}
+    if(mode==='play'&&p.fly>0&&Math.abs(en.x-p.x)<36&&Math.abs(ey-(p.y+22))<46){en.dead=true;sfx('stomp');bonus+=2500;stomps++;stompKind[en.kind]=(stompKind[en.kind]||0)+1;addFloat('+2500',en.x,ey-40,'#1a7a32');continue}
     if(mode==='play'&&Math.abs(en.x-p.x)<32&&Math.abs(ey-(p.y+22))<42){
-      if(p.vy>0&&p.y+FEET<ey+2){en.dead=true;sfx('stomp');p.vy=-12;p.sq=1;bonus+=2500;stomps++;stompKind[en.kind]=(stompKind[en.kind]||0)+1;addFloat('+2500',en.x,ey-40,'#1c7a4a')}
+      if(p.vy>0&&p.y+FEET<ey+2){en.dead=true;sfx('stomp');p.vy=-12;p.sq=1;bonus+=2500;stomps++;stompKind[en.kind]=(stompKind[en.kind]||0)+1;addFloat('+2500',en.x,ey-40,'#1a7a32')}
       else{cause=ENEMIES[en.kind].cause;causeKind=en.kind;gameOver();return}
     }
   }
@@ -867,7 +867,7 @@ function patch(w,h,bg,dk){
   ctx.fillStyle=dk;ctx.fillRect(2,3,w-4,h);ctx.fillRect(0,5,w,h-4);
   ctx.fillStyle=bg;ctx.fillRect(2,0,w-4,h);ctx.fillRect(0,2,w,h-4);
 }
-const PLAT_COL={normal:['#e53935','#8e1b1f'],spring:['#7c4dff','#3d23a6'],minus:['#4f5866','#262c35'],moving:['#ff7a1a','#a3410a']};
+const PLAT_COL={normal:['#2ea043','#1a6b32'],spring:['#7bcf3a','#3d8a18'],minus:['#4f5866','#262c35'],moving:['#ff7a1a','#a3410a']};
 function stitches(w,h,col){ctx.fillStyle=col;for(let x=6;x<w-6;x+=7){ctx.fillRect(x,3,4,2);ctx.fillRect(x,h-5,4,2)}for(let y=8;y<h-7;y+=7){ctx.fillRect(3,y,2,4);ctx.fillRect(w-5,y,2,4)}}
 function drawPlat(pl){
   const sy=Math.round(pl.y-camY),w=Math.round(pl.w),h=pl.h;
@@ -885,7 +885,7 @@ function drawPlat(pl){
     const wear=Math.min(1,(pl.hits||0)/(pl.life||4));
     stitches(w,h,'rgba(255,255,255,'+(.85-.65*wear).toFixed(2)+')');
     if(wear>0&&!pl.broken){ctx.fillStyle='rgba(0,0,0,.35)';const t=Math.round(6+wear*14);for(let i=0;i<t;i+=3)ctx.fillRect(w-4-i,i,2,2)}
-    if(pl.type==='spring'){ctx.fillStyle='#3e2a99';const cx=Math.round(w/2);for(let i=0;i<4;i++){ctx.fillRect(cx-8+(i%2)*8,-4-i*4,8,3)}}
+    if(pl.type==='spring'){ctx.fillStyle='#3d8a18';const cx=Math.round(w/2);for(let i=0;i<4;i++){ctx.fillRect(cx-8+(i%2)*8,-4-i*4,8,3)}}
     if(pl.type==='moving'){ctx.fillStyle='#ffffff';for(const [x,d] of [[8,1],[w-8,-1]]){ctx.fillRect(x,h/2-1,2*d,2);ctx.fillRect(x+2*d,h/2-3,2*d,6)}}
     if(pl.type==='minus'){ctx.fillStyle='#ffffff';ctx.fillRect(9,h/2-1,8,3)}
     ctx.fillStyle='#ffffff';
@@ -1031,7 +1031,7 @@ function draw(){
   ctx.globalAlpha=1;
   if(player.fly>0&&mode==='play'){
     const gordon=player.flyKind==='gordon',tot=player.flyMax||(gordon?GORDON_FLY:EXPRESS_FLY),w=Math.round(148*Math.max(0,Math.min(1,player.fly/tot)));
-    ctx.fillStyle='#2a1722';ctx.fillRect(W/2-86,H-28,172,12);ctx.fillStyle=gordon?'#e2a91c':'#d63434';ctx.fillRect(W/2-84,H-26,w,8);
+    ctx.fillStyle='#2a1722';ctx.fillRect(W/2-86,H-28,172,12);ctx.fillStyle=gordon?'#e2a91c':'#2ea043';ctx.fillRect(W/2-84,H-26,w,8);
     ctx.save();ctx.translate(W/2-98,H-22);
     if(gordon){ctx.fillStyle='#e2a91c';ctx.fillRect(-6,-6,12,12);ctx.fillStyle='#2a1722';ctx.fillRect(-2,-2,4,4)}
     else{const rk=ROCKET_SPR;ctx.drawImage(rk,-10,-14,20,28)}
