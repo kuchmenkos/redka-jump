@@ -59,6 +59,28 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .mute{pointer-events:auto;margin-top:6px;flex:none;min-width:0;padding:4px 7px;font-size:10px;font-weight:800;border-radius:5px;background:rgba(255,255,255,.7);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
 .stats{display:flex;justify-content:center;gap:16px;font-size:13px;font-weight:700;color:var(--muted)}
 .stats b{color:var(--ink)}
+.overlay{padding-top:max(12px,env(safe-area-inset-top,0px));padding-bottom:max(12px,env(safe-area-inset-bottom,0px));overscroll-behavior:contain}
+.card{max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 10px 0 rgba(20,10,16,.35)}
+.card.start{gap:9px;padding:18px 18px 14px}
+.cta{flex:none;width:100%;font-size:18px;padding:14px;letter-spacing:.02em;box-shadow:0 4px 0 #8e1b1f;transition:transform .08s}
+.cta:active{transform:translateY(3px);box-shadow:0 1px 0 #8e1b1f}
+.bestline{margin:-2px 0 0;font-size:12px;font-weight:700;color:var(--muted)}
+.bestline b{color:var(--ink)}
+.tabs{display:flex;gap:4px;background:var(--well);padding:4px;border-radius:9px}
+.tab{flex:1;min-width:0;padding:8px 4px;font-size:13px;background:transparent;color:var(--muted);border-radius:6px;box-shadow:none}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--card)}
+.panels{height:204px;overflow-y:auto}
+.panels .legend{gap:5px 10px;font-size:12.5px;line-height:1.25}
+.panels .legend img{height:34px}
+.patch.fake{background:rgba(255,248,240,.9);outline:1.5px dashed #e53935;outline-offset:-2px}
+.patch.worn{opacity:.7;outline-color:rgba(255,255,255,.35)}
+.keys{display:flex;gap:3px}
+.keys i{font-style:normal;font-size:11px;background:var(--ink);color:var(--card);border-radius:4px;padding:3px 5px}
+.badge{font-family:var(--pixel);font-size:9px;padding:6px 5px;border-radius:5px;background:#1c7a4a;color:#fff}
+.badge.red{background:#c62828}
+.badge.gold{background:linear-gradient(#ffe48a,#e2a91c);color:var(--ink)}
+@media (max-height:720px){.hero img{height:88px}h1{font-size:19px}.card.start{gap:7px}.card.start .sub{font-size:13px}.panels{height:196px}.panels .legend img{height:30px}}
+@media (max-height:620px){.card.start .sub{display:none}.hero img{height:72px}.panels{height:170px}}
 #shareTxt{font-size:12px;background:var(--well);border-radius:8px;padding:8px;margin:0;user-select:text;-webkit-user-select:text;text-align:left}
 </style>
 
@@ -71,26 +93,43 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
   </div>
 
   <div class="overlay" id="startScr">
-    <div class="card">
+    <div class="card start">
       <p class="eyebrow">Хронологія кенселів · 2022–2026</p>
       <div class="hero"><img id="heroImg" alt="Редька з мікрофоном"></div>
       <h1>РЕДЬКА ДЖАМП</h1>
       <p class="sub">Що більше на нього наїжджають, то вище він піднімається.</p>
-      <div class="legend">
-        <span class="ic"><span class="patch" style="background:#d63434"></span></span><span>Що про нього пишуть — стрибай</span>
-        <span class="ic"><span class="patch" style="background:#6b4fd8"></span></span><span>Скандал — підкидає вище</span>
-        <span class="ic"><span class="patch" style="background:#4f5866"></span></span><span>Відписка — мінус підписники</span>
-        <span class="ic"><span class="patch" style="background:#e0473a"></span></span><span>Перевзувалки — повзають туди-сюди</span>
-        <span class="ic"><span class="patch" style="background:transparent;outline-color:#d63434;outline-offset:-2px"></span></span><span>Фейк — розпорюється</span>
-        <span class="ic"><img id="icStuk" alt=""></span><span><b>Стукач</b> кидає скарги — збивають стрибок</span>
-        <span class="ic"><img id="icThreads" alt=""></span><span><b>Тредс-блогер</b> кидає треди — мінус підписники</span>
-        <span class="ic"><img id="icLang" alt=""></span><span><b>Мовна інспекторка</b> кричить — відштовхує вбік</span>
-        <span class="ic"><img id="icCancel" alt=""></span><span><b>Скасовувач</b> штампує латки «СКАСОВАНО»</span>
-        <span class="ic"><img id="icKoms" alt=""></span><span><b>Комсомол</b> літає і цькує — топчи зверху</span>
-        <span class="ic"><img id="icRocket" alt=""></span><span><b>Шакалячий експрес</b> — політ на ракеті</span>
+      <button id="playBtn" class="cta">Стрибати</button>
+      <p class="bestline" id="bestLine" hidden>Твій рекорд: <b id="bestStart">0</b></p>
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" data-tab="how" aria-selected="true">Як грати</button>
+        <button class="tab" role="tab" data-tab="haters" aria-selected="false">Хейтери</button>
+        <button class="tab" role="tab" data-tab="bonus" aria-selected="false">Бонуси</button>
       </div>
-      <div class="btns"><button id="playBtn">Стрибати</button></div>
-      <p class="fine">Тримай ліву чи праву половину екрана або стрілки. Фан-пародія.</p>
+      <div class="panels">
+        <div class="legend" role="tabpanel" data-panel="how">
+          <span class="ic"><span class="keys"><i>◀</i><i>▶</i></span></span><span>Тримай ліву чи праву половину екрана</span>
+          <span class="ic"><span class="patch" style="background:#e53935"></span></span><span>Що про нього пишуть — стрибай</span>
+          <span class="ic"><span class="patch" style="background:#7c4dff"></span></span><span>Скандал — підкидає вище</span>
+          <span class="ic"><span class="patch" style="background:#ff7a1a"></span></span><span>Перевзувалка — повзає туди-сюди</span>
+          <span class="ic"><span class="patch" style="background:#4f5866"></span></span><span>Відписка — мінус підписники</span>
+          <span class="ic"><span class="patch fake"></span></span><span>Фейк — розпорюється під ногами</span>
+          <span class="ic"><span class="patch worn" style="background:#e53935"></span></span><span>Ярлик відклеюється — не стій на місці</span>
+        </div>
+        <div class="legend" role="tabpanel" data-panel="haters" hidden>
+          <span class="ic"><img id="icStuk" alt=""></span><span><b>Стукач</b> — скарги збивають стрибок</span>
+          <span class="ic"><img id="icThreads" alt=""></span><span><b>Тредс-блогер</b> — треди мінусують підписників</span>
+          <span class="ic"><img id="icLang" alt=""></span><span><b>Мовна інспекторка</b> — криком штовхає вбік</span>
+          <span class="ic"><img id="icCancel" alt=""></span><span><b>Скасовувач</b> — штампує «СКАСОВАНО»</span>
+          <span class="ic"><img id="icKoms" alt=""></span><span><b>Комсомол</b> — цькує в польоті, топчи зверху</span>
+        </div>
+        <div class="legend" role="tabpanel" data-panel="bonus" hidden>
+          <span class="ic"><img id="icRocket" alt=""></span><span><b>Шакалячий експрес</b> — ракета, що збиває хейтерів</span>
+          <span class="ic"><span class="badge">×5</span></span><span><b>Комбо</b> — стрибай на нові ярлики без зупинок</span>
+          <span class="ic"><span class="badge red">3/3</span></span><span><b>Хет-трик</b> — розпори три «скасовані» міста туру</span>
+          <span class="ic"><span class="badge gold">???</span></span><span>Кажуть, після <b>777 000</b> заходить рідкісний гість. Не завжди.</span>
+        </div>
+      </div>
+      <p class="fine">Фан-пародія. Збіги з реальними кенселами не випадкові.</p>
     </div>
   </div>
 
@@ -757,6 +796,13 @@ function gameOver(){
 function start(){reset();mode='play';$('startScr').hidden=true;$('overScr').hidden=true;$('hud').hidden=false;$('score').textContent='0';$('best').textContent=fmt(best);banner={top:'Етап 1 / '+ZONES.length,text:ZONES[0].name,life:1}}
 
 $('playBtn').onclick=()=>{audioOn();primeGordonAudio();start()};$('againBtn').onclick=()=>{audioOn();primeGordonAudio();start()};
+document.querySelectorAll('.tabs').forEach(t=>t.addEventListener('click',e=>{
+  const b=e.target.closest('.tab');if(!b)return;const card=t.closest('.card');
+  card.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
+  card.querySelectorAll('[data-panel]').forEach(p=>{p.hidden=p.dataset.panel!==b.dataset.tab});
+}));
+function showBestStart(){$('bestStart').textContent=fmt(best);$('bestLine').hidden=!(best>0)}
+showBestStart();
 const DEMO=true;
 $('demoBtn').hidden=!DEMO;
 $('demoBtn').onclick=function(e){
