@@ -81,6 +81,23 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .badge.gold{background:linear-gradient(#ffe48a,#e2a91c);color:var(--ink)}
 @media (max-height:720px){.hero img{height:88px}h1{font-size:19px}.card.start{gap:7px}.card.start .sub{font-size:13px}.panels{height:196px}.panels .legend img{height:30px}}
 @media (max-height:620px){.card.start .sub{display:none}.hero img{height:72px}.panels{height:170px}}
+.card.over{gap:10px;padding:18px 18px 14px}
+.overpanels{min-height:338px;display:flex;flex-direction:column}
+.respanel,.hatepanel{display:flex;flex-direction:column;gap:9px}
+.scenewrap{position:relative}
+.record{position:absolute;left:50%;top:-8px;transform:translateX(-50%) rotate(-3deg);font-family:var(--pixel);font-size:10px;background:linear-gradient(#ffe48a,#e2a91c);color:var(--ink);padding:6px 9px;border-radius:5px;box-shadow:0 2px 0 rgba(43,30,25,.35);white-space:nowrap}
+.lookrow{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;align-items:center}
+.rankmini{font-size:12px;font-weight:800;color:#8f5f08;background:#fff1c2;border-radius:6px;padding:6px 9px}
+.rank{margin:4px 0 0;font-family:var(--pixel);font-size:13px;line-height:1.5;color:#8f5f08;text-wrap:balance}
+.hatetotal{margin:0;font-size:13px;font-weight:700;color:var(--muted)}
+.hatetotal b{color:var(--stamp);font-size:16px}
+.hatelist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;text-align:left}
+.hatelist li{position:relative;display:flex;justify-content:space-between;gap:8px;align-items:center;padding:7px 10px;border-radius:6px;background:var(--well);font-size:12.5px;font-weight:800;overflow:hidden}
+.hatelist li i{position:absolute;inset:0 auto 0 0;background:rgba(229,57,53,.22);border-radius:6px}
+.hatelist li span,.hatelist li b{position:relative}
+.hatelist li b{color:var(--stamp);font-family:var(--pixel);font-size:11px;font-weight:400}
+.hatelist .none{justify-content:center;color:var(--muted);font-weight:700}
+@media (max-height:720px){.card.over .scene{max-height:170px;object-fit:cover}.overpanels{min-height:300px}.card.over{gap:8px}}
 #shareTxt{font-size:12px;background:var(--well);border-radius:8px;padding:8px;margin:0;user-select:text;-webkit-user-select:text;text-align:left}
 </style>
 
@@ -134,17 +151,31 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
   </div>
 
   <div class="overlay" id="overScr" hidden>
-    <div class="card">
+    <div class="card over">
       <p class="eyebrow" id="zoneReached">Етап 1 з 7</p>
-      <img class="scene" id="endImg" alt="Як скінчився забіг">
-      <p class="cause" id="cause">Впав</p>
-      <p class="big" id="finalScore">0</p>
-      <p class="sub" style="margin-top:-6px">підписників на хейті</p>
-      <span class="look" id="look">Просто редька</span>
-      <div class="stats" id="stats"></div>
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" data-tab="res" aria-selected="true">Результат</button>
+        <button class="tab" role="tab" data-tab="hate" aria-selected="false">Зібрано хейту</button>
+      </div>
+      <div class="overpanels">
+        <div class="respanel" role="tabpanel" data-panel="res">
+          <div class="scenewrap"><img class="scene" id="endImg" alt="Як скінчився забіг"><span class="record" id="recordBadge" hidden>НОВИЙ РЕКОРД!</span></div>
+          <p class="cause" id="cause">Впав</p>
+          <p class="big" id="finalScore">0</p>
+          <p class="sub" style="margin-top:-6px">підписників на хейті</p>
+          <div class="lookrow"><span class="look" id="look">Без піджака</span><span class="rankmini" id="rankMini"></span></div>
+          <div class="stats" id="stats"></div>
+        </div>
+        <div class="hatepanel" role="tabpanel" data-panel="hate" hidden>
+          <p class="rank" id="rankTitle">Ще навіть не скенселений</p>
+          <p class="hatetotal" id="hateTotal"></p>
+          <ol class="hatelist" id="hateList"></ol>
+          <div class="stats" id="hateExtra"></div>
+        </div>
+      </div>
       <div class="btns">
-        <button id="againBtn">Ще раз</button>
-        <button class="ghost" id="shareBtn">Поділитись</button>
+        <button id="shareBtn">Поділитись</button>
+        <button class="ghost" id="againBtn">Ще раз</button>
       </div>
       <p id="shareTxt" hidden></p>
       <img id="shareImg" class="scene" alt="Картка результату" hidden>
@@ -344,6 +375,8 @@ const ZONES=[
   {from:530000,name:'Тур «Одіссея» · 2026',cloth:'#f1e1c6',labels:['ВІДМІНИТИ!','АГЕНТ КРЕМЛЯ','ІПСО','ЗРАДНИК','НЕ ПУСКАТИ!','ВОРОГ НАРОДУ','ЗАЛ НЕ ДАВАТИ','ПОВЕРНІТЬ КВИТКИ','НЕ ПУСКАТИ В МІСТО','ПОЗА ЗАКОНОМ'],springs:['СКАНДАЛ!','БОЙКОТ!','ЗІРВАТИ ТУР!'],cities:true},
   {from:750000,name:'Стадіон',cloth:'#f3ead9',labels:[],springs:['СКАНДАЛ!','СБУ, ПЕРЕВІРТЕ!','РОЗСЛІДУВАННЯ','ВСЕ, ВІН ЗАКІНЧИВСЯ','БОЙКОТ!']}
 ];
+// The labels that stick most often, so the end-of-run tally has a clear winner to brag about.
+const HOT=['МАЛОРОС','ЗРАДНИК','АГЕНТ КРЕМЛЯ','ІПСО','ХАЙПОЖЕР','ЖЕБРАК ІЗ СУМ'];
 const MINUS=[[],['МАСОВА ВІДПИСКА','КОНЦЕРТ МАЙЖЕ ЗІРВАЛИ'],['ЦИРК НЕ ДАВ ЗАЛ','МАСОВА ВІДПИСКА'],['МАСОВА ВІДПИСКА','ВІДПИСКА-ДЕМАРШ'],['РЕКЛАМУ РОЗІРВАНО','МАСОВА ВІДПИСКА'],['КВИТКИ ПОВЕРТАЮТЬ','РЕКЛАМУ РОЗІРВАНО'],['МАСОВА ВІДПИСКА','РЕКЛАМУ РОЗІРВАНО','КВИТКИ ПОВЕРТАЮТЬ']];
 const CITIES=['ЛЬВІВ СКАСОВАНО','ХМЕЛЬНИЦЬКИЙ СКАСОВАНО','ФРАНКІВСЬК СКАСОВАНО'];
 const FAKES=['ФЕЙК','ВИРВАНО З КОНТЕКСТУ','СКРІН БЕЗ ДЖЕРЕЛА','«ВСІ ЗНАЮТЬ»','ІНСАЙД ВІД КУМА','НЕПЕРЕВІРЕНЕ','ЗМОНТОВАНЕ ВІДЕО','КОЛАЖ ЗІ СТРІЛКАМИ'];
@@ -441,7 +474,8 @@ function genStep(){
   if(r<pSpring)type='spring';else if(r<pSpring+pMove)type='moving';
   if(calm)type=Math.random()<.12?'spring':'normal';
   if(!calm&&type==='normal'&&gs>100000&&Math.random()<.015+.08*ramp(gs,100000,850000))type='minus';
-  const label=calmStart?'АНТРАКТ':type==='spring'?pick(z.springs):type==='minus'?'− '+pick(MINUS[Math.max(1,zi)]):type==='moving'?pickFresh(MOVERS):pickFresh((z.labels.length&&Math.random()<.75)?z.labels:COMMON);
+  const lr=Math.random(),pool=lr<.38?HOT:(z.labels.length&&lr<.8)?z.labels:COMMON;
+  const label=calmStart?'АНТРАКТ':type==='spring'?pick(z.springs):type==='minus'?'− '+pick(MINUS[Math.max(1,zi)]):type==='moving'?pickFresh(MOVERS):pickFresh(pool);
   const p=makePlat(type,topY,label,type==='minus'?{pen:Math.round((2500+gs*.01)/500)*500}:null);
   p.life=type==='spring'?2:platLife(gs);
   placePlat(p,calm);
@@ -468,7 +502,51 @@ function genStep(){
     if(enemies.filter(e=>!e.dead).length<ecap&&gs>700000&&Math.random()<.35*ramp(gs,700000,1000000)){const k2=pick(ks);enemies.push({kind:k2,v:Math.floor(Math.random()*2),x:k2==='stuk'?(Math.random()<.5?36:W-36):rnd(40,W-40),y:topY-gap*.5-90,vx:(k2==='koms'||k2==='cancel'||k2==='threads')?(Math.random()<.5?-1:1)*rnd(.6,.7+1.2*d):0,t:Math.random()*6,dead:false,fy:0,cool:rnd(160,240),d})}
   }
 }
+/* ---------- hate stats ---------- */
+let hateLog={},minusCnt=0,fakeCnt=0;
+const NOT_HATE=new Set(['ПЕРШИЙ ЖАРТ','АНТРАКТ']);
+function logHate(pl){
+  if(pl.type==='minus'){minusCnt++;return}
+  if(NOT_HATE.has(pl.label))return;
+  hateLog[pl.label]=(hateLog[pl.label]||0)+1;
+}
+const hateTop=()=>Object.entries(hateLog).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
+const hateSum=()=>Object.values(hateLog).reduce((a,b)=>a+b,0);
+const plural=(n,one,few,many)=>{const m10=n%10,m100=n%100;return m10===1&&m100!==11?one:m10>=2&&m10<=4&&(m100<12||m100>14)?few:many};
+const RANKS=[
+  [['МАЛОРОС','МАЛОРОСІЙСЬКИЙ КОМІК'],'Почесний малорос України'],
+  [['ЖЕБРАК ІЗ СУМ','СУМСЬКИЙ ЖЕБРАК'],'Найбагатший жебрак із Сум'],
+  [['АГЕНТ КРЕМЛЯ','ГРОШІ З МОСКВИ','ХТО ЗАМОВИВ?'],'Агент Кремля під прикриттям гумору'],
+  [['ЗРАДНИК','ЗАПРОДАНЕЦЬ','ЯНИЧАР'],'Зрадник місяця (втретє поспіль)'],
+  [['ІПСО','ІНФОДИВЕРСАНТ','ПРОВОКАТОР'],'Ходяче ІПСО з аншлагом'],
+  [['ХАЙПОЖЕР','ДЕШЕВИЙ ХАЙП','ХАЙП НА ВІЙНІ','ПІАРНИК','ПІАР НА КРОВІ'],'Хайпожер вищої ліги'],
+  [['КЛОУН','НЕ СМІШНО','НЕ СМІШНО!'],'Найнесмішніший комік з sold out'],
+  [['ВАТНИК','ВАТЯРА','СОВОК'],'Ватник-мільйонник'],
+  [['КВНЩИК','КВН-ЩИНА'],'КВНщик-рецидивіст'],
+  [['НОНЕЙМ','ХТО ЦЕ ВЗАГАЛІ?','ДЯДЯ, ВИ ХТО?','ТИ ХТО ТАКИЙ?'],'Найвідоміший нонейм країни'],
+  [['ДОКОНАНИЙ РАБ','МАНКУРТ','КРЕОЛ','КОЛОНІЗОВАНИЙ'],'Доконаний, але з повним залом'],
+  [['ПРОВІНЦІАЛ','ВИСКОЧКА','ПРИКОРДОННИЙ'],'Провінціал, що взяв столицю'],
+  [['СХІДНЯК','ЗАЙДА','ПОВЕРНИСЬ НА СХІД'],'Східняк із західним аншлагом'],
+  [['ПЕРЕЙДИ НА МОВУ','ПЕРЕХОДЬ НА МОВУ!','МОВНИЙ ЗРАДНИК','СУРЖИКОВИЙ','ЯЗИЧІЄ','РОСІЙСЬКОМОВНИЙ','ЧОМУ НЕ ДЕРЖАВНОЮ?'],'Головний клієнт мовного омбудсмена'],
+  [['ЗА БУЛГАКОВА?!','ЛЮБИТЕЛЬ БУЛГАКОВА','МАЙСТЕР І МАРГАРИТА'],'Булгакознавець мимоволі'],
+  [['ОБРАЗИВ КНЯЗЯ','БЛЮЗНІР','КОЩУНСТВО','ОСКВЕРНИВ СВЯТИНЮ'],'Особистий ворог князя Володимира'],
+  [['ВОЄННИЙ ТУРИСТ','ТУРИСТ У ШОЛОМІ','ФОТО В СУДЖІ'],'Турист у шоломі'],
+  [['СКАНДАЛ!','ГУЧНИЙ КЕНСЕЛ','ВСЕ, ВІН ЗАКІНЧИВСЯ'],'Ходячий скандал, що не закінчується']
+];
+function rankFor(label){
+  if(!label)return 'Ще навіть не скенселений';
+  for(const [keys,title] of RANKS)if(keys.includes(label))return title;
+  return 'Збирач ярликів «'+label.toLowerCase()+'»';
+}
+function rankNow(){
+  const top=hateTop();if(!top.length)return rankFor(null);
+  // A rank family pools every label it covers, so "НЕ СМІШНО" and "КЛОУН" count together.
+  let best=null,bs=0;
+  for(const [keys,title] of RANKS){const s=keys.reduce((a,k)=>a+(hateLog[k]||0),0);if(s>bs){bs=s;best=title}}
+  return bs>=top[0][1]?best:rankFor(top[0][0]);
+}
 function reset(){
+  hateLog={};minusCnt=0;fakeCnt=0;
   camY=0;bonus=0;zoneIdx=0;lookIdx=0;banner=null;cities=new Set();stomps=0;hat=false;cause='Впав у прірву скасування';causeKind='fall';recent=[];stepN=0;million=false;streak=0;mult=1;shownCnt={};lastItemStep=-99;lastExpressGs=-1e9;seenNew=new Set();
   gordonDecided=false;gordonBits=[];stopGordonMusic();
   floats=[];plats=[];enemies=[];envs=[];items=[];waves=[];
@@ -502,7 +580,7 @@ function update(dt){
       if(pl.broken)continue;
       if(prevB<=pl.y+3&&bot>=pl.y&&p.x+18>pl.x&&p.x-18<pl.x+pl.w){
         if(pl.type==='breaking'){
-          pl.broken=true;sfx('break');
+          pl.broken=true;sfx('break');if(mode==='play')fakeCnt++;
           if(mode==='play'&&pl.city){cities.add(pl.label);addFloat('скасовано '+cities.size+' з 3',pl.x+pl.w/2,pl.y-8,'#b02020');
             if(cities.size===3&&!hat){hat=true;sfx('unlock');bonus+=18000;addFloat('ХЕТ-ТРИК! +18 000',W/2,p.y-90,'#b02020',18)}}
           continue;
@@ -510,7 +588,7 @@ function update(dt){
         p.y=pl.y-FEET;p.vy=pl.type==='spring'?-16.5:-10.3;p.sq=1;
         sfx(pl.type==='spring'?'spring':pl.type==='minus'&&!pl.visited?'minus':'jump');
         pl.hits++;if(pl.hits>=pl.life){pl.broken=true;pl.peeled=true;sfx('break')}
-        if(!pl.visited&&mode==='play'){pl.visited=true;if(pl.type!=='minus'){streak++;const nm=Math.min(5,1+Math.floor(streak/12));if(nm>mult){mult=nm;addFloat('КОМБО ×'+mult,p.x,pl.y-60,'#1c7a4a',16);sfx('stage')}bonus+=100*mult;if(pl.label==='АНТРАКТ')addFloat('антракт: видихни',p.x,pl.y-40,'#6f5a52',14)}else breakCombo(p);if(pl.type==='spring'){bonus+=1800;addFloat(pick(SPRING_Q),p.x,pl.y-40,'#4a2fb0')}
+        if(!pl.visited&&mode==='play'){pl.visited=true;logHate(pl);if(pl.type!=='minus'){streak++;const nm=Math.min(5,1+Math.floor(streak/12));if(nm>mult){mult=nm;addFloat('КОМБО ×'+mult,p.x,pl.y-60,'#1c7a4a',16);sfx('stage')}bonus+=100*mult;if(pl.label==='АНТРАКТ')addFloat('антракт: видихни',p.x,pl.y-40,'#6f5a52',14)}else breakCombo(p);if(pl.type==='spring'){bonus+=1800;addFloat(pick(SPRING_Q),p.x,pl.y-40,'#4a2fb0')}
           if(pl.type==='minus'){bonus-=pl.pen;addFloat('−'+fmt(pl.pen)+' відписались',p.x,pl.y-40,'#3c434e',15);pl.dim=1}}
         break;
       }
@@ -784,14 +862,35 @@ function gameOver(){
   stopGordonMusic();gordonBits=[];
   sfx(causeKind==='fall'?'fall':'lose');
   mode='over';const s=Math.max(0,Math.floor(score()));
+  isRecord=s>best&&s>0;
   if(s>best){best=s;try{localStorage.setItem('redkaBest',String(best))}catch(e){}}
-  $('finalScore').textContent=fmt(s);$('cause').textContent=cause;
+  $('finalScore').textContent=fmt(s);$('cause').textContent=cause;$('recordBadge').hidden=!isRecord;
   const L=LOOKS[lookIdx];$('look').textContent=L.name;$('look').className='look'+(L.gold?' gold':'');
+  runRank=rankNow();$('rankMini').textContent=runRank;
+  fillHatePanel();
   const sc=scene(causeKind,lookIdx);$('endImg').src=sc.toDataURL();shareCard=makeCard(sc,s);$('shareImg').hidden=true;
   $('zoneReached').textContent='Етап '+(zoneIdx+1)+' / '+ZONES.length+' · '+ZONES[zoneIdx].name;
   $('stats').innerHTML='<span>Рекорд: <b>'+fmt(best)+'</b></span><span>Розібрано хейтерів: <b>'+stomps+'</b></span>'+(hat?'<span><b>Хет-трик!</b></span>':'');
   $('best').textContent=fmt(best);$('shareTxt').hidden=true;$('shareBtn').textContent='Поділитись';
-  $('hud').hidden=true;$('overScr').hidden=false;$('againBtn').focus();
+  const card=$('overScr').querySelector('.card'),op=card.querySelector('.overpanels');op.style.minHeight='';
+  card.querySelector('[data-tab="res"]').click();card.scrollTop=0;
+  $('hud').hidden=true;$('overScr').hidden=false;$('againBtn').focus();showBestStart();
+  const fix=()=>{op.style.minHeight=card.querySelector('.respanel').offsetHeight+'px'};
+  $('endImg').complete?fix():$('endImg').addEventListener('load',fix,{once:true});
+}
+let isRecord=false,runRank='';
+function fillHatePanel(){
+  const top=hateTop(),sum=hateSum(),list=$('hateList');
+  $('rankTitle').textContent=runRank;
+  $('hateTotal').innerHTML=sum?'На Редьку повісили <b>'+fmt(sum)+'</b> '+plural(sum,'ярлик','ярлики','ярликів'):'Хейт ще не встиг налипнути';
+  list.innerHTML='';
+  if(!top.length){const li=document.createElement('li');li.className='none';li.textContent='Стрибни хоч на один ярлик';list.append(li)}
+  const max=top.length?top[0][1]:1;
+  for(const [label,n] of top.slice(0,5)){
+    const li=document.createElement('li'),bar=document.createElement('i'),t=document.createElement('span'),c=document.createElement('b');
+    bar.style.width=Math.round(100*n/max)+'%';t.textContent=label;c.textContent='×'+n;li.append(bar,t,c);list.append(li);
+  }
+  $('hateExtra').innerHTML='<span>Відписок: <b>'+minusCnt+'</b></span><span>Фейків розпорото: <b>'+fakeCnt+'</b></span>';
 }
 function start(){reset();mode='play';$('startScr').hidden=true;$('overScr').hidden=true;$('hud').hidden=false;$('score').textContent='0';$('best').textContent=fmt(best);banner={top:'Етап 1 / '+ZONES.length,text:ZONES[0].name,life:1}}
 
@@ -820,17 +919,28 @@ function makeCard(sc,s){
   g.textAlign='center';g.textBaseline='middle';
   g.fillStyle='#d63434';g.font='800 34px Manrope, sans-serif';g.fillText('ХРОНОЛОГІЯ КЕНСЕЛІВ · 2022–2026',540,140);
   g.fillStyle='#2a1722';g.font='56px "Press Start 2P", monospace';g.fillText('РЕДЬКА ДЖАМП',540,215);
-  g.imageSmoothingEnabled=false;g.drawImage(sc,100,270,880,550);g.strokeStyle='#2a1722';g.lineWidth=6;g.strokeRect(100,270,880,550);
-  g.fillStyle='#c42626';g.font='800 46px Manrope, sans-serif';g.fillText(cause,540,885,880);
-  g.fillStyle='#2a1722';g.font='72px "Press Start 2P", monospace';g.fillText(fmt(s),540,990,900);
-  g.fillStyle='#6f5a52';g.font='700 36px Manrope, sans-serif';g.fillText('підписників на хейті',540,1060);
-  const L=LOOKS[lookIdx],lt=L.name.toUpperCase();g.font='800 34px Manrope, sans-serif';const lw=g.measureText(lt).width+48;
-  g.fillStyle=L.gold?'#e2b33a':'#2a1722';g.fillRect(540-lw/2,1100,lw,62);g.fillStyle=L.gold?'#2a1722':'#f8f1e3';g.fillText(lt,540,1132);
-  g.fillStyle='#2a1722';g.font='700 32px Manrope, sans-serif';g.fillText('Етап '+(zoneIdx+1)+' / '+ZONES.length+' · '+ZONES[zoneIdx].name,540,1200,880);
-  g.fillStyle='#d63434';g.font='800 32px Manrope, sans-serif';g.fillText('Побий мій рекорд!',540,1248);
+  g.imageSmoothingEnabled=false;g.drawImage(sc,160,256,760,475);g.strokeStyle='#2a1722';g.lineWidth=6;g.strokeRect(160,256,760,475);
+  if(isRecord){g.save();g.translate(540,300);g.rotate(-.04);g.font='28px "Press Start 2P", monospace';const rw=g.measureText('НОВИЙ РЕКОРД!').width+44;
+    g.fillStyle='#e2a91c';g.fillRect(-rw/2,-28,rw,56);g.fillStyle='#2a1722';g.fillText('НОВИЙ РЕКОРД!',0,2);g.restore()}
+  g.fillStyle='#c42626';g.font='800 40px Manrope, sans-serif';g.fillText(cause,540,785,880);
+  g.fillStyle='#2a1722';g.font='68px "Press Start 2P", monospace';g.fillText(fmt(s),540,872,900);
+  g.fillStyle='#6f5a52';g.font='700 32px Manrope, sans-serif';g.fillText('підписників на хейті',540,932);
+  g.font='800 34px Manrope, sans-serif';const rt='Звання: '+runRank,rw=Math.min(940,g.measureText(rt).width+56);
+  g.fillStyle='#e2b33a';g.fillRect(540-rw/2,972,rw,64);g.fillStyle='#2a1722';g.fillText(rt,540,1005,900);
+  const top=hateTop().slice(0,3),sum=hateSum();
+  g.fillStyle='#2a1722';g.font='700 30px Manrope, sans-serif';
+  g.fillText(sum?'Зібрав '+fmt(sum)+' '+plural(sum,'ярлик','ярлики','ярликів')+' хейту:':'Хейт ще не налип',540,1078,900);
+  if(top.length){g.fillStyle='#c42626';g.font='800 32px Manrope, sans-serif';g.fillText(top.map(([l,n])=>'«'+l+'» ×'+n).join('   '),540,1126,920)}
+  g.fillStyle='#2a1722';g.font='700 28px Manrope, sans-serif';g.fillText('Етап '+(zoneIdx+1)+' / '+ZONES.length+' · '+ZONES[zoneIdx].name+' · '+LOOKS[lookIdx].name.toLowerCase(),540,1188,900);
+  g.fillStyle='#d63434';g.font='800 34px Manrope, sans-serif';g.fillText('Побий мій рекорд!',540,1240);
   return c;
 }
-function shareText(){return 'Мій Редька піднявся на хейті до '+$('finalScore').textContent+' підписників і дійшов до етапу «'+ZONES[zoneIdx].name+'». Стукачі й комсомол не впорались. Побий мій рекорд у «Редька Джамп».'}
+const gameUrl=()=>/^https?:/.test(location.protocol)?' '+location.origin+location.pathname:'';
+function shareText(){
+  const top=hateTop()[0],s=$('finalScore').textContent;
+  const hook=top?'Редьку назвали «'+top[0].toLowerCase()+'» '+top[1]+' '+plural(top[1],'раз','рази','разів')+', а він все одно набрав '+s+' підписників.':'Редька набрав '+s+' підписників на хейті.';
+  return hook+' Моє звання: '+runRank+'. Побий мій рекорд у «Редька Джамп»!'+gameUrl();
+}
 function showImgFallback(msg){const im=$('shareImg');im.src=shareCard.toDataURL('image/png');im.hidden=false;$('shareBtn').textContent=msg}
 $('shareBtn').onclick=function(){
   if(!shareCard)return;const txt=shareText();
@@ -879,7 +989,7 @@ loadFaces();loadBackgrounds();
 resize();reset();$('best').textContent=fmt(best);
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode!=='over')update(dt);draw();requestAnimationFrame(loop)}
-(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-20)})});
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});
 requestAnimationFrame(loop);
 })();
 </script>
