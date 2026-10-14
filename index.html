@@ -161,7 +161,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
           <span class="ic"><img id="icRocket" alt=""></span><span><b>Шакалячий експрес</b> — ракета проти хейтерів</span>
           <span class="ic"><span class="badge">×5</span></span><span><b>Комбо</b> — нові ярлики без пауз</span>
           <span class="ic"><span class="badge red">3/3</span></span><span><b>Хет-трик</b> — три скасовані міста туру</span>
-          <span class="ic"><span class="badge gold">???</span></span><span>Після <b>777 000</b> інколи заходить гість</span>
+          <span class="ic"><span class="badge gold">???</span></span><span>Після <b>300 000</b> інколи заходить гість</span>
         </div>
       </div>
     </div>
@@ -427,7 +427,7 @@ const STOMP_Q={stuk:['скаргу порвано','стукач у мюті'],k
 const FEET=22*PX;
 
 let items=[],waves=[],causeKind='fall',mode='start',player,plats,enemies,envs,floats,camY,topY,bonus,zoneIdx,lookIdx,banner,cities,stomps,hat,cause,best=0,input={l:false,r:false},pointers=new Map(),player0=0,tick=0,recent=[];
-let gordonAudio=null,gordonBits=[],gordonDecided=false,gordonTitle=0,gordonLastSide=null,gordonCaught=false,gordonDemo=false,gordonMissed=false,gordonOffered=false;
+let gordonAudio=null,gordonBits=[],gordonDecided=false,gordonTitle=0,gordonLastEdge=-1,gordonDeck=[],gordonDeckI=0,gordonCaught=false,gordonDemo=false,gordonMissed=false,gordonOffered=false;
 let toasts=[],toastNow=null,stompKind={},expressN=0,malorosN=0,threadHits=0,idlePeak=0,newAchs=[];
 const GORDON_IMGS=[];
 try{best=parseInt(localStorage.getItem('redkaBest')||'0',10)||0}catch(e){}
@@ -582,7 +582,7 @@ function placePlat(p,calm){
   p.x=best-p.w/2;centreHist.push(mid(best)?1:0);if(centreHist.length>3)centreHist.shift();
   lastCx=best;lastW=p.w;
 }
-const GORDON_AT=777000,GORDON_P=.34,GORDON_FLY=768,EXPRESS_FLY=450;
+const GORDON_AT=300000,GORDON_P=.34,GORDON_FLY=768,EXPRESS_FLY=450;
 function genStep(){
   stepN++;
   const gs0=Math.max(0,player0-topY)*SC,d=curD=ramp(gs0,0,1000000),gap=rnd(54,64)+50*ramp(gs0,20000,950000);topY-=gap;
@@ -599,10 +599,9 @@ function genStep(){
   p.life=type==='spring'?2:platLife(gs);
   placePlat(p,calm);
   plats.push(p);
-  // One Gordon roll per run: first ordinary platform after 777k, and only while Redka is not already flying.
+  // After 300k, every eligible platform rolls 34% until the first spawn; one item per run.
   if(!gordonDecided&&gs>=GORDON_AT&&player.fly<=0&&type==='normal'&&!p.vx&&!calm){
-    gordonDecided=true;
-    if(Math.random()<GORDON_P){items.push({kind:'gordon',x:p.x+p.w/2,y:topY-30,t:0});lastItemStep=stepN;gordonOffered=true}
+    if(Math.random()<GORDON_P){items.push({kind:'gordon',x:p.x+p.w/2,y:topY-30,t:0});lastItemStep=stepN;gordonOffered=true;gordonDecided=true}
   }else if(player.flyKind!=='gordon'&&!calm&&!p.vx&&type!=='minus'&&stepN-lastItemStep>20){const rr=Math.random();
     if(gs>250000&&gs-lastExpressGs>200000&&rr<.006+.01*ramp(gs,250000,800000)){items.push({kind:'express',x:p.x+p.w/2,y:topY-26,t:0});lastItemStep=stepN;lastExpressGs=gs}}
   const bc=calm?0:z.cities?.34:gs<80000?0:.03+.27*ramp(gs,80000,900000);
@@ -667,7 +666,7 @@ function rankNow(){
 function reset(){
   hateLog={};minusCnt=0;fakeCnt=0;
   camY=0;bonus=0;zoneIdx=0;lookIdx=0;banner=null;cities=new Set();stomps=0;hat=false;cause='Впав у прірву скасування';causeKind='fall';recent=[];stepN=0;million=false;streak=0;mult=1;shownCnt={};lastItemStep=-99;lastExpressGs=-1e9;seenNew=new Set();
-  gordonDecided=false;gordonBits=[];gordonTitle=0;gordonLastSide=null;gordonCaught=false;gordonDemo=false;gordonMissed=false;gordonOffered=false;stopGordonMusic();
+  gordonDecided=false;gordonBits=[];gordonTitle=0;gordonLastEdge=-1;gordonDeck=[];gordonDeckI=0;gordonCaught=false;gordonDemo=false;gordonMissed=false;gordonOffered=false;stopGordonMusic();
   toasts=[];toastNow=null;stompKind={};expressN=0;malorosN=0;threadHits=0;idlePeak=0;newAchs=[];
   floats=[];plats=[];enemies=[];envs=[];items=[];waves=[];
   const sy=H*.8;player0=sy;
@@ -857,12 +856,28 @@ function syncGordonFly(p,dt){
     p.flyMax=total;p.fly=Math.max(0,(a.duration-a.currentTime)/rate*60);
   }else p.fly-=dt;
 }
-function gordonPhoto(){return GORDON_IMGS[Math.floor(Math.random()*GORDON_IMGS.length)]}
-function pushGordonBit(){
-  const left=gordonLastSide==null?Math.random()<.5:!gordonLastSide;gordonLastSide=left;
-  gordonBits.push({img:gordonPhoto(),left,age:0,span:96,tilt:(left?1:-1)*rnd(.06,.16)});
+const GORDON_EDGE=[[-.22,-.18],[.5,-.22],[1.22,-.18],[1.28,.5],[1.22,1.18],[.5,1.22],[-.22,1.18],[-.28,.5]];
+function shuffleGordonDeck(avoid){
+  const d=GORDON_IMGS.slice();
+  for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=d[i];d[i]=d[j];d[j]=t}
+  if(avoid&&d.length>1&&d[0]===avoid){const j=1+Math.floor(Math.random()*(d.length-1));const t=d[0];d[0]=d[j];d[j]=t}
+  return d;
 }
-function seedGordon(){gordonBits=[];gordonLastSide=null;gordonTitle=1;pushGordonBit()}
+function gordonPhoto(){
+  if(!gordonDeck.length||gordonDeckI>=gordonDeck.length){
+    const last=gordonDeck.length?gordonDeck[gordonDeck.length-1]:null;
+    gordonDeck=shuffleGordonDeck(last);gordonDeckI=0;
+  }
+  return gordonDeck[gordonDeckI++];
+}
+function pushGordonBit(){
+  let e=Math.floor(Math.random()*8);
+  if(e===gordonLastEdge)e=(e+1+Math.floor(Math.random()*7))%8;
+  gordonLastEdge=e;
+  const [nx,ny]=GORDON_EDGE[e];
+  gordonBits.push({img:gordonPhoto(),sx:nx*W,sy:ny*H,ex:(1-nx)*W,ey:(1-ny)*H,age:0,span:96,tilt:(nx<.5?1:-1)*rnd(.06,.16)});
+}
+function seedGordon(){gordonBits=[];gordonLastEdge=-1;gordonDeck=[];gordonDeckI=0;gordonTitle=1;pushGordonBit()}
 function spinGordon(dt){
   const last=gordonBits[gordonBits.length-1];
   if(last&&last.age>48&&gordonBits.length<9)pushGordonBit();
@@ -890,7 +905,7 @@ function loadFaces(){
   const names=['felix','koms','threads','lang','stuk','cancel'];let left=names.length;
   const done=()=>{if(--left)return;for(const k in REDKA_CH)delete REDKA_CH[k];for(const k in ECH)delete ECH[k];paintIcons()};
   for(const n of names){const im=new Image();im.onload=()=>{FACES[n]=im;done()};im.onerror=done;im.src='art/faces/'+n+'.png'}
-  for(let n=1;n<=5;n++){const im=new Image();im.src='art/gordon/'+n+'.webp';GORDON_IMGS.push(im)}
+  for(let n=1;n<=9;n++){const im=new Image();im.src='art/gordon/'+n+'.webp';GORDON_IMGS.push(im)}
 }
 function drawItem(it){
   const y=it.y-camY+Math.sin(it.t)*4;
@@ -908,7 +923,7 @@ function drawGordonBits(){
   for(const b of gordonBits){
     const im=b.img;if(!im||!im.complete||!im.naturalWidth)continue;
     const k=b.age/b.span,sc=1+.15*k,tw=W*.78*sc,th=tw*(im.naturalHeight/im.naturalWidth);
-    const x=b.left?(-W*.35+k*W*1.55):(W*1.35-k*W*1.55),y=H*.44;
+    const x=b.sx+(b.ex-b.sx)*k,y=b.sy+(b.ey-b.sy)*k;
     ctx.save();ctx.globalAlpha=.55;ctx.translate(x,y);ctx.rotate(b.tilt);ctx.drawImage(im,-tw/2,-th/2,tw,th);ctx.restore();
   }
   ctx.filter='none';ctx.restore();
@@ -1149,7 +1164,13 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&gordonAudi
 
 loadFaces();loadBackgrounds();
 resize();reset();$('best').textContent=fmt(best);paintAchCount();
-window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},setInput(l,r){input.l=!!l;input.r=!!r}};
+function jumpTo(gs){
+  const y=player0-gs/SC;player.y=y;camY=y-H*.45;
+  plats=[];items=[];
+  const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
+  topY=player.y+FEET+2;while(topY>camY-160)genStep();
+}
+window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon,jumpTo,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},setInput(l,r){input.l=!!l;input.r=!!r}};
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode!=='over')update(dt);draw();requestAnimationFrame(loop)}
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});
