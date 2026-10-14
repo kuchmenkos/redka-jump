@@ -623,7 +623,10 @@ function paintCol(){
   const wg=$('wardGrid');wg.innerHTML='';
   LOOKS.forEach((L,i)=>{
     const on=best>=L.at||(STATS.looks||0)>=i,el=document.createElement('div');el.className='wardcard'+(on?'':' locked');
-    const img=document.createElement('img');img.alt='';img.src=redkaChar(i,3).c.toDataURL();
+    const img=document.createElement('img');img.alt='';
+    const ch=redkaChar(i,3);
+    if(on)img.src=ch.c.toDataURL();
+    else{const s=document.createElement('canvas');s.width=ch.c.width;s.height=ch.c.height;const sg=s.getContext('2d');sg.drawImage(ch.c,0,0);sg.globalCompositeOperation='source-in';sg.fillStyle='#3a2a28';sg.fillRect(0,0,s.width,s.height);img.src=s.toDataURL()}
     const n=document.createElement('div');n.className='an';n.textContent=on?L.name:'???';
     const h=document.createElement('div');h.className='ah';h.textContent=(on?'від ':'з ')+fmt(L.at);
     el.append(img,n,h);wg.append(el);
@@ -1038,10 +1041,10 @@ function draw(){
   if(toastNow&&mode==='play'){
     const a=toastNow.life>toastNow.max-.2?(toastNow.max-toastNow.life)/.2:toastNow.life<.25?toastNow.life/.25:1;
     ctx.save();ctx.globalAlpha=a;ctx.textAlign='left';ctx.textBaseline='middle';
-    const tw=W-24,bx=12,by=58;
-    ctx.fillStyle='#2a1722';ctx.fillRect(bx,by+3,tw,46);ctx.fillStyle='#f8f1e3';ctx.fillRect(bx,by,tw,46);
-    ctx.fillStyle='#d63434';ctx.font='800 12px Manrope, system-ui, sans-serif';ctx.fillText(toastNow.top.toUpperCase(),bx+12,by+14,tw-24);
-    ctx.fillStyle='#2a1722';ctx.font='13px "Press Start 2P", monospace';ctx.fillText(toastNow.text,bx+12,by+32,tw-24);
+    const tw=W-24,bx=12,by=56;
+    ctx.fillStyle='#2a1722';ctx.fillRect(bx,by+2,tw,38);ctx.fillStyle='#f8f1e3';ctx.fillRect(bx,by,tw,38);
+    ctx.fillStyle='#d63434';ctx.font='800 12px Manrope, system-ui, sans-serif';ctx.fillText(toastNow.top.toUpperCase(),bx+10,by+12,tw-20);
+    ctx.fillStyle='#2a1722';ctx.font='12px "Press Start 2P", monospace';ctx.fillText(toastNow.text,bx+10,by+26,tw-20);
     ctx.restore();
   }
 }
@@ -1057,13 +1060,13 @@ function scene(kind,li){
   const bubble=(t,x,y)=>{g.font='800 11px Manrope, sans-serif';const w=g.measureText(t).width+14;const bx=Math.max(4,Math.min(Wd-w-4,x-w/2));g.fillStyle='#fff';g.fillRect(bx,y,w,20);g.strokeStyle='#1a141a';g.lineWidth=2;g.strokeRect(bx,y,w,20);g.fillStyle='#b02020';g.textAlign='center';g.textBaseline='middle';g.fillText(t,bx+w/2,y+10.5)};
   const sign=(t,x,y,w)=>{g.fillStyle='#2a1722';g.fillRect(x,y,w,28);g.fillStyle='#f8f1e3';g.fillRect(x+2,y+2,w-4,24);g.fillStyle='#2a1722';g.font='800 11px Manrope, sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,x+w/2,y+14,w-8)};
   if(kind==='fall'){
-    sign('ПРІРВА СКАСУВАННЯ, глибина: ∞',24,8,272);
-    g.fillStyle='#2a1722';g.fillRect(50,150,220,8);
-    for(let i=1;i<6;i++){const w=220-i*i*6;g.fillRect(160-w/2,150+i*8,w,8)}
-    sprRedka(160,96,1,Math.PI+.28,false);
-    sprEnemy('stuk',48,46,.9,false);sprEnemy('threads',272,44,.9,true);sprEnemy('koms',90,38,.75,false);sprEnemy('lang',230,36,.75,true);
-    g.fillStyle='#fff';g.fillRect(36,18,16,10);g.fillRect(260,16,16,10);g.fillRect(78,12,14,8);g.fillRect(218,10,14,8);
-    stamp('СКАСОВАНО',250,168,-.15);
+    g.fillStyle='#2a1722';g.fillRect(50,138,220,8);
+    for(let i=1;i<5;i++){const w=220-i*i*6;g.fillRect(160-w/2,138+i*8,w,8)}
+    sprRedka(160,84,1,Math.PI+.28,false);
+    sprEnemy('stuk',42,48,.85,false);sprEnemy('threads',278,46,.85,true);
+    g.fillStyle='#fff';g.fillRect(30,24,14,8);g.fillRect(276,22,14,8);
+    stamp('СКАСОВАНО',246,28,-.18);
+    sign('ПРІРВА СКАСУВАННЯ, глибина: ∞',16,168,288);
   }else if(kind==='stuk'){
     sprRedka(150,104,1,0,false);
     for(let i=0;i<40;i++)spr(ENV_SPR,90+((i*47)%140),120+((i*31)%70),1.4,(i%5-2)*.2);
