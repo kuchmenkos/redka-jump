@@ -44,7 +44,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 .steerhint .arr span{font-family:var(--body);font-size:11px;font-weight:700;color:var(--ink)}
 .achbtn.demo{color:#8f5f08;letter-spacing:.06em}
 .soundrow{display:flex;gap:8px}
-.soundchip{flex:1;min-width:0;min-height:48px;padding:10px 8px;font-size:14px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line)}
+.soundchip{flex:1;min-width:0;min-height:48px;padding:10px 8px;font-size:14px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line);pointer-events:auto;touch-action:manipulation;-webkit-touch-callout:default}
 .soundchip b{font-size:16px;margin-left:4px}
 .soundchip.off{color:var(--muted)}
 .overlay{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;background:rgba(43,30,25,.45);padding:max(12px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));overflow-y:auto;box-sizing:border-box;overscroll-behavior:contain}
@@ -351,7 +351,7 @@ const PX=3;
 
 /* ---------- sound ---------- */
 let AC=null,muted=false,bgmOn=true,bgmAudio=null,bgmPrimed=false;try{muted=localStorage.getItem('redkaMute')==='1'}catch(e){}try{bgmOn=localStorage.getItem('redkaBgm')!=='0'}catch(e){}
-const BGM_VOL=.7,SFX_VOL=2.8,DEMO=true;
+const BGM_VOL=.63,SFX_VOL=5,DEMO=true;
 function audioOn(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();loadGordonBuf()}catch(e){}}
 function tone(type,f0,f1,dur,vol,delay){
   if(!AC||muted)return;const t=AC.currentTime+(delay||0),o=AC.createOscillator(),g=AC.createGain();
@@ -754,7 +754,7 @@ function paintMute(){
 function paintBgm(){
   document.querySelectorAll('[data-bgm]').forEach(b=>{
     b.classList.toggle('off',!bgmOn);
-    b.innerHTML='Музика <b>♫</b>';
+    b.innerHTML='Музика <b>'+(bgmOn?'♫':'✕')+'</b>';
     b.setAttribute('aria-label',bgmOn?'Вимкнути музику':'Увімкнути музику');
   });
 }
@@ -802,9 +802,11 @@ function ensureBgm(){
   if(bgmAudio)return bgmAudio;
   const a=new Audio('art/springy-lead.mp3');
   a.preload='auto';a.loop=true;a.volume=BGM_VOL;
+  try{a.playsInline=true}catch(e){}
   bgmAudio=a;return a;
 }
 function bgmWanted(){return bgmOn&&!(player&&player.flyKind==='gordon')}
+function bgmPlaying(){const a=bgmAudio;return !!(a&&!a.paused&&!a.muted)}
 function syncBgm(){
   const a=ensureBgm();a.volume=BGM_VOL;
   if(!bgmPrimed||!bgmWanted()){a.pause();return}
@@ -816,6 +818,7 @@ function primeBgm(){
   if(!bgmOn){a.muted=true;const p=a.play();const done=()=>{a.pause();a.muted=false};if(p&&p.then)p.then(done,()=>{a.muted=false;bgmPrimed=false});else done();return}
   a.muted=false;a.play().catch(()=>{bgmPrimed=false});
 }
+function unlockAudio(){audioOn();primeBgm();syncBgm()}
 function resize(){const r=wrap.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,2);cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);scale=r.width/W;H=r.height/scale;ctx.imageSmoothingEnabled=false;clothPat=null;gc=null;if(clothZone>=0)makeCloth(clothZone)}
 const PFONT=13,PH=26;
 function fontFor(t,maxW){let s=PFONT;ctx.font='800 '+s+'px Manrope, system-ui, sans-serif';while(s>9&&ctx.measureText(t).width>maxW){s--;ctx.font='800 '+s+'px Manrope, system-ui, sans-serif'}return s}
@@ -1609,29 +1612,43 @@ $('shareBtn').onclick=async function(){
   }catch(e){if(e&&e.name==='AbortError')return}
   shareHint('Текст скопійовано');
 };
+let chipTapAt=0;
+function chipOnce(){const t=performance.now();if(t-chipTapAt<280)return false;chipTapAt=t;return true}
 function toggleMute(e){
-  if(e)e.stopPropagation();
+  if(e){e.preventDefault();e.stopPropagation()}
+  if(!chipOnce())return;
   muted=!muted;try{localStorage.setItem('redkaMute',muted?'1':'0')}catch(err){}
   paintMute();
   if(muted){if(gordonGain)gordonGain.gain.value=0;if(gordonAudio)gordonAudio.pause();if(bgmAudio)bgmAudio.pause();return}
   audioOn();try{SFX.jump()}catch(err){}
-  if(mode==='pause'){if(gordonGain)gordonGain.gain.value=GORDON_VOL;return}
   if(gordonGain)gordonGain.gain.value=GORDON_VOL;
   if(player&&player.flyKind==='gordon'&&player.fly>0&&!gordonSrc)resumeGordonAudio();
+  syncBgm();
 }
 function toggleBgm(e){
-  if(e){e.stopPropagation();if(e.currentTarget)e.currentTarget.blur()}
+  if(e){e.preventDefault();e.stopPropagation();const b=e.target&&e.target.closest&&e.target.closest('[data-bgm]');if(b)b.blur()}
+  if(!chipOnce())return;
+  if(bgmOn&&!bgmPlaying()){audioOn();primeBgm();syncBgm();return}
   bgmOn=!bgmOn;try{localStorage.setItem('redkaBgm',bgmOn?'1':'0')}catch(err){}
   paintBgm();audioOn();primeBgm();syncBgm();
 }
-document.addEventListener('click',e=>{
+function onSoundChip(e){
   if(e.target.closest('[data-mute]'))toggleMute(e);
   else if(e.target.closest('[data-bgm]'))toggleBgm(e);
+}
+document.querySelectorAll('[data-mute],[data-bgm]').forEach(b=>{
+  b.addEventListener('click',onSoundChip);
+  b.addEventListener('pointerup',onSoundChip);
 });
 paintMute();paintBgm();
 
 function setPtr(){input.l=false;input.r=false;const r=wrap.getBoundingClientRect();for(const x of pointers.values()){if(x-r.left<r.width/2)input.l=true;else input.r=true}if(mode==='play')noteSteer()}
-wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.card,.menu,.soundchip,.demo,.achbtn,.extchip,.threads,#menuBtn,#yellScr,#pauseScr'))return;audioOn();pointers.set(e.pointerId,e.clientX);setPtr()});
+wrap.addEventListener('pointerdown',e=>{
+  if(!e.target.closest('[data-bgm]'))unlockAudio();
+  else audioOn();
+  if(e.target.closest('.card,.menu,.soundchip,.demo,.achbtn,.extchip,.threads,#menuBtn,#yellScr,#pauseScr'))return;
+  pointers.set(e.pointerId,e.clientX);setPtr();
+});
 document.querySelectorAll('a.threads').forEach(a=>a.addEventListener('click',e=>{
   e.preventDefault();e.stopPropagation();
   const url=a.href;const w=window.open(url,'_blank','noopener,noreferrer');
