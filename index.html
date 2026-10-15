@@ -6,7 +6,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Редька Джамп</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<meta property="og:title" content="Редька Джамп">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://redkajump.fun/">
+<link rel="canonical" href="https://redkajump.fun/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&family=Press+Start+2P&display=swap">
 <style>
@@ -16,6 +19,7 @@
   --card:#f8f1e3; --card-line:#c9b9a0; --well:#ece0cb; --gold:#e2b33a;
   --pixel:'Press Start 2P','Courier New',monospace;
   --body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --safe-b:env(safe-area-inset-bottom,0px);
   color-scheme:light;
 }
 [hidden]{display:none!important}
@@ -25,24 +29,23 @@ body{box-sizing:border-box;background:var(--frame);color:var(--ink);font-family:
   padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
 #wrap{position:relative;height:100vh;height:100dvh;max-width:460px;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow:hidden}
 canvas{display:block;width:100%;height:100%;touch-action:none}
-.hud{position:absolute;top:max(6px,env(safe-area-inset-top,0px));left:8px;right:8px;z-index:4;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
-.hud .scorebox{display:flex;flex-direction:column;align-items:flex-start;background:var(--card);padding:10px 12px 0;border-radius:10px;min-width:112px;outline:2px dashed var(--card-line);outline-offset:-5px;box-shadow:0 3px 0 rgba(43,30,25,.28);overflow:hidden}
+.hud{position:absolute;top:max(6px,env(safe-area-inset-top,0px));left:8px;right:8px;z-index:4;display:flex;justify-content:space-between;align-items:flex-start;gap:6px;pointer-events:none}
+.hud .scorebox{display:flex;flex-direction:column;align-items:flex-start;flex:1 1 0;min-width:0;background:var(--card);padding:8px 10px 0;border-radius:10px;outline:2px dashed var(--card-line);outline-offset:-5px;box-shadow:0 3px 0 rgba(43,30,25,.28);overflow:hidden}
 .hud .scorebox .eyebrow{font-size:9px;letter-spacing:.12em;margin:0 0 4px}
-.hud .val{font-family:var(--pixel);font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.2;padding-bottom:8px}
+.hud .val{font-family:var(--pixel);font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.2;padding-bottom:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .hud .combo{display:inline-block;margin:-2px 0 8px;padding:3px 7px;font-size:11px;font-weight:800;color:#fff;background:#1a7a32;border-radius:4px;transform:rotate(-4deg);box-shadow:0 2px 0 #0f4d1e}
 .hud .best{align-self:stretch;margin:0 -12px;padding:5px 10px 7px;font-size:10px;font-weight:800;color:var(--ink);background:linear-gradient(#ffe48a,#e2a91c);text-align:center}
-.hud .tixchip{position:absolute;left:50%;top:0;transform:translateX(-50%);pointer-events:none;display:flex;align-items:center;gap:5px;background:var(--card);color:#8f5f08;padding:6px 12px 6px 8px;border-radius:10px;box-shadow:0 3px 0 rgba(43,30,25,.28);outline:2px dashed var(--card-line);outline-offset:-5px;font-weight:800}
+.hud .tixchip{position:static;flex:0 0 auto;align-self:flex-start;pointer-events:none;display:flex;align-items:center;gap:4px;background:var(--card);color:#8f5f08;padding:6px 8px;border-radius:10px;box-shadow:0 3px 0 rgba(43,30,25,.28);outline:2px dashed var(--card-line);outline-offset:-5px;font-weight:800}
 .hud .tixchip img{image-rendering:pixelated;height:22px;width:auto}
 .hud .tixchip .run{font-family:var(--pixel);font-size:12px;line-height:1}
 .hud .tixchip .wallet{font-size:10px;font-weight:700;opacity:.78}
-.hud .right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:auto;pointer-events:none}
-.menu{pointer-events:auto;flex:none;height:44px;min-width:44px;padding:0 12px;font-size:13px;font-weight:800;border-radius:10px;background:var(--card);color:var(--ink);outline:2px dashed var(--card-line);outline-offset:-5px;box-shadow:0 3px 0 rgba(43,30,25,.28)}
+.hud .right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto;pointer-events:none}
+.menu{pointer-events:auto;flex:none;height:44px;min-width:44px;padding:0 10px;font-size:13px;font-weight:800;border-radius:10px;background:var(--card);color:var(--ink);outline:2px dashed var(--card-line);outline-offset:-5px;box-shadow:0 3px 0 rgba(43,30,25,.28)}
 .steerhint{position:absolute;inset:0;z-index:3;pointer-events:none;display:flex;align-items:center;justify-content:space-between;padding:0 8%;opacity:0;transition:opacity .4s}
 .steerhint.on{opacity:1}
 .steerhint .arr{display:flex;flex-direction:column;align-items:center;gap:4px;width:22%;opacity:.4}
 .steerhint .arr i{font-style:normal;font-size:22px;line-height:1;background:var(--ink);color:var(--card);border-radius:4px;padding:6px 8px}
 .steerhint .arr span{font-family:var(--body);font-size:11px;font-weight:700;color:var(--ink)}
-.achbtn.demo{color:#8f5f08;letter-spacing:.06em}
 .soundrow{display:flex;gap:8px}
 .soundchip{flex:1;min-width:0;min-height:48px;padding:10px 8px;font-size:14px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line);pointer-events:auto;touch-action:manipulation;-webkit-touch-callout:default}
 .soundchip b{font-size:16px;margin-left:4px}
@@ -116,7 +119,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .newach:last-child{margin:0}
 .newach img{width:36px;height:36px;image-rendering:pixelated;flex:none}
 .newach span{font-size:13px;font-weight:700;line-height:1.3}
-.achpop{position:absolute;left:10px;right:72px;top:max(158px,calc(env(safe-area-inset-top,0px) + 152px));z-index:5;pointer-events:none;display:flex;gap:10px;align-items:center;background:var(--card);color:var(--ink);border-radius:8px;padding:8px 10px;outline:1.5px dashed var(--card-line);outline-offset:-4px;box-shadow:0 4px 0 rgba(20,10,16,.25);transform:rotate(-2deg);animation:achPopIn .35s cubic-bezier(.2,1.4,.4,1)}
+.achpop{position:absolute;left:10px;right:10px;top:max(124px,calc(env(safe-area-inset-top,0px) + 118px));z-index:5;pointer-events:none;display:flex;gap:10px;align-items:center;background:var(--card);color:var(--ink);border-radius:8px;padding:8px 10px;outline:1.5px dashed var(--card-line);outline-offset:-4px;box-shadow:0 4px 0 rgba(20,10,16,.25);transform:rotate(-2deg);animation:achPopIn .35s cubic-bezier(.2,1.4,.4,1)}
 .achpop-ico{width:44px;height:44px;image-rendering:pixelated;flex:none}
 .achpop-k{font-size:10px;font-weight:800;color:var(--stamp);letter-spacing:.08em;text-transform:uppercase;margin:0}
 .achpop-n{font-size:13px;font-weight:800;margin:2px 0 0;line-height:1.25}
@@ -279,7 +282,6 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
         <button type="button" class="soundchip" data-mute aria-label="Вимкнути звук">Звук <b>♪</b></button>
         <button type="button" class="soundchip" data-bgm aria-label="Вимкнути музику">Музика <b>♫</b></button>
       </div>
-      <button id="pauseDemoBtn" class="achbtn demo" type="button" hidden aria-label="Демо: увімкнути режим Гордона">DEMO</button>
       <button id="quitBtn" class="achbtn" type="button">На старт</button>
     </div>
   </div>
@@ -343,7 +345,7 @@ const PX=3;
 
 /* ---------- sound ---------- */
 let AC=null,muted=false,bgmOn=true,bgmAudio=null,bgmPrimed=false;try{muted=localStorage.getItem('redkaMute')==='1'}catch(e){}try{bgmOn=localStorage.getItem('redkaBgm')!=='0'}catch(e){}
-const BGM_VOL=.63,SFX_VOL=5,DEMO=true;
+const BGM_VOL=.63,SFX_VOL=5;
 function audioOn(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();loadGordonBuf()}catch(e){}}
 function tone(type,f0,f1,dur,vol,delay){
   if(!AC||muted)return;const t=AC.currentTime+(delay||0),o=AC.createOscillator(),g=AC.createGain();
@@ -615,10 +617,10 @@ const ACH=[
   {id:'stuk10',name:'Стук-стук, хто там?',hint:'Розтопчи 10 Стукачів',test:(r,S)=>(S.stomp.stuk||0)+(r.fromOver?0:(r.stompKind.stuk||0))>=10},
   {id:'koms5',name:'Збори закрито',hint:'Розтопчи 5 Комсомолів',test:(r,S)=>(S.stomp.koms||0)+(r.fromOver?0:(r.stompKind.koms||0))>=5},
   {id:'t47',name:'Тред на 47 частин',hint:'Спіймай 47 тредів',test:(r,S)=>(S.threads||0)+(r.fromOver?0:r.threadHits)>=47},
-  {id:'lang20',name:'Перейшов на мову',hint:'20 разів сдує Мовна інспекторка',test:(r,S)=>(S.death.lang||0)>=20},
+  {id:'lang20',name:'Перейшов на мову',hint:'20 смертей від Мовної інспекторки',test:(r,S)=>(S.death.lang||0)>=20},
   {id:'can10',name:'Квитки не повертаються',hint:'Зламай 10 табличок Скасовувача',test:(r,S)=>(S.stomp.cancel||0)+(r.fromOver?0:(r.stompKind.cancel||0))>=10},
   {id:'exp3',name:'Шакалячий пасажир',hint:'3 експреси за забіг',test:(r)=>r.expressN>=3},
-  {id:'guest',name:'Був у гостях',hint:'Піймай Гордона — не DEMO',test:(r,S)=>(r.gordonCaught&&!r.gordonDemo)||(S.gordon||0)>=1},
+  {id:'guest',name:'Був у гостях',hint:'Піймай Гордона',test:(r,S)=>(r.gordonCaught&&!r.gordonDemo)||(S.gordon||0)>=1},
   {id:'gmiss',name:'Гордон чекав, а ти не прийшов',hint:'Пропусти предмет Гордона',test:(r,S)=>r.gordonMissed||(S.gordonMiss||0)>=1},
   {id:'hat',name:'Хет-трик туру',hint:'3 скасовані міста туру за забіг',test:(r)=>r.citiesN>=3},
   {id:'hat7',name:'Сім залів',hint:'7 скасованих міст туру за забіг',test:(r)=>r.citiesN>=7},
@@ -1367,8 +1369,10 @@ function draw(){
   ctx.globalAlpha=1;
   if(player.fly>0&&mode==='play'){
     const gordon=player.flyKind==='gordon',tot=player.flyMax||(gordon?GORDON_FLY:EXPRESS_FLY),w=Math.round(148*Math.max(0,Math.min(1,player.fly/tot)));
-    ctx.fillStyle='#2a1722';ctx.fillRect(W/2-86,H-28,172,12);ctx.fillStyle=gordon?'#e2a91c':'#2ea043';ctx.fillRect(W/2-84,H-26,w,8);
-    ctx.save();ctx.translate(W/2-98,H-22);
+    const insetB=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-b'))||0)/scale;
+    const barY=H-28-insetB;
+    ctx.fillStyle='#2a1722';ctx.fillRect(W/2-86,barY,172,12);ctx.fillStyle=gordon?'#e2a91c':'#2ea043';ctx.fillRect(W/2-84,barY+2,w,8);
+    ctx.save();ctx.translate(W/2-98,barY+6);
     if(gordon){ctx.fillStyle='#e2a91c';ctx.fillRect(-6,-6,12,12);ctx.fillStyle='#2a1722';ctx.fillRect(-2,-2,4,4)}
     else{const rk=ROCKET_SPR;ctx.drawImage(rk,-10,-14,20,28)}
     ctx.restore();
@@ -1377,7 +1381,7 @@ function draw(){
   if(toastNow&&mode==='play'){
     const a=toastNow.life>toastNow.max-.2?(toastNow.max-toastNow.life)/.2:toastNow.life<.25?toastNow.life/.25:1;
     ctx.save();ctx.globalAlpha=a;ctx.textAlign='left';ctx.textBaseline='middle';
-    const tw=W-24,bx=12,by=108;
+    const tw=W-24,bx=12,by=toastY();
     ctx.fillStyle='#2a1722';ctx.fillRect(bx,by+2,tw,38);ctx.fillStyle='#f8f1e3';ctx.fillRect(bx,by,tw,38);
     ctx.fillStyle='#d63434';ctx.font='800 12px Manrope, system-ui, sans-serif';ctx.fillText(toastNow.top.toUpperCase(),bx+10,by+12,tw-20);
     ctx.fillStyle='#2a1722';ctx.font='12px "Press Start 2P", monospace';ctx.fillText(toastNow.text,bx+10,by+26,tw-20);
@@ -1502,7 +1506,6 @@ function goPlay(){if((mode==='play'||mode==='pause')&&$('yellScr').hidden)return
 function openPause(){
   if(mode!=='play'||!$('yellScr').hidden)return;
   mode='pause';input.l=input.r=false;pointers.clear();
-  $('pauseDemoBtn').hidden=!DEMO||!(player&&player.flyKind!=='gordon');
   paintMute();paintBgm();
   pauseGordonAudio();
   showPlayHud(false);
@@ -1513,11 +1516,23 @@ function resumePlay(){
   $('pauseScr').hidden=true;$('colScr').hidden=true;
   mode='play';showPlayHud(true);showSteer();if(!steerDone)steerArmed=true;resumeGordonAudio();syncBgm();
 }
+function wipeCanvas(){
+  ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);ctx.imageSmoothingEnabled=false;
+  ctx.fillStyle='#2b1e19';ctx.fillRect(0,0,W,H);
+  const pat=clothPat||(typeof cloth!=='undefined'&&cloth&&ctx.createPattern(cloth,'repeat'));
+  if(pat){ctx.fillStyle=pat;ctx.globalAlpha=.4;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1}
+}
+function toastY(){
+  const box=$('scorebox');
+  if(!box||box.hidden)return 96;
+  const wr=wrap.getBoundingClientRect(),hr=$('hud').getBoundingClientRect();
+  return Math.round((hr.bottom-wr.top)/scale)+8;
+}
 function quitToStart(){
   hideAchPop();stopGordonMusic();gordonBits=[];
   mode='start';colBack='start';input.l=input.r=false;pointers.clear();
   $('pauseScr').hidden=true;$('colScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=true;
-  showPlayHud(false);$('startScr').hidden=false;paintHero();showBestStart();syncBgm();
+  showPlayHud(false);wipeCanvas();$('startScr').hidden=false;paintHero();showBestStart();syncBgm();
 }
 function openCol(tab,back){
   colBack=back||'start';paintCol();
@@ -1530,18 +1545,11 @@ function closeCol(){
   $('colScr').hidden=true;
   if(colBack==='pause'&&mode==='pause'){$('pauseScr').hidden=false;paintMute();paintBgm()}
 }
-function fireDemo(){
-  if(!player||player.flyKind==='gordon')return;
-  if(mode==='pause')resumePlay();
-  if(mode!=='play')return;
-  audioOn();primeGordonAudio();gordonDemo=true;gordonDecided=true;items=items.filter(it=>it.kind!=='gordon');beginGordon(player);
-}
 $('playBtn').onclick=goPlay;$('againBtn').onclick=goPlay;$('yellScr').onclick=finishYell;
 $('menuBtn').onclick=function(e){e.stopPropagation();openPause()};
 $('resumeBtn').onclick=resumePlay;
 $('pauseWardBtn').onclick=()=>openCol('ward','pause');
 $('quitBtn').onclick=quitToStart;
-$('pauseDemoBtn').onclick=function(e){e.stopPropagation();this.blur();fireDemo()};
 document.querySelectorAll('.tabs').forEach(t=>t.addEventListener('click',e=>{
   const b=e.target.closest('.tab');if(!b)return;const card=t.closest('.card');
   card.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
@@ -1577,7 +1585,7 @@ function makeCard(sc,s){
   g.fillStyle='#d63434';g.font='800 34px Manrope, sans-serif';g.fillText('Побий мій рекорд!',540,1280);
   return c;
 }
-const GAME_LINK='https://kuchmenkos.github.io/redka-jump/';
+const GAME_LINK='https://redkajump.fun/';
 function liveGameUrl(){
   if(/^https?:/.test(location.protocol)&&!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){
     return location.origin+location.pathname.replace(/index\.html$/,'');
@@ -1602,10 +1610,12 @@ $('shareBtn').onclick=async function(){
     if(navigator.share){
       const file=new File([blob],'redka-jump.png',{type:'image/png'});
       if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:txt});shareHint('Готово');return}
-      await navigator.share({text:txt});shareHint('Готово');return;
+      await navigator.share({text:txt});
+      showImgFallback();
+      return;
     }
   }catch(e){if(e&&e.name==='AbortError')return}
-  shareHint('Текст скопійовано');
+  showImgFallback();
 };
 let chipTapAt=0;
 function chipOnce(){const t=performance.now();if(t-chipTapAt<80)return false;chipTapAt=t;return true}
@@ -1641,7 +1651,7 @@ function setPtr(){input.l=false;input.r=false;const r=wrap.getBoundingClientRect
 wrap.addEventListener('pointerdown',e=>{
   if(!e.target.closest('[data-bgm]'))unlockAudio();
   else audioOn();
-  if(e.target.closest('.card,.menu,.soundchip,.demo,.achbtn,.extchip,.threads,#menuBtn,#yellScr,#pauseScr'))return;
+  if(e.target.closest('.card,.menu,.soundchip,.achbtn,.extchip,.threads,#menuBtn,#yellScr,#pauseScr'))return;
   pointers.set(e.pointerId,e.clientX);setPtr();
 });
 document.querySelectorAll('a.threads').forEach(a=>a.addEventListener('click',e=>{
@@ -1674,7 +1684,10 @@ addEventListener('resize',resize);addEventListener('orientationchange',()=>setTi
 if(window.visualViewport)visualViewport.addEventListener('resize',resize);
 addEventListener('blur',()=>{input.l=input.r=false;pointers.clear()});
 document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){if(gordonAudio)gordonAudio.pause();if(bgmAudio)bgmAudio.pause();return}
+  if(document.hidden){
+    if(mode==='play')openPause();
+    if(gordonAudio)gordonAudio.pause();if(bgmAudio)bgmAudio.pause();return
+  }
   if(mode==='pause')return;
   if(AC&&AC.state==='suspended')AC.resume();
   if(player&&player.flyKind==='gordon'&&!muted){
@@ -1685,13 +1698,15 @@ document.addEventListener('visibilitychange',()=>{
 
 loadFaces();loadEnds();loadAchs();loadBackgrounds();
 resize();reset();draw();paintBestHud();paintAchCount();paintTickets();paintHero();showBestStart();
-function jumpTo(gs){
-  const y=player0-gs/SC;player.y=y;camY=y-H*.45;
-  plats=[];items=[];enemies=[];envs=[];
-  const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
-  topY=player.y+FEET+2;while(topY>camY-280)genStep();
+if(/\bqa=1\b/.test(location.search)){
+  function jumpTo(gs){
+    const y=player0-gs/SC;player.y=y;camY=y-H*.45;
+    plats=[];items=[];enemies=[];envs=[];
+    const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
+    topY=player.y+FEET+2;while(topY>camY-280)genStep();
+  }
+  window.__g={get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,tapLook,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get cities(){return cities},get citySpawned(){return citySpawned},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get runs(){return STATS.runs},set runs(v){STATS.runs=v|0},get steerN(){return STATS.steerN|0},set steerN(v){STATS.steerN=v|0;saveStats()},get steerOn(){const el=$('steerHint');return !!(el&&!el.hidden&&el.classList.contains('on'))},get steerArmed(){return steerArmed},hideSteer,showSteer,armSteer,get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get muted(){return muted},get bgm(){return bgmAudio},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r;if(mode==='play')noteSteer()}};
 }
-window.__g={get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,tapLook,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get cities(){return cities},get citySpawned(){return citySpawned},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get runs(){return STATS.runs},set runs(v){STATS.runs=v|0},get steerN(){return STATS.steerN|0},set steerN(v){STATS.steerN=v|0;saveStats()},get steerOn(){const el=$('steerHint');return !!(el&&!el.hidden&&el.classList.contains('on'))},get steerArmed(){return steerArmed},hideSteer,showSteer,armSteer,get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r;if(mode==='play')noteSteer()}};
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode==='play'){update(dt);draw()}requestAnimationFrame(loop)}
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});
