@@ -26,23 +26,32 @@ body{box-sizing:border-box;background:var(--frame);color:var(--ink);font-family:
 #wrap{position:relative;height:100vh;height:100dvh;max-width:460px;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow:hidden}
 canvas{display:block;width:100%;height:100%;touch-action:none}
 .hud{position:absolute;top:max(6px,env(safe-area-inset-top,0px));left:8px;right:8px;z-index:4;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
-.hud .scorebox{background:rgba(248,241,227,.92);padding:8px 12px 6px;border-radius:8px;box-shadow:0 2px 0 rgba(43,30,25,.25);min-width:104px}
-.hud .val{font-family:var(--pixel);font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
-.hud .combo{font-size:12px;font-weight:800;color:#1a7a32;margin-top:2px;min-height:14px}
-.hud .tix{font-size:11px;font-weight:800;color:#8f5f08;margin-top:2px}
-.hud .best{font-size:11px;font-weight:700;color:var(--muted);margin-top:2px}
+.hud .scorebox{display:flex;flex-direction:column;align-items:flex-start;background:var(--card);padding:10px 12px 0;border-radius:10px;min-width:112px;outline:2px dashed var(--card-line);outline-offset:-5px;box-shadow:0 3px 0 rgba(43,30,25,.28);overflow:hidden}
+.hud .scorebox .eyebrow{font-size:9px;letter-spacing:.12em;margin:0 0 4px}
+.hud .val{font-family:var(--pixel);font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.2;padding-bottom:8px}
+.hud .combo{display:inline-block;margin:-2px 0 8px;padding:3px 7px;font-size:11px;font-weight:800;color:#fff;background:#1a7a32;border-radius:4px;transform:rotate(-4deg);box-shadow:0 2px 0 #0f4d1e}
+.hud .best{align-self:stretch;margin:0 -12px;padding:5px 10px 7px;font-size:10px;font-weight:800;color:var(--ink);background:linear-gradient(#ffe48a,#e2a91c);text-align:center}
+.hud .tixchip{position:absolute;left:50%;top:0;transform:translateX(-50%);pointer-events:none;display:flex;align-items:center;gap:5px;background:linear-gradient(#fff8e4,#f0d48a);color:#8f5f08;padding:5px 10px 5px 6px;border-radius:8px;box-shadow:0 3px 0 rgba(43,30,25,.28);outline:1.5px dashed rgba(143,95,8,.4);outline-offset:-4px;font-weight:800}
+.hud .tixchip img{image-rendering:pixelated;height:22px;width:auto}
+.hud .tixchip .run{font-family:var(--pixel);font-size:12px;line-height:1}
+.hud .tixchip .wallet{font-size:10px;font-weight:700;opacity:.78}
 .hud .right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:auto;pointer-events:none}
-.menu{pointer-events:auto;flex:none;height:44px;min-width:44px;padding:0 12px;font-size:13px;font-weight:800;border-radius:10px;background:rgba(248,241,227,.92);color:var(--ink);box-shadow:0 2px 0 rgba(43,30,25,.25)}
+.menu{pointer-events:auto;flex:none;height:44px;min-width:44px;padding:0 12px;font-size:13px;font-weight:800;border-radius:10px;background:rgba(248,241,227,.92);color:var(--ink);box-shadow:0 3px 0 rgba(43,30,25,.28)}
+.steerhint{position:absolute;inset:0;z-index:3;pointer-events:none;display:flex;align-items:center;justify-content:space-between;padding:0 5%;opacity:0;transition:opacity .4s}
+.steerhint.on{opacity:1}
+.steerhint .arr{display:flex;flex-direction:column;align-items:center;gap:2px;width:28%;color:var(--ink);opacity:.28}
+.steerhint .arr b{font-size:64px;line-height:.9;font-weight:800}
+.steerhint .arr span{font-family:var(--body);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .demo{pointer-events:auto;flex:none;width:100%;min-width:0;padding:10px 12px;min-height:44px;font-size:13px;font-weight:800;border-radius:8px;background:linear-gradient(#ffe48a,#e2a91c);color:#2a1722;box-shadow:inset 0 0 0 1.5px #2a1722,0 2px 0 rgba(43,30,25,.35);letter-spacing:.04em}
 .demo:disabled{opacity:.45}
 .soundrow{display:flex;gap:8px}
 .soundchip{flex:1;min-width:0;min-height:48px;padding:10px 8px;font-size:14px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line)}
 .soundchip b{font-size:16px;margin-left:4px}
-.soundchip.off{color:var(--muted);text-decoration:line-through}
-.overlay{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;background:rgba(43,30,25,.45);padding:12px max(16px,env(safe-area-inset-left,0px));overflow-y:auto;box-sizing:border-box}
+.soundchip.off{color:var(--muted)}
+.overlay{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;background:rgba(43,30,25,.45);padding:max(12px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));overflow-y:auto;box-sizing:border-box;overscroll-behavior:contain}
 #startScr,#pauseScr,#colScr,#overScr{z-index:6}
-.card{position:relative;background:var(--card);color:var(--ink);border-radius:10px;padding:22px 20px 18px;width:100%;max-width:350px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;text-align:center;margin:auto;
-  outline:2px dashed var(--card-line);outline-offset:-8px}
+.card{position:relative;background:var(--card);color:var(--ink);border-radius:10px;padding:22px 20px 18px;width:100%;max-width:350px;max-height:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;text-align:center;margin:auto;
+  outline:2px dashed var(--card-line);outline-offset:-8px;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 10px 0 rgba(20,10,16,.35)}
 .eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--stamp);margin:0}
 h1{font-family:var(--pixel);font-size:22px;line-height:1.35;margin:0;font-weight:400}
 .sub{font-size:14px;line-height:1.45;color:var(--muted);margin:0;font-weight:600;text-wrap:balance}
@@ -75,8 +84,6 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .fine{font-size:12px;color:var(--muted);margin:0}
 .stats{display:flex;justify-content:center;gap:16px;font-size:13px;font-weight:700;color:var(--muted)}
 .stats b{color:var(--ink)}
-.overlay{padding-top:max(12px,env(safe-area-inset-top,0px));padding-bottom:max(12px,env(safe-area-inset-bottom,0px));overscroll-behavior:contain}
-.card{max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 10px 0 rgba(20,10,16,.35)}
 .card.start{gap:9px;padding:18px 18px 14px}
 .cta{flex:none;width:100%;font-size:20px;padding:16px;min-height:52px;letter-spacing:.02em;background:#2ea043;box-shadow:0 4px 0 #1a6b32;transition:transform .08s,box-shadow .08s}
 .cta:active{transform:translateY(3px);box-shadow:0 1px 0 #1a6b32}
@@ -98,7 +105,6 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .achcard .an,.wardcard .an{font-size:14px;font-weight:800;line-height:1.3}
 .achcard .ah,.wardcard .ah{font-size:12px;color:var(--muted);font-weight:600;line-height:1.35}
 .achico{image-rendering:pixelated;width:64px;height:64px;grid-row:1/3;align-self:center}
-.wardpic{image-rendering:pixelated;width:28px;height:28px}
 .wardcard img{image-rendering:pixelated;height:80px;width:auto;grid-row:1/3;align-self:center;justify-self:center}
 .wardcard{cursor:pointer}
 .wardcard .ah.price{color:var(--stamp)}
@@ -110,7 +116,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .newach:last-child{margin:0}
 .newach img{width:36px;height:36px;image-rendering:pixelated;flex:none}
 .newach span{font-size:13px;font-weight:700;line-height:1.3}
-.achpop{position:absolute;left:10px;right:72px;top:max(102px,calc(env(safe-area-inset-top,0px) + 96px));z-index:5;pointer-events:none;display:flex;gap:10px;align-items:center;background:var(--card);color:var(--ink);border-radius:8px;padding:8px 10px;outline:1.5px dashed var(--card-line);outline-offset:-4px;box-shadow:0 4px 0 rgba(20,10,16,.25);transform:rotate(-2deg);animation:achPopIn .35s cubic-bezier(.2,1.4,.4,1)}
+.achpop{position:absolute;left:10px;right:72px;top:max(158px,calc(env(safe-area-inset-top,0px) + 152px));z-index:5;pointer-events:none;display:flex;gap:10px;align-items:center;background:var(--card);color:var(--ink);border-radius:8px;padding:8px 10px;outline:1.5px dashed var(--card-line);outline-offset:-4px;box-shadow:0 4px 0 rgba(20,10,16,.25);transform:rotate(-2deg);animation:achPopIn .35s cubic-bezier(.2,1.4,.4,1)}
 .achpop-ico{width:44px;height:44px;image-rendering:pixelated;flex:none}
 .achpop-k{font-size:10px;font-weight:800;color:var(--stamp);letter-spacing:.08em;text-transform:uppercase;margin:0}
 .achpop-n{font-size:13px;font-weight:800;margin:2px 0 0;line-height:1.25}
@@ -129,9 +135,10 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .badge{font-family:var(--pixel);font-size:9px;padding:6px 5px;border-radius:5px;background:#1a7a32;color:#fff}
 .badge.red{background:#c62828}
 .badge.gold{background:linear-gradient(#ffe48a,#e2a91c);color:var(--ink)}
+.badge.tour{font-family:var(--body);font-size:11px;padding:6px 2px;letter-spacing:.01em;white-space:nowrap}
 @media (max-height:720px){.hero img{height:88px}h1{font-size:19px}.card.start{gap:7px}.card.start .sub{font-size:13px}.panels{height:210px}.panels .legend img{height:30px}}
 @media (max-height:620px){.card.start .sub{display:none}.hero img{height:72px}.panels{height:180px}}
-@media (prefers-reduced-motion:reduce){.hero img,#playBtn{animation:none}.achpop{animation:achPopFade .25s ease;transform:none}}
+@media (prefers-reduced-motion:reduce){.hero img,#playBtn{animation:none}.achpop{animation:achPopFade .25s ease;transform:none}.steerhint{transition:none}}
 .card.over{gap:10px;padding:18px 18px 14px}
 .overpanels{min-height:0;display:flex;flex-direction:column}
 .respanel,.hatepanel{display:flex;flex-direction:column;gap:9px}
@@ -165,14 +172,23 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
   <canvas id="cv" aria-label="Ігрове поле: Редька стрибає по ярликах угору"></canvas>
   <div class="hud" id="hud">
     <div class="scorebox" id="scorebox" hidden>
+      <p class="eyebrow">Підписники</p>
       <div class="val" id="score">0</div>
-      <div class="combo" id="combo"></div>
-      <div class="tix" id="hudTix">Квитки 0</div>
+      <div class="combo" id="combo" hidden></div>
       <div class="best" id="best" hidden></div>
+    </div>
+    <div class="tixchip" id="hudTix" hidden>
+      <img id="hudTixImg" alt="">
+      <span class="run" id="hudTixRun">0</span>
+      <span class="wallet" id="hudTixAll"></span>
     </div>
     <div class="right">
       <button id="menuBtn" class="menu" type="button" hidden aria-label="Меню">Меню</button>
     </div>
+  </div>
+  <div class="steerhint" id="steerHint" hidden aria-hidden="true">
+    <div class="arr"><b>◀</b><span>тримай</span></div>
+    <div class="arr"><b>▶</b><span>тримай</span></div>
   </div>
   <div id="achPop" class="achpop" hidden>
     <img id="achPopImg" class="achpop-ico" alt="">
@@ -188,8 +204,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
       <h1>РЕДЬКА ДЖАМП</h1>
       <p class="sub">Що більше наїжджають — то вище стрибає.</p>
       <button id="playBtn" class="cta">Стрибати</button>
-      <p class="bestline" id="bestLine" hidden>Рекорд: <b id="bestStart">0</b></p>
-      <p class="bestline" id="tixLine">Квитки: <b id="tixStart">0</b></p>
+      <p class="bestline" id="bestLine"><span id="bestRec" hidden>Рекорд: <b id="bestStart">0</b> · </span>Квитки: <b id="tixStart">0</b></p>
       <button id="colBtn" class="achbtn" type="button">Досягнення <b id="achCount">0/22</b></button>
       <div class="soundrow">
         <button type="button" class="soundchip" data-mute aria-label="Вимкнути звук">Звук <b>♪</b></button>
@@ -221,7 +236,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
         <div class="legend" role="tabpanel" data-panel="bonus" hidden>
           <span class="ic"><img id="icRocket" alt=""></span><span><b>Шакалячий експрес</b> — ракета проти хейтерів</span>
           <span class="ic"><span class="badge">×5</span></span><span><b>Комбо</b> — нові ярлики без пауз</span>
-          <span class="ic"><span class="badge red">3 / 7 / 12</span></span><span><b>Скасовані міста туру</b> — три, сім або дванадцять залів</span>
+          <span class="ic"><span class="badge red tour">3/7/12</span></span><span><b>Скасовані міста туру</b> — три, сім або дванадцять залів</span>
           <span class="ic"><span class="badge gold">???</span></span><span>Після <b>300 000</b> інколи заходить гість</span>
           <span class="ic"><img id="icTicket" alt=""></span><span><b>Квитки</b> — збирай і купуй луки в гардеробі</span>
         </div>
@@ -353,51 +368,6 @@ const REDKA=["...KGGGGGgKGGGGGGggKGGGGGgK...", "...KGGGGGgKGGGGGGggKGGGGGgK...",
 const REDKA_NOMIC=REDKA.map((r,y)=>y>=12&&y<=22?'......'+r.slice(6):r);
 const CLOWN=["..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", ".........KKKKKKKKKKKK.........", ".......KKSSSSSSSSSSSsKK.......", "......KSSSSSSSSSSSSSsssK......", ".....KSSSSSSSWWWWSSSssssK.....", ".....KSSSWWWWWWWWWssssssK.....", ".....KSSWWWWWWWWWWssssssK.....", "......KKWWWWSSSSSSSsssKK......", "......KKKKAWWWBWWWCKKKKKK.....", ".....KAAAAAaKBBbKCCcKKBBBK....", ".....KAAAAAaBBBbCCCccKBBBK....", ".....KAAAAABKBBCKCCAKKBBBK....", ".....KAAAKBBbKCCcKAAaKBBBK....", ".....KAAABBBbCCCcAAAaaBBBK....", ".....KAAAKABbKBCcKCAaKBBBK....", ".....KAAAAAaKBBbKCCcKKBBBK....", ".....KAAAAAaBBBbCCCccKBBBK....", "....KFFFFAABKBBCKCCAKKFFFFK...", "....KFFFFKBBbKCCcKAAaKFFFFK...", ".....KKKKBBBbCCCcAAAaaKKKK....", ".........KKKKKKCKKKKKK........", ".........KSSSSKCKSSSSK........", ".........KSSSSKKKSSSSK........", ".........KssssK.KssssK........", ".........KKAKK...KKBKK........", ".........KKKKK...KKKKK........"];
 const ODYSSEY=["..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", ".................KKKK.........", "...............KKUUUUKK.......", ".............KKUUUUUUUuK......", "...........KKFFFFFUUUUuuKKK...", "..........KDDDDDDFUUUUUUUUUK..", ".........KDDDDDDDOOEEEUUUUUK..", "......KKKDDDDDDDDOoEEEUUUUUK..", ".....KFFFDDDDDDDDOOoOUUUUUUK..", ".....KFhFDdddddddOOOOUUUUUUK..", ".....KFFFDddddddddDdUuuuuuuuK.", ".....KFFFDDDDDODDDDdUuuuuuuuK.", ".....KFFFDDDDDDDDDDdUuuuuuuuK.", ".....KFFFDddddddddDdUuuuuuuuK.", ".....KFFFDDDDDODDDDdUuuuuuuuK.", ".....KFFFDDDDDDDDDDdUuuuuuuuK.", "....KFFFFDddddddddDdUuuuuuuuK.", "....KFFFKDDDDDDDDDDUUuuuuuuuK.", ".....KKKKDDDDDDDDDDUUuuuuuuuK.", "........KDDDDDDDDDDUUuuuuuuuK.", "........KNNNNNNNNNNUUuuuuuuuK.", "........KDNDNDNDNDNUUuuuuuuuK.", "........KDNDNDNDNDNUUuuuuuuuK.", "........KDKDKDUDUDUUUuuuuuuuK.", "........KNNNNKKUNNNNUuuuuuuuK.", "........KOKKK..KKKOKKuuuuuuuK.", "........KKKKK...KKKKKKKKKKKK.."];
-const STUK=[
-"....KKKKKK....",
-"...KKKKKKKK...",
-"...KkkkkkkK...",
-".KKKKKKKKKKKK.",
-"...FFFFFFFF...",
-"..FFKKFFKKFF..",
-"..FFFFFFFFFF..",
-"..FFFFFKKKFF..",
-"...FFFFFFFF...",
-"..CCCCCCCWWWW.",
-".CCCCCCCCWKKW.",
-".CCCCCCCCWWWW.",
-".CCCCCCCCWKKW.",
-"..CCCCCCCWWWW.",
-"..CC......CC..",
-"..KK......KK.."];
-const KOMS=[
-"...HHHHHHHH...",
-"..HHHHHHHHHH..",
-"..FFFFFFFFFF..",
-"..FKKFFFFKKF..",
-"..FFKFFFFKFF..",
-"..FFFFFFFFFF..",
-"..FFKKKKKKFF..",
-"...FFFFFFFF...",
-"....TTTTTT....",
-"..WWWTTTTWWWYY",
-".WWWWWTTWWWYYY",
-".WWWWWWWWWWYYY",
-".WWWWWWWWWWWYY",
-"..NNNNNNNNNN..",
-"..NN......NN..",
-"..KK......KK.."];
-const ENV=[
-"KKKKKKKKKK",
-"KKWWWWWWKK",
-"KWKWWWWKWK",
-"KWWKWWKWWK",
-"KWWWKKWWWK",
-"KWWWWWWWWK",
-"KKKKKKKKKK"];
-const POOP=["......BB......", ".....BbBB.....", "....BBBBBB....", "...BbBBBBbB...", "..BBBBBBBBBB..", ".BbBBBBBBBBbB.", "BBBBBBBBBBBBBB", "BbBBBBBBBBBBbB", ".BBBBBBBBBBBB."];
-const TRAIN=["..ZZ........", "..ZZ..YYYYY.", "YYYYYYYyyyY.", "YyyYYYYyZyY.", "YYYYYYYYYYYY", "YZYYYYYYYYZY", ".KK..KK..KK.", ".KK..KK..KK."];
-const ROCKET=["...RR...", "..RRRR..", "..WWWW..", "..WLLW..", "..WLLW..", "..WWWW..", "..WWWW..", ".RWWWWR.", "RRWWWWRR", "RR.KK.RR", "...OO...", "..O..O.."];
 const BASEPAL={B:'#7a4a22',b:'#a86a35',O:'#e0b04a',Q:'#c0303a',U:'#2b6fd6',Z:'#fff3b0',G:'#4ca038',g:'#286e24',R:'#d63434',r:'#961c20',p:'#f07878',K:'#1a141a',L:'#eef6fa',S:'#fafafa',H:'#1e1e1e',k:'#3d3640',F:'#f2c9a0',C:'#7d7f88',W:'#f6f6f0',T:'#d93030',Y:'#e8b23a',N:'#2c3a66'};
 
 function buildSprite(rows,pal,px,outline){
@@ -484,7 +454,7 @@ function redkaChar(li,px,faceKey){
 }
 const EGRID={"stuk":["....................","....................","....................","....................","....................","....................","....................","....................",".....KKKKKKKKKK.....","...KKHHHHHHHHHhKK...","..KHHHHHHHHHHHhhhK..","..KHHhhhhhhhhhhhhK..","...KHHHHfFFfHHhhK...","....KKKCCCCCCKKKKKK.","....KCCCCSSSCcPPPPPK","...KCCCCCSSSCcPLLLPK","...KCCCCCccCCFPPPPPK","..KCCCCCCccCCFPLLLPK","..KCCCCCCccCCcPPPPPK","..KCCCCCCccCCcPTTTPK","...KCCCCCccCCcPPPPPK","...KCCCCCccCCcPPPPPK","....KCCCCccCCccKKKK.",".....KnnnCCnnnK.....",".....KnnnKKnnnK.....",".....KKKK..KKKK....."],"koms":["....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","........KKKK........",".......KfFFfK.......",".......KFFFFKK...KKK",".....KKTTTTTttKKKMMM","....KSSTTTTTttsMMMmm","....KSSTTTTTttFMMMmm","...KSSSTTTTTttFMMMmm","...KSSSTTStSsssMMMmm","...KSSSSSSSSssssKMMM","...KSSSSSSSSssssKKKK","....KSSSSSSSsssK....","....KSSSSSSSsssK....",".....KNNNSSNNNK.....",".....KNNNKKNNNK.....",".....KKKK..KKKK....."],"cancel":[".....KKKKKKKKKK.....","....KBBBBBBBBBBK....","...KGGGGGGGGGGGGK...","...KBBBBBBBBBBBBBK..","..KGBBBBBBBBBBBBGK..","..KGFFBBBBBBBBffGK..","..KGFFKFFFFFFFKfGK..","..KGFFFKFFFFFKffGK..","..KGFFFWKFFFWKffGK..","..KGFFFKKFFFKKffGK..","..KGFpFFFFFFFFfpGK..","...KKFFFFFFFFFGGK...","....KFFFKKKKFKYYYK..",".....KKFFFFFFKYYYK..",".....KKDDSSSDKYYYK..","....KDDDDddDDdFYYK..","...KDDDDDddDDdFYYK..","...KDDDDDddDDdYYYKKK","...KDDDDDddDDRRRRRRR","...KDDDDDddDDRRRRRRR","...KDDDDDddDDRRRRRRR","...KDDDDDddDDrrrrrrr","....KDDDDddDDddKKKKK",".....KdddDDdddK.....",".....KdddKKdddK.....",".....KKKK..KKKK....."],"lang":[".....KKKKKKKKKK.....","....KHHHHHHHHhhK....","...KHHHHHHHHHhhhK...","...KHHHHHHHHHHHHK...","...KHHHHHHHHHHHHK...","...KHHHHHHHHHHHHK...","..KHHFKFHHHHFFKHHK..","..KHHKKKKFFKKKKHHK..","..KHHKWKKKKKWKKHHK..","..KHHKKKKFFKKKKHHK..","...KFpFFFFFFFFfpK...","....KFFFKKKKFFfK....","....KFFFKTTKFFfK....",".....KKFfFFfFKK.....","......KKFFFFKK......","..KKKKXXSSSSSxKK....",".KUUZUXXSSSSSxFFK...",".KUPPPXXXSSSXxFFK...",".KUPKPFXXXXXXxFFK...",".KUPPPXXXXXXXxxxK...",".KUPVPXXXXXXXxxxK...",".KUUUUXXXXXXXxxxK...","..KKKXXXXXXXXxxK....",".....KxxxXXxxxK.....",".....KxxxKKxxxK.....",".....KKKK..KKKK....."],"threads":["....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","........KKKK........",".......KfFFfK.......",".......KFFFFKKKKKK..",".....KKIIIIIIIEEEEK.","....KIIIWIIIWiEeeEK.","...KIIIIIIIIIiEeeEK.","..KIIIIIIWWWIFEeeEK.","..KIIIIIWIeIWFEeeEK.","..KIIIIIIWWWWiEeeEK.","..KIIIIIIIIIIiEeeEK.","...KIIIIIIIIIiEEEEK.","...KIIIIIIIIIiiiKK..","....KKiiiIIiiiKK....",".....KiiiIIiiiK.....",".....KKKKKKKKKK....."]};
 const EPAL={"K":"#1e1820","F":"#f3c6a0","f":"#d99c72","p":"#f08f86","W":"#ffffff","H":"#4a4a55","h":"#22222a","C":"#c9a46a","c":"#9c7a44","P":"#fbfbf2","L":"#8aa0c8","n":"#3b3b46","A":"#5a3a22","T":"#d9302c","t":"#9e1b1b","S":"#f4f4ee","s":"#c4c8d0","M":"#f0b93a","m":"#b07d16","N":"#2c3a66","B":"#2a2320","G":"#59606c","R":"#d63434","r":"#8f1c1c","D":"#5e6675","d":"#3f4552","Y":"#a8743e","O":"#ecc062","o":"#b98a2c","V":"#c22a3a","Q":"#c0303a","X":"#2a9a8c","x":"#1b6660","Z":"#9a9aa4","U":"#9a6a3a","J":"#2b6fd6","j":"#1b4a99","I":"#2c2c36","i":"#17171d","E":"#3a3a44","e":"#7cd2ff"};
-const IGRID={"ROCKET":["....KRRK....","...KRRRRK...","...KRRRRK...","..KWWWWwwK..","..KWWWWwwK..","..KWBbbBwK..","..KWBbbBwK..","..KWBBBBwK..","..KWBBBBwK..",".KKWRRRRwKK.","KRRWWWWwwRRK","KRRWWWWwwRRK","KRRRRRRRRRRK","KRRRRRRRRRRK","KRRRRRRRRRRK",".KKKKKKKKKK.","...KOOOOK...","....KYYK....","....KYYK...."],"TRAIN":["...KKKKK......KKKKKKKKK.","..KkkkkkK....KkkkkkkkkkK","...KkkkK.KKK..KZZZZZZZK.","...KkkkKKZZZK.KYYYYYYyK.","...KkkkKKYYYKKKYYLLLYyK.","..KZZZZZyZZZyZZYYLLLYyK.","..KZZZZZyZZZyZZYYLLLYyK.","..KYYYYYyYYYyYYYYYYYYyK.",".KKYYYYYyYYYyYYYYYYYYyK.","KkkYYYYYyYYYyYYYYYYYYyK.","kkkyyyyyyyyyyyyYYYYYYyK.","kkkkkkkkkkkkkkkkkkkkkkkK","KKKKKkZZkKkZZkKKKKkZkKK.","....KkZZkKkZZkK..KkZkK..","....KkkkkKkkkkK..KkkkK.."],"ENV":["WWWWWWWWWWWWWW","WKWWWWWWWWWWKW","WWKWWWWWWWWKWW","WWWKWWWWWWKWWW","WWWWKWWWWKWWWW","WWWWWKWWKWWWWW","WWWWWWRRWWWWWW","WWWWWWRRWWWWWW","WWWWWWWWWWWWWW","ssssssssssssss"],"THREAD":["KIIIIIIIIIIIIIIIIIIIIIIIIK","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","KIIIIIIIIIIIIIIIIIIIIIIIIK",".KKIIIKKKKKKKKKKKKKKKKKKK.","..KIKK....................","...K......................"]};
+const IGRID={"ROCKET":["....KRRK....","...KRRRRK...","...KRRRRK...","..KWWWWwwK..","..KWWWWwwK..","..KWBbbBwK..","..KWBbbBwK..","..KWBBBBwK..","..KWBBBBwK..",".KKWRRRRwKK.","KRRWWWWwwRRK","KRRWWWWwwRRK","KRRRRRRRRRRK","KRRRRRRRRRRK","KRRRRRRRRRRK",".KKKKKKKKKK.","...KOOOOK...","....KYYK....","....KYYK...."],"ENV":["WWWWWWWWWWWWWW","WKWWWWWWWWWWKW","WWKWWWWWWWWKWW","WWWKWWWWWWKWWW","WWWWKWWWWKWWWW","WWWWWKWWKWWWWW","WWWWWWRRWWWWWW","WWWWWWRRWWWWWW","WWWWWWWWWWWWWW","ssssssssssssss"],"THREAD":["KIIIIIIIIIIIIIIIIIIIIIIIIK","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","KIIIIIIIIIIIIIIIIIIIIIIIIK",".KKIIIKKKKKKKKKKKKKKKKKKK.","..KIKK....................","...K......................"]};
 const IPAL={R:'#d63434',W:'#f6f6f0',w:'#c9ccd4',B:'#2b6fd6',b:'#9fd6ff',O:'#ff9a2a',Y:'#ffd23a',K:'#1e1820',Z:'#fff3b0',y:'#a8740f',L:'#7cc4f0',k:'#4a320a',s:'#c9c2b0',I:'#1e1e26',e:'#7cd2ff'};
 const EPAL_X={cancel:{D:'#4a5fd6',d:'#2c3a96',G:'#e0473a',B:'#2a2320'},koms:{A:'#8a4a1e',S:'#fff7e6',s:'#e0cfae',M:'#ffcc33',m:'#d18f00'}};
 const EFACE={
@@ -519,6 +489,7 @@ function paintIcons(){
   for(const [id,k] of [['icStuk','stuk'],['icKoms','koms'],['icThreads','threads'],['icLang','lang'],['icCancel','cancel']]){const el=$(id);if(el)el.src=enemyChar(k).c.toDataURL()}
   const r=$('icRocket');if(r)r.src=ROCKET_SPR.toDataURL();
   const t=$('icTicket');if(t)t.src=TICKET_SPR.toDataURL();
+  const ht=$('hudTixImg');if(ht)ht.src=TICKET_SPR.toDataURL();
 }
 paintIcons();
 
@@ -530,7 +501,7 @@ const ZONES=[
   {from:140000,name:'Князь Володимир',cloth:'#f0e0d6',labels:['ОБРАЗИВ КНЯЗЯ','ЗРАДНИК','ВОРОГ ІСТОРІЇ','ОБРАЗИВ ІСТОРІЮ','ПЛЮЄ В ІСТОРІЮ','ОСКВЕРНИВ СВЯТИНЮ','ЗНЕВАЖИВ ПРЕДКІВ','ЗАБОРОНИТИ КОНЦЕРТ','ЯК ВИ СМІЄТЕ?!'],springs:['СБУ, ПЕРЕВІРТЕ!','ПОЗБАВИТИ ГРОМАДЯНСТВА','ВИСЛАТИ З КРАЇНИ!','ЧОРНИЙ СПИСОК']},
   {from:240000,name:'Суджа · 2024',cloth:'#e4d4c4',labels:['ХАЙП НА ВІЙНІ','ВОЄННИЙ ТУРИСТ','ПІАРНИК','ФОТО В СУДЖІ','ПІАР НА КРОВІ','ДЕШЕВИЙ ХАЙП','ТУРИСТ У ШОЛОМІ','ЛАЙКИ НА ВІЙНІ','БЛОГЕР НА ФРОНТІ','НАВІЩО ТИ ТАМ?'],springs:['СКАНДАЛ!','ТЕРМІНОВО: ЗРАДА','ГУЧНЕ РОЗСЛІДУВАННЯ']},
   {from:370000,name:'Київ · 2026',cloth:'#e8dce6',labels:['ЗА БУЛГАКОВА?!','РОСІЙСЬКІ НАРАТИВИ','ЗАХИЩАЄ БУЛГАКОВА','ПРОРОСІЙСЬКИЙ','КОЛАБОРАНТ','РУСЬКІЙ МІР','МАЙСТЕР І МАРГАРИТА','РУСЬКИЙ СВІТ','ЛЮБИТЕЛЬ БУЛГАКОВА','СПОЧАТКУ КУЛЬТУРА!','ВИЗНАЙ ПОМИЛКУ'],springs:['РОЗСЛІДУВАННЯ','ВСЕ, ВІН ЗАКІНЧИВСЯ','ТРЕД НА 300 ЛАЙКІВ']},
-  {from:530000,name:'Тур «Одіссея» · 2026',cloth:'#f1e1c6',labels:['ВІДМІНИТИ!','АГЕНТ КРЕМЛЯ','ІПСО','ЗРАДНИК','НЕ ПУСКАТИ!','ВОРОГ НАРОДУ','ЗАЛ НЕ ДАВАТИ','ПОВЕРНІТЬ КВИТКИ','НЕ ПУСКАТИ В МІСТО','ПОЗА ЗАКОНОМ'],springs:['СКАНДАЛ!','БОЙКОТ!','ЗІРВАТИ ТУР!'],cities:true},
+  {from:530000,name:'Тур «Одіссея» · 2026',cloth:'#f1e1c6',labels:['ВІДМІНИТИ!','АГЕНТ КРЕМЛЯ','ІПСО','ЗРАДНИК','НЕ ПУСКАТИ!','ВОРОГ НАРОДУ','ЗАЛ НЕ ДАВАТИ','ПОВЕРНІТЬ КВИТКИ','НЕ ПУСКАТИ В МІСТО','ПОЗА ЗАКОНОМ'],springs:['СКАНДАЛ!','БОЙКОТ!','ЗІРВАТИ ТУР!']},
   {from:750000,name:'Стадіон',cloth:'#f3ead9',labels:[],springs:['СКАНДАЛ!','СБУ, ПЕРЕВІРТЕ!','РОЗСЛІДУВАННЯ','ВСЕ, ВІН ЗАКІНЧИВСЯ','БОЙКОТ!']}
 ];
 // The labels that stick most often, so the end-of-run tally has a clear winner to brag about.
@@ -567,14 +538,14 @@ const lookAt=s=>{let i=0;LOOKS.forEach((l,j)=>{if(s>=l.at)i=j});return i};
 function stageD(gs){const zi=zoneAt(gs),z=ZONES[zi],nx=ZONES[zi+1];const frac=nx?Math.min(1,(gs-z.from)/(nx.from-z.from)):Math.min(1,(gs-z.from)/20000);return Math.min(1,(zi+frac*.7)/(ZONES.length-1))}
 let curD=0;const diff=()=>curD;
 
-let cloth,clothZone=-1,gc=null;
+let cloth,clothPat=null,clothZone=-1,gc=null;
 function goldCloth(){if(!gc){const c=document.createElement('canvas');c.width=24;c.height=24;const g=c.getContext('2d');g.fillStyle='#f1c84b';g.fillRect(0,0,24,24);g.fillStyle='rgba(140,90,10,.12)';for(let i=0;i<24;i+=6){g.fillRect(i,0,1,24);g.fillRect(0,i,24,1)}g.fillStyle='rgba(255,250,210,.5)';for(let y=0;y<24;y+=6)for(let x=0;x<24;x+=6)g.fillRect(x,y,2,2);gc=ctx.createPattern(c,'repeat')}return gc}
 function makeCloth(zi){
   const base=ZONES[zi].cloth;cloth=document.createElement('canvas');cloth.width=24;cloth.height=24;const c=cloth.getContext('2d');
   c.fillStyle=base;c.fillRect(0,0,24,24);
   c.fillStyle='rgba(90,60,40,.07)';for(let i=0;i<24;i+=6){c.fillRect(i,0,1,24);c.fillRect(0,i,24,1)}
   c.fillStyle='rgba(90,60,40,.16)';for(let y=0;y<24;y+=6)for(let x=0;x<24;x+=6)c.fillRect(x,y,2,2);
-  clothZone=zi;
+  clothPat=ctx.createPattern(cloth,'repeat');clothZone=zi;
 }
 function mkC(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.imageSmoothingEnabled=false;return {c,g}}
 function F(g,x,y,w,h,col){g.fillStyle=col;g.fillRect(x|0,y|0,Math.max(1,w|0),Math.max(1,h|0))}
@@ -695,7 +666,8 @@ function loadAchs(){
 function paintAchCount(){const el=$('achCount');if(el)el.textContent=Object.keys(ACH_HAVE).filter(k=>ACH.some(a=>a.id===k)).length+'/'+ACH.length}
 function paintTickets(){
   const n=STATS.tickets|0,run=ticketsRun|0;
-  const hud=$('hudTix');if(hud)hud.textContent='Квитки '+(run?run+' · '+n:n);
+  const runEl=$('hudTixRun');if(runEl)runEl.textContent=String(run);
+  const all=$('hudTixAll');if(all)all.textContent=n?'· '+fmt(n):'';
   const st=$('tixStart');if(st)st.textContent=fmt(n);
   const wt=$('wardTix');if(wt)wt.innerHTML='Квитки: <b>'+fmt(n)+'</b>';
 }
@@ -763,7 +735,33 @@ function paintBestHud(){
   const el=$('best');if(!el)return;
   el.hidden=!(best>0);el.textContent=best?'рекорд '+fmt(best):'';
 }
-function showPlayHud(on){$('scorebox').hidden=!on;$('menuBtn').hidden=!on;if(on)paintBestHud()}
+function showPlayHud(on){
+  $('scorebox').hidden=!on;$('menuBtn').hidden=!on;
+  const t=$('hudTix');if(t)t.hidden=!on;
+  if(on){paintBestHud();paintTickets()}
+  else hideSteer(false);
+}
+let steerDone=false,steerT=null;
+function hideSteer(fade){
+  const el=$('steerHint');if(!el)return;
+  clearTimeout(steerT);steerT=null;
+  el.classList.remove('on');
+  if(!fade){el.hidden=true;return}
+  if(el.hidden)return;
+  steerT=setTimeout(()=>{el.hidden=true;steerT=null},400);
+}
+function showSteer(){
+  const el=$('steerHint');if(!el)return;
+  clearTimeout(steerT);steerT=null;
+  if(steerDone||(STATS.runs|0)>=3){el.hidden=true;el.classList.remove('on');return}
+  el.hidden=false;
+  requestAnimationFrame(()=>el.classList.add('on'));
+  steerT=setTimeout(()=>{steerDone=true;hideSteer(true)},4000);
+}
+function noteSteer(){
+  if(steerDone||(STATS.runs|0)>=3)return;
+  if(input.l||input.r){steerDone=true;hideSteer(true)}
+}
 function ensureBgm(){
   if(bgmAudio)return bgmAudio;
   const a=new Audio('art/springy-lead.mp3');
@@ -782,7 +780,7 @@ function primeBgm(){
   if(!bgmOn){a.muted=true;const p=a.play();const done=()=>{a.pause();a.muted=false};if(p&&p.then)p.then(done,()=>{a.muted=false;bgmPrimed=false});else done();return}
   a.muted=false;a.play().catch(()=>{bgmPrimed=false});
 }
-function resize(){const r=wrap.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,2);cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);scale=r.width/W;H=r.height/scale;ctx.imageSmoothingEnabled=false}
+function resize(){const r=wrap.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,2);cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);scale=r.width/W;H=r.height/scale;ctx.imageSmoothingEnabled=false;clothPat=null;gc=null;if(clothZone>=0)makeCloth(clothZone)}
 const PFONT=13,PH=26;
 function fontFor(t,maxW){let s=PFONT;ctx.font='800 '+s+'px Manrope, system-ui, sans-serif';while(s>9&&ctx.measureText(t).width>maxW){s--;ctx.font='800 '+s+'px Manrope, system-ui, sans-serif'}return s}
 // Labels peel off after a few landings, so standing still eventually drops Redka into the abyss.
@@ -1027,7 +1025,12 @@ function update(dt){
   if(banner){banner.life-=.006*dt;if(banner.life<=0)banner=null}
   tickToast(dt);if(gordonTitle>0)gordonTitle-=.016*dt;
   p.sq*=Math.pow(.84,dt);
-  if(mode==='play'){$('score').textContent=fmt(Math.max(0,score()));$('combo').textContent=mult>1?'КОМБО ×'+mult:'';if(p.y-camY>H+70){cause='Впав у прірву скасування';causeKind='fall';gameOver()}}
+  if(mode==='play'){
+    $('score').textContent=fmt(Math.max(0,score()));
+    const c=$('combo');if(mult>1){c.hidden=false;c.textContent='×'+mult}else{c.hidden=true;c.textContent=''}
+    noteSteer();
+    if(p.y-camY>H+70){cause='Впав у прірву скасування';causeKind='fall';gameOver()}
+  }
 }
 function score(){return hs()+bonus}
 
@@ -1305,7 +1308,7 @@ function draw(){
   if(bgFade<1&&bgPrev>=0)painted=drawBg(bgPrev,1,1);
   painted=drawBg(bgShown,zoneFrac(),bgFade)||painted;
   const off=((-camY*.4)%24+24)%24;
-  ctx.save();ctx.translate(0,off-24);ctx.fillStyle=ctx.createPattern(cloth,'repeat');
+  ctx.save();ctx.translate(0,off-24);ctx.fillStyle=clothPat||ctx.createPattern(cloth,'repeat');
   if(painted){ctx.globalAlpha=.16;ctx.fillRect(0,0,W,H+48);ctx.globalAlpha=1;ctx.fillStyle='rgba(255,248,236,.16)';ctx.fillRect(0,0,W,H+48)}
   else ctx.fillRect(0,0,W,H+48);
   ctx.restore();
@@ -1331,7 +1334,7 @@ function draw(){
   if(toastNow&&mode==='play'){
     const a=toastNow.life>toastNow.max-.2?(toastNow.max-toastNow.life)/.2:toastNow.life<.25?toastNow.life/.25:1;
     ctx.save();ctx.globalAlpha=a;ctx.textAlign='left';ctx.textBaseline='middle';
-    const tw=W-24,bx=12,by=56;
+    const tw=W-24,bx=12,by=108;
     ctx.fillStyle='#2a1722';ctx.fillRect(bx,by+2,tw,38);ctx.fillStyle='#f8f1e3';ctx.fillRect(bx,by,tw,38);
     ctx.fillStyle='#d63434';ctx.font='800 12px Manrope, system-ui, sans-serif';ctx.fillText(toastNow.top.toUpperCase(),bx+10,by+12,tw-20);
     ctx.fillStyle='#2a1722';ctx.font='12px "Press Start 2P", monospace';ctx.fillText(toastNow.text,bx+10,by+26,tw-20);
@@ -1444,7 +1447,7 @@ function fillHatePanel(){
   $('hateExtra').innerHTML='<span>Розібрано хейтерів: <b>'+stomps+'</b></span><span>Відписок: <b>'+minusCnt+'</b></span><span>Фейків: <b>'+fakeCnt+'</b></span>';
 }
 let bestAtStart=0,recordShown=false,colBack='start';
-function start(){reset();bestAtStart=best;recordShown=false;mode='play';colBack='start';$('startScr').hidden=true;$('colScr').hidden=true;$('pauseScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=true;showPlayHud(true);$('score').textContent='0';paintBestHud();paintTickets();pushToast('Етап 1 / '+ZONES.length,ZONES[0].name);syncBgm()}
+function start(){reset();bestAtStart=best;recordShown=false;mode='play';colBack='start';$('startScr').hidden=true;$('colScr').hidden=true;$('pauseScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=true;showPlayHud(true);$('score').textContent='0';$('combo').hidden=true;$('combo').textContent='';paintBestHud();paintTickets();steerDone=false;showSteer();pushToast('Етап 1 / '+ZONES.length,ZONES[0].name);syncBgm()}
 let yellT=null;
 function showYell(){
   $('startScr').hidden=true;$('colScr').hidden=true;$('pauseScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=false;
@@ -1465,7 +1468,7 @@ function openPause(){
 function resumePlay(){
   if(mode!=='pause')return;
   $('pauseScr').hidden=true;$('colScr').hidden=true;
-  mode='play';showPlayHud(true);resumeGordonAudio();syncBgm();
+  mode='play';showPlayHud(true);showSteer();resumeGordonAudio();syncBgm();
 }
 function quitToStart(){
   hideAchPop();stopGordonMusic();gordonBits=[];
@@ -1501,12 +1504,11 @@ document.querySelectorAll('.tabs').forEach(t=>t.addEventListener('click',e=>{
   card.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
   card.querySelectorAll('[data-panel]').forEach(p=>{p.hidden=p.dataset.panel!==b.dataset.tab});
 }));
-function showBestStart(){$('bestStart').textContent=fmt(best);$('bestLine').hidden=!(best>0);paintTickets()}
+function showBestStart(){$('bestStart').textContent=fmt(best);const rec=$('bestRec');if(rec)rec.hidden=!(best>0);paintTickets()}
 showBestStart();
 $('colBtn').onclick=()=>openCol('achs','start');
 $('colClose').onclick=closeCol;
-let shareCard=null,DL=null;
-try{window.claude&&window.claude.use&&window.claude.use('downloads').then(d=>{DL=d}).catch(()=>{})}catch(e){}
+let shareCard=null;
 function makeCard(sc,s){
   const c=document.createElement('canvas');c.width=1080;c.height=1350;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
   g.fillStyle='#2b1e19';g.fillRect(0,0,1080,1350);
@@ -1576,7 +1578,7 @@ document.addEventListener('click',e=>{
 });
 paintMute();paintBgm();
 
-function setPtr(){input.l=false;input.r=false;const r=wrap.getBoundingClientRect();for(const x of pointers.values()){if(x-r.left<r.width/2)input.l=true;else input.r=true}}
+function setPtr(){input.l=false;input.r=false;const r=wrap.getBoundingClientRect();for(const x of pointers.values()){if(x-r.left<r.width/2)input.l=true;else input.r=true}if(mode==='play')noteSteer()}
 wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.card,.menu,.soundchip,.demo,.achbtn,#menuBtn,#yellScr,#pauseScr'))return;audioOn();pointers.set(e.pointerId,e.clientX);setPtr()});
 wrap.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('touchmove',e=>{if(!e.target.closest('.card'))e.preventDefault()},{passive:false});
@@ -1590,8 +1592,8 @@ addEventListener('keydown',e=>{
     if(mode==='play'){openPause();e.preventDefault();return}
     if(mode==='pause'){if(!$('colScr').hidden)closeCol();else resumePlay();e.preventDefault();return}
   }
-  if(KL.includes(e.key)){input.l=true;e.preventDefault()}
-  if(KR.includes(e.key)){input.r=true;e.preventDefault()}
+  if(KL.includes(e.key)){input.l=true;e.preventDefault();if(mode==='play')noteSteer()}
+  if(KR.includes(e.key)){input.r=true;e.preventDefault();if(mode==='play')noteSteer()}
   if((e.key===' '||e.key==='Enter')&&document.activeElement.tagName!=='BUTTON'){
     if(!$('yellScr').hidden){finishYell();e.preventDefault();return}
     if(mode==='pause'){if($('colScr').hidden)resumePlay();e.preventDefault();return}
@@ -1613,16 +1615,16 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 loadFaces();loadEnds();loadAchs();loadBackgrounds();
-resize();reset();paintBestHud();paintAchCount();paintTickets();paintHero();showBestStart();
+resize();reset();draw();paintBestHud();paintAchCount();paintTickets();paintHero();showBestStart();
 function jumpTo(gs){
   const y=player0-gs/SC;player.y=y;camY=y-H*.45;
   plats=[];items=[];enemies=[];envs=[];
   const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
   topY=player.y+FEET+2;while(topY>camY-280)genStep();
 }
-window.__g={get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,tapLook,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get cities(){return cities},get citySpawned(){return citySpawned},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r}};
+window.__g={get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,tapLook,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get cities(){return cities},get citySpawned(){return citySpawned},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get runs(){return STATS.runs},set runs(v){STATS.runs=v|0},get steerOn(){const el=$('steerHint');return !!(el&&!el.hidden&&el.classList.contains('on'))},hideSteer,showSteer,get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r;if(mode==='play')noteSteer()}};
 let last=performance.now();
-function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode==='play')update(dt);draw();requestAnimationFrame(loop)}
+function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode==='play'){update(dt);draw()}requestAnimationFrame(loop)}
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});
 requestAnimationFrame(loop);
 })();
