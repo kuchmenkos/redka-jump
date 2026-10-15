@@ -116,8 +116,8 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 @media (max-height:720px){.card.over .scene{max-height:170px;object-fit:cover}.overpanels{min-height:300px}.card.over{gap:8px}}
 #shareTxt{font-size:12px;background:var(--well);border-radius:8px;padding:8px;margin:0;user-select:text;-webkit-user-select:text;text-align:left}
 #yellScr{z-index:3;background:rgba(43,30,25,.72)}
-.card.yell{gap:14px;padding:28px 18px 22px;outline-color:var(--stamp);transform:rotate(-2deg);animation:yellIn .35s cubic-bezier(.2,1.4,.4,1),yellShake .4s .35s ease-in-out 4}
-.card.yell h2{font-family:var(--pixel);font-size:15px;line-height:1.55;color:var(--stamp);margin:0;font-weight:400;text-wrap:balance}
+.card.yell{gap:12px;padding:28px 18px 24px;outline-color:var(--stamp);transform:rotate(-2deg);animation:yellIn .35s cubic-bezier(.2,1.4,.4,1),yellShake .4s .35s ease-in-out 4}
+.card.yell h2{font-family:var(--body);font-size:22px;line-height:1.3;color:var(--stamp);margin:0;font-weight:800;text-wrap:balance;letter-spacing:.04em}
 @keyframes yellIn{from{transform:scale(.55) rotate(-10deg);opacity:0}to{transform:scale(1) rotate(-2deg);opacity:1}}
 @keyframes yellShake{0%,100%{transform:rotate(-2deg)}25%{transform:rotate(2deg) translateX(4px)}50%{transform:rotate(-4deg)}75%{transform:rotate(1deg) translateX(-3px)}}
 </style>
@@ -177,8 +177,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
   <div class="overlay" id="yellScr" hidden>
     <div class="card yell" role="dialog" aria-label="Хто не скаче — той москаль">
       <p class="eyebrow">УВАГА</p>
-      <h2>ХТО НЕ СКАЧЕ - ТОЙ МОСКАЛЬ</h2>
-      <p class="fine">тицяй, щоб стрибати</p>
+      <h2>ХТО НЕ СКАЧЕ — ТОЙ МОСКАЛЬ</h2>
     </div>
   </div>
 
