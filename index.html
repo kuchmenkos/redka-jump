@@ -9,7 +9,22 @@
 <meta property="og:title" content="Редька Джамп">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://redkajump.fun/">
+<meta property="og:image" content="https://redkajump.fun/art/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://redkajump.fun/art/og.png">
 <link rel="canonical" href="https://redkajump.fun/">
+<script>
+window.POSTHOG_KEY='';
+window.POSTHOG_HOST='https://us.i.posthog.com';
+(function(){
+  var k=window.POSTHOG_KEY;
+  if(!k){window.posthog={capture:function(){}};return}
+  !function(t,e){var o,n,p,r;e.__SV||window.posthog&&window.posthog.__loaded||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once identify reset get_distinct_id set_config".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init(k,{api_host:window.POSTHOG_HOST,autocapture:!1,capture_pageview:!0,persistence:'localStorage+'});
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&family=Press+Start+2P&display=swap">
 <style>
@@ -145,7 +160,6 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .badge{font-family:var(--pixel);font-size:9px;padding:6px 5px;border-radius:5px;background:#1a7a32;color:#fff}
 .badge.red{background:#c62828}
 .badge.gold{background:linear-gradient(#ffe48a,#e2a91c);color:var(--ink)}
-.badge.tour{font-family:var(--body);font-size:11px;padding:6px 2px;letter-spacing:.01em;white-space:nowrap}
 @media (max-height:720px){.hero img{height:88px}h1{font-size:19px}.card.start{gap:7px}.card.start .sub{font-size:13px}.panels{height:210px}.panels .legend img{height:30px}}
 @media (max-height:620px){.card.start .sub{display:none}.hero img{height:72px}.panels{height:180px}}
 @media (prefers-reduced-motion:reduce){.hero img,#playBtn{animation:none}.achpop{animation:achPopFade .25s ease;transform:none}.steerhint{transition:none}}
@@ -216,7 +230,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
       <p class="sub">Що більше наїжджають — то вище стрибає.</p>
       <button id="playBtn" class="cta">Стрибати</button>
       <p class="bestline" id="bestLine"><span id="bestRec" hidden>Рекорд: <b id="bestStart">0</b> · </span>Квитки: <b id="tixStart">0</b></p>
-      <button id="colBtn" class="achbtn" type="button">Досягнення <b id="achCount">0/22</b></button>
+      <button id="colBtn" class="achbtn" type="button">Досягнення <b id="achCount">0/19</b></button>
       <div class="soundrow">
         <button type="button" class="soundchip" data-mute aria-label="Вимкнути звук">Звук <b>♪</b></button>
         <button type="button" class="soundchip" data-bgm aria-label="Вимкнути музику">Музика <b>♫</b></button>
@@ -248,7 +262,6 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
         <div class="legend" role="tabpanel" data-panel="bonus" hidden>
           <span class="ic"><img id="icRocket" alt=""></span><span><b>Шакалячий експрес</b> — ракета проти хейтерів</span>
           <span class="ic"><span class="badge">×5</span></span><span><b>Комбо</b> — нові ярлики без пауз</span>
-          <span class="ic"><span class="badge red tour">3/7/12</span></span><span><b>Скасовані міста туру</b> — три, сім або дванадцять залів</span>
           <span class="ic"><span class="badge gold">???</span></span><span>Після <b>300 000</b> інколи заходить гість</span>
           <span class="ic"><img id="icTicket" alt=""></span><span><b>Квитки</b> — збирай і купуй луки в гардеробі</span>
         </div>
@@ -528,8 +541,6 @@ const ZONES=[
 // The labels that stick most often, so the end-of-run tally has a clear winner to brag about.
 const HOT=['МАЛОРОС','ЗРАДНИК','АГЕНТ КРЕМЛЯ','ІПСО','ХАЙПОЖЕР','ЖЕБРАК ІЗ СУМ'];
 const MINUS=[[],['МАСОВА ВІДПИСКА','КОНЦЕРТ МАЙЖЕ ЗІРВАЛИ'],['ЗАЛ ВІДМОВИВ','МАСОВА ВІДПИСКА'],['МАСОВА ВІДПИСКА','ВІДПИСАЛИСЬ ХОРОМ'],['РЕКЛАМУ РОЗІРВАНО','МАСОВА ВІДПИСКА'],['КВИТКИ ПОВЕРТАЮТЬ','РЕКЛАМУ РОЗІРВАНО'],['МАСОВА ВІДПИСКА','РЕКЛАМУ РОЗІРВАНО','КВИТКИ ПОВЕРТАЮТЬ']];
-const CITIES=['ЛЬВІВ СКАСОВАНО','ХМЕЛЬНИЦЬКИЙ СКАСОВАНО','ФРАНКІВСЬК СКАСОВАНО','ТЕРНОПІЛЬ СКАСОВАНО','ВІННИЦЯ СКАСОВАНО','ОДЕСА СКАСОВАНО','ДНІПРО СКАСОВАНО','ХАРКІВ СКАСОВАНО','ПОЛТАВА СКАСОВАНО','ЧЕРНІГІВ СКАСОВАНО','ЗАПОРІЖЖЯ СКАСОВАНО','ЧЕРКАСИ СКАСОВАНО','СУМИ СКАСОВАНО','ЛУЦЬК СКАСОВАНО','РІВНЕ СКАСОВАНО'];
-const CITY_CAP=15,CITY_GOAL=12,CITY_FROM=40000;
 const FAKES=['ФЕЙК','ВИРВАНО З КОНТЕКСТУ','СКРІН БЕЗ ДЖЕРЕЛА','«ВСІ ЗНАЮТЬ»','ІНСАЙД ВІД ЗНАЙОМОГО','НЕПЕРЕВІРЕНЕ','ЗМОНТОВАНЕ ВІДЕО','КОЛАЖ ЗІ СТРІЛКАМИ'];
 const MOVERS=['ПЕРЕВЗУВСЯ','ТО ЗРАДА, ТО ПЕРЕМОГА','ЗМІНИВ ПОЗИЦІЮ','ТО ТАК, ТО СЯК','ТО ЛАЙК, ТО ХЕЙТ','ВЧОРА ЛАЙКАВ','СЬОГОДНІ ХЕЙТИТЬ','СПОЧАТКУ ХВАЛИВ','ТЕПЕР ПРОТИ','ТРЕД ПО КОЛУ'];
 const ENEMIES={
@@ -544,8 +555,9 @@ const SPRING_Q=['дякую за рекламу','+хайп = +зал','квит
 const STOMP_Q={stuk:['скаргу порвано','стукач у мюті'],koms:['комсомол розпущено','збори закрито','порядок денний вичерпано'],cancel:['концерт відбудеться!','скасовувача скасовано'],lang:['інспекцію закрито','дякую, почув','штраф скасовано'],threads:['тред видалено','блогера в бан']};
 const FEET=22*PX;
 
-let items=[],waves=[],causeKind='fall',mode='start',player,plats,enemies,envs,floats,camY,topY,bonus,zoneIdx,lookIdx,banner,cities,stomps,hat,cause,best=0,input={l:false,r:false},pointers=new Map(),player0=0,tick=0,recent=[];
-let ticketsRun=0,citySpawned=[],lastTicketStep=-99;
+let items=[],waves=[],causeKind='fall',mode='start',player,plats,enemies,envs,floats,camY,topY,bonus,zoneIdx,lookIdx,banner,stomps,cause,best=0,input={l:false,r:false},pointers=new Map(),player0=0,tick=0,recent=[];
+let ticketsRun=0,lastTicketStep=-99;
+function ph(n,p){try{window.posthog&&posthog.capture&&posthog.capture(n,p||{})}catch(e){}}
 let gordonAudio=null,gordonBits=[],gordonDecided=false,gordonTitle=0,gordonLastEdge=-1,gordonDeck=[],gordonDeckI=0,gordonCaught=false,gordonDemo=false,gordonMissed=false,gordonOffered=false;
 let toasts=[],toastNow=null,stompKind={},expressN=0,malorosN=0,threadHits=0,idlePeak=0,newAchs=[];
 const GORDON_IMGS=[];
@@ -622,9 +634,6 @@ const ACH=[
   {id:'exp3',name:'Шакалячий пасажир',hint:'3 експреси за забіг',test:(r)=>r.expressN>=3},
   {id:'guest',name:'Був у гостях',hint:'Піймай Гордона',test:(r,S)=>(r.gordonCaught&&!r.gordonDemo)||(S.gordon||0)>=1},
   {id:'gmiss',name:'Гордон чекав, а ти не прийшов',hint:'Пропусти предмет Гордона',test:(r,S)=>r.gordonMissed||(S.gordonMiss||0)>=1},
-  {id:'hat',name:'Хет-трик туру',hint:'3 скасовані міста туру за забіг',test:(r)=>r.citiesN>=3},
-  {id:'hat7',name:'Сім залів',hint:'7 скасованих міст туру за забіг',test:(r)=>r.citiesN>=7},
-  {id:'hat12',name:'Тур зірвано',hint:'12 скасованих міст туру за забіг',test:(r)=>r.citiesN>=12},
   {id:'minus5',name:'Мінус на мінусі',hint:'5 відписок за забіг',test:(r)=>r.minusCnt>=5},
   {id:'fake15',name:'Фактчекер',hint:'Порви 15 фейків',test:(r,S)=>(S.fakes||0)+(r.fromOver?0:r.fakeCnt)>=15},
   {id:'stoic',name:'Стоїк',hint:'Впади, простоявши понад 3 с',test:(r)=>r.fromOver&&r.causeKind==='fall'&&r.idlePeak>180},
@@ -633,7 +642,7 @@ const ACH=[
   {id:'gold',name:'Золотий хлопчик',hint:'Купи золотий піджак',test:(r,S)=>(S.owned||[]).some(i=>LOOKS[i]&&LOOKS[i].gold)},
   {id:'ward',name:'Повний гардероб',hint:'Купи всі костюми',test:(r,S)=>(S.owned||[]).length>=LOOKS.length}
 ];
-function runSnap(){return {score:Math.max(0,Math.floor(score())),causeKind,zoneIdx,lookIdx,hat,citiesN:cities.size,malorosN,expressN,minusCnt,fakeCnt,threadHits,idlePeak,stompKind,gordonCaught,gordonDemo,gordonMissed,fromOver:false}}
+function runSnap(){return {score:Math.max(0,Math.floor(score())),causeKind,zoneIdx,lookIdx,malorosN,expressN,minusCnt,fakeCnt,threadHits,idlePeak,stompKind,gordonCaught,gordonDemo,gordonMissed,fromOver:false}}
 function saveAch(){try{localStorage.setItem('redkaAch',JSON.stringify(ACH_HAVE))}catch(e){}}
 (function grantShopAchs(){
   let n=0;for(const a of ACH){if((a.id==='gold'||a.id==='ward')&&!ACH_HAVE[a.id]&&a.test({},STATS)){ACH_HAVE[a.id]=1;n++}}
@@ -846,7 +855,7 @@ function placePlat(p,calm){
   p.x=best-p.w/2;centreHist.push(mid(best)?1:0);if(centreHist.length>3)centreHist.shift();
   lastCx=best;lastW=p.w;
 }
-const GORDON_AT=300000,GORDON_P=.34,GORDON_FLY=768,EXPRESS_FLY=450;
+const GORDON_AT=300000,GORDON_P=.34,GORDON_FLY=768,EXPRESS_FLY=450,EXPRESS_FROM=60000,EXPRESS_CD=50000;
 function genStep(){
   stepN++;
   const gs0=Math.max(0,player0-topY)*SC,d=curD=ramp(gs0,0,1000000),gap=rnd(72,88)+80*ramp(gs0,40000,700000);topY-=gap;
@@ -866,21 +875,16 @@ function genStep(){
   // After 300k, every eligible platform rolls 34% until the first spawn; one item per run.
   if(!gordonDecided&&gs>=GORDON_AT&&player.fly<=0&&type==='normal'&&!p.vx&&!calm){
     if(Math.random()<GORDON_P){items.push({kind:'gordon',x:p.x+p.w/2,y:topY-30,t:0});lastItemStep=stepN;gordonOffered=true;gordonDecided=true}
-  }else if(player.flyKind!=='gordon'&&!calm&&!p.vx&&type!=='minus'&&stepN-lastItemStep>20){const rr=Math.random();
-    if(gs>250000&&gs-lastExpressGs>200000&&rr<.006+.01*ramp(gs,250000,800000)){items.push({kind:'express',x:p.x+p.w/2,y:topY-26,t:0});lastItemStep=stepN;lastExpressGs=gs}}
+  }
+  if(player.flyKind!=='gordon'&&!calm&&!p.vx&&type!=='minus'&&gs>=EXPRESS_FROM&&gs-lastExpressGs>EXPRESS_CD){
+    if(Math.random()<.05+.04*ramp(gs,EXPRESS_FROM,400000)){items.push({kind:'express',x:p.x+p.w/2,y:topY-26,t:0});lastExpressGs=gs}
+  }
   if(gs>12000&&!calm&&type==='normal'&&!p.vx&&player.fly<=0&&stepN-lastTicketStep>=8&&Math.random()<(.10+.06*ramp(gs,20000,500000))){
     items.push({kind:'ticket',x:p.x+p.w/2,y:topY-26,t:0});lastTicketStep=stepN;
   }
-  if(!calm&&citySpawned.length<CITY_CAP&&gs>=CITY_FROM&&Math.random()<(.028+.03*ramp(gs,CITY_FROM,750000))){
-    const left=CITIES.filter(c=>citySpawned.indexOf(c)<0);
-    if(left.length){const lab=pick(left);citySpawned.push(lab);
-      const b=makePlat('breaking',topY+gap*rnd(.4,.6),lab,{city:true});
-      if(Math.abs((b.x+b.w/2)-(p.x+p.w/2))<110)b.x=((b.x+W/2)%Math.max(1,W-b.w-4))+2;
-      plats.push(b)}
-  }
   const bc=calm?0:gs<50000?0:.05+.15*ramp(gs,50000,700000);
   if(Math.random()<bc){
-    const b=makePlat('breaking',topY+gap*rnd(.4,.6),pick(FAKES),{city:false});
+    const b=makePlat('breaking',topY+gap*rnd(.4,.6),pick(FAKES));
     if(Math.abs((b.x+b.w/2)-(p.x+p.w/2))<110)b.x=((b.x+W/2)%Math.max(1,W-b.w-4))+2;
     plats.push(b);
   }
@@ -946,7 +950,7 @@ function rankNow(){
 }
 function reset(){
   hateLog={};minusCnt=0;fakeCnt=0;
-  camY=0;bonus=0;zoneIdx=0;lookIdx=STATS.wear||0;banner=null;cities=new Set();citySpawned=[];stomps=0;hat=false;cause='Впав у прірву скасування';causeKind='fall';recent=[];stepN=0;million=false;streak=0;mult=1;shownCnt={};lastItemStep=-99;lastExpressGs=-1e9;lastTicketStep=-99;ticketsRun=0;seenNew=new Set();
+  camY=0;bonus=0;zoneIdx=0;lookIdx=STATS.wear||0;banner=null;stomps=0;cause='Впав у прірву скасування';causeKind='fall';recent=[];stepN=0;million=false;streak=0;mult=1;shownCnt={};lastItemStep=-99;lastExpressGs=-1e9;lastTicketStep=-99;ticketsRun=0;seenNew=new Set();
   gordonDecided=false;gordonBits=[];gordonTitle=0;gordonLastEdge=-1;gordonDeck=[];gordonDeckI=0;gordonCaught=false;gordonDemo=false;gordonMissed=false;gordonOffered=false;stopGordonMusic();
   toasts=[];toastNow=null;stompKind={};expressN=0;malorosN=0;threadHits=0;idlePeak=0;newAchs=[];hideAchPop();
   floats=[];plats=[];enemies=[];envs=[];items=[];waves=[];
@@ -993,10 +997,6 @@ function update(dt){
       if(prevB<=pl.y+3&&bot>=pl.y&&p.x+18>pl.x&&p.x-18<pl.x+pl.w){
         if(pl.type==='breaking'){
           pl.broken=true;sfx('break');if(mode==='play')fakeCnt++;
-          if(mode==='play'&&pl.city){cities.add(pl.label);const n=cities.size;addFloat(n<=CITY_GOAL?('скасовано '+n+' з '+CITY_GOAL):('скасовано '+n),pl.x+pl.w/2,pl.y-8,'#b02020');
-            if(n===3){sfx('unlock');bonus+=8000;pushToast('Хет-трик туру','+8 000');checkAchLive()}
-            else if(n===7){sfx('unlock');bonus+=15000;pushToast('Сім залів','+15 000');checkAchLive()}
-            else if(n===12){hat=true;sfx('unlock');bonus+=25000;pushToast('Тур зірвано','+25 000');checkAchLive()}}
           continue;
         }
         p.y=pl.y-FEET;p.vy=pl.type==='spring'?-16.5:-10.3;p.sq=1;
@@ -1086,8 +1086,8 @@ function drawPlat(pl){
   if(pl.broken)ctx.rotate(pl.fy*(pl.peeled?-.015:.02));
   if(pl.type==='breaking'){
     ctx.fillStyle='rgba(255,248,240,.82)';ctx.fillRect(2,2,w-4,h-4);
-    stitches(w,h,pl.city?'#b02020':'#e53935');
-    ctx.fillStyle=pl.city?'#9a1818':'#c62828';
+    stitches(w,h,'#e53935');
+    ctx.fillStyle='#c62828';
   }else{
     const C=PLAT_COL[pl.type]||PLAT_COL.normal;
     ctx.fillStyle='rgba(30,12,24,.3)';ctx.fillRect(3,6,w-1,h-1);
@@ -1391,9 +1391,7 @@ function draw(){
 
 const END_ART={};
 function loadEnds(){
-  for(const k of ['fall','stuk','threads','lang','cancel','koms']){
-    const im=new Image();im.onload=()=>{END_ART[k]=im};im.src='art/ends/'+k+'.webp';
-  }
+  for(const k of ['fall','stuk','threads','lang','cancel','koms'])END_ART[k]=loadImg('art/ends/'+k+'.webp');
 }
 function scene(kind,li){
   const c=document.createElement('canvas'),Wd=320,Hd=200,k=2;c.width=Wd*k;c.height=Hd*k;const g=c.getContext('2d');g.scale(k,k);g.imageSmoothingEnabled=false;
@@ -1473,6 +1471,7 @@ function gameOver(){
   fillHatePanel();
   const sc=scene(causeKind,lookIdx);$('endImg').src=sc.toDataURL();shareCard=makeCard(sc,s);$('shareImg').hidden=true;
   $('zoneReached').textContent='Етап '+(zoneIdx+1)+' / '+ZONES.length+' · '+ZONES[zoneIdx].name;
+  ph('game_over',{cause:causeKind,score:s,zone:ZONES[zoneIdx].name});
   paintBestHud();paintAchCount();
   const hint=$('shareHint');if(hint){hint.hidden=true;hint.textContent=''}
   const card=$('overScr').querySelector('.card');
@@ -1494,7 +1493,7 @@ function fillHatePanel(){
   $('hateExtra').innerHTML='<span>Розібрано хейтерів: <b>'+stomps+'</b></span><span>Відписок: <b>'+minusCnt+'</b></span><span>Фейків: <b>'+fakeCnt+'</b></span>';
 }
 let bestAtStart=0,recordShown=false,colBack='start';
-function start(){reset();bestAtStart=best;recordShown=false;mode='play';colBack='start';input.l=input.r=false;pointers.clear();$('startScr').hidden=true;$('colScr').hidden=true;$('pauseScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=true;showPlayHud(true);$('score').textContent='0';$('combo').hidden=true;$('combo').textContent='';paintBestHud();paintTickets();steerDone=false;armSteer();showSteer();pushToast('Етап 1 / '+ZONES.length,ZONES[0].name);syncBgm()}
+function start(){reset();bestAtStart=best;recordShown=false;mode='play';colBack='start';input.l=input.r=false;pointers.clear();$('startScr').hidden=true;$('colScr').hidden=true;$('pauseScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=true;showPlayHud(true);$('score').textContent='0';$('combo').hidden=true;$('combo').textContent='';paintBestHud();paintTickets();steerDone=false;armSteer();showSteer();pushToast('Етап 1 / '+ZONES.length,ZONES[0].name);syncBgm();ph('play_start')}
 let yellT=null;
 function showYell(){
   $('startScr').hidden=true;$('colScr').hidden=true;$('pauseScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=false;
@@ -1577,9 +1576,10 @@ function makeCard(sc,s){
   g.font='800 34px Manrope, sans-serif';const rt='Звання: '+runRank,rw=Math.min(940,g.measureText(rt).width+56);
   g.fillStyle='#e2b33a';g.fillRect(540-rw/2,972,rw,64);g.fillStyle='#2a1722';g.fillText(rt,540,1005,900);
   const top=hateTop().slice(0,3),sum=hateSum();
+  const clip=(t,maxW)=>{if(g.measureText(t).width<=maxW)return t;let s=t;while(s.length>1&&g.measureText(s+'…').width>maxW)s=s.slice(0,-1);return s+'…'};
   g.fillStyle='#2a1722';g.font='700 30px Manrope, sans-serif';
-  g.fillText(sum?'Зібрав '+fmt(sum)+' '+plural(sum,'ярлик','ярлики','ярликів')+' хейту:':'Хейт ще не налип',540,1078,900);
-  if(top.length){g.fillStyle='#c42626';g.font='800 32px Manrope, sans-serif';g.fillText(top.map(([l,n])=>'«'+l+'» ×'+n).join('   '),540,1126,920)}
+  g.fillText(sum?'Зібрав '+fmt(sum)+' '+plural(sum,'ярлик','ярлики','ярликів')+' хейту:':'Хейт ще не налип',540,1078,880);
+  if(top.length){g.fillStyle='#c42626';g.font='800 32px Manrope, sans-serif';g.fillText(clip(top.map(([l,n])=>'«'+l+'» ×'+n).join('   '),880),540,1126,880)}
   g.fillStyle='#2a1722';g.font='700 28px Manrope, sans-serif';g.fillText('Етап '+(zoneIdx+1)+' / '+ZONES.length+' · '+ZONES[zoneIdx].name+' · '+LOOKS[lookIdx].name.toLowerCase(),540,1188,900);
   if(newAchs.length){g.fillStyle='#8f5f08';g.font='700 26px Manrope, sans-serif';g.fillText('Досягнення: '+newAchs.map(a=>a.name).slice(0,3).join(' · '),540,1232,920)}
   g.fillStyle='#d63434';g.font='800 34px Manrope, sans-serif';g.fillText('Побий мій рекорд!',540,1280);
@@ -1603,7 +1603,7 @@ function showImgFallback(){const im=$('shareImg');im.src=shareCard.toDataURL('im
 function copyShareText(){const txt=shareText();try{navigator.clipboard&&navigator.clipboard.writeText(txt).catch(()=>{})}catch(e){}return txt}
 function cardBlob(){return new Promise(r=>shareCard.toBlob(r,'image/png'))}
 $('shareBtn').onclick=async function(){
-  if(!shareCard)return;const txt=copyShareText();
+  if(!shareCard)return;ph('share');const txt=copyShareText();
   const blob=await cardBlob();
   if(!blob){showImgFallback();return}
   try{
@@ -1705,7 +1705,7 @@ if(/\bqa=1\b/.test(location.search)){
     const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
     topY=player.y+FEET+2;while(topY>camY-280)genStep();
   }
-  window.__g={get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,tapLook,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get cities(){return cities},get citySpawned(){return citySpawned},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get runs(){return STATS.runs},set runs(v){STATS.runs=v|0},get steerN(){return STATS.steerN|0},set steerN(v){STATS.steerN=v|0;saveStats()},get steerOn(){const el=$('steerHint');return !!(el&&!el.hidden&&el.classList.contains('on'))},get steerArmed(){return steerArmed},hideSteer,showSteer,armSteer,get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get muted(){return muted},get bgm(){return bgmAudio},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r;if(mode==='play')noteSteer()}};
+  window.__g={get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,tapLook,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get runs(){return STATS.runs},set runs(v){STATS.runs=v|0},get steerN(){return STATS.steerN|0},set steerN(v){STATS.steerN=v|0;saveStats()},get steerOn(){const el=$('steerHint');return !!(el&&!el.hidden&&el.classList.contains('on'))},get steerArmed(){return steerArmed},hideSteer,showSteer,armSteer,get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get muted(){return muted},get bgm(){return bgmAudio},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r;if(mode==='play')noteSteer()}};
 }
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode==='play'){update(dt);draw()}requestAnimationFrame(loop)}

@@ -36,3 +36,19 @@ jobs:
           path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  cloudflare-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pack site
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -a art _site/art
+          rm -f _site/art/*.py
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy _site --project-name=redkajump
