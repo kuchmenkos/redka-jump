@@ -73,7 +73,8 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .achcard.locked,.wardcard.locked{opacity:.55;filter:grayscale(.8)}
 .achcard .an{font-size:13px;font-weight:800;line-height:1.25}
 .achcard .ah{font-size:12px;color:var(--muted);font-weight:600;line-height:1.3}
-.achico,.wardpic{image-rendering:pixelated;width:28px;height:28px}
+.achico{image-rendering:pixelated;width:40px;height:40px}
+.wardpic{image-rendering:pixelated;width:28px;height:28px}
 .wardcard{align-items:center;text-align:center}
 .wardcard img{image-rendering:pixelated;height:72px;width:auto}
 .wardcard .an{font-size:12px;font-weight:800}
@@ -141,7 +142,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
       <p class="sub">Що більше наїжджають — то вище стрибає.</p>
       <button id="playBtn" class="cta">Стрибати</button>
       <p class="bestline" id="bestLine" hidden>Рекорд: <b id="bestStart">0</b></p>
-      <button id="colBtn" class="achbtn" type="button">Ачивки <b id="achCount">0/20</b></button>
+      <button id="colBtn" class="achbtn" type="button">Досягнення <b id="achCount">0/20</b></button>
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" data-tab="how" aria-selected="true">Як грати</button>
         <button class="tab" role="tab" data-tab="haters" aria-selected="false">Хейтери</button>
@@ -185,7 +186,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
     <div class="card col">
       <h1>Колекція</h1>
       <div class="tabs" role="tablist">
-        <button class="tab" role="tab" data-tab="achs" aria-selected="true">Ачивки</button>
+        <button class="tab" role="tab" data-tab="achs" aria-selected="true">Досягнення</button>
         <button class="tab" role="tab" data-tab="ward" aria-selected="false">Гардероб</button>
       </div>
       <div id="achGrid" class="achgrid" role="tabpanel" data-panel="achs"></div>
@@ -530,20 +531,25 @@ function saveRun(){
 function checkAch(fromOver){
   const r=runSnap();r.fromOver=!!fromOver;
   const S=STATS;let n=0;
-  for(const a of ACH){if(ACH_HAVE[a.id])continue;if(a.test(r,S)){ACH_HAVE[a.id]=1;newAchs.push(a);n++;if(!fromOver)pushToast('Ачивка',a.name)}}
+  for(const a of ACH){if(ACH_HAVE[a.id])continue;if(a.test(r,S)){ACH_HAVE[a.id]=1;newAchs.push(a);n++;if(!fromOver)pushToast('Досягнення',a.name)}}
   if(n){saveAch();paintAchCount()}
 }
 function checkAchLive(){checkAch(false)}
+const ACH_IMGS={};
 function achIco(id,on){
+  const im=ACH_IMGS[id];
+  if(im&&im.complete&&im.naturalWidth)return im.src;
   const {c,g}=mkC(24,24);F(g,0,0,24,24,on?'#f8f1e3':'#cfc6b6');F(g,1,1,22,22,on?'#efe0b8':'#b8b0a2');
   const col=on?'#d63434':'#6f5a52';
-  if(id==='joke'||id==='abyss'||id==='stoic'){F(g,8,6,8,10,col);F(g,10,16,4,4,col)}
-  else if(id==='guest'||id==='gmiss'||id==='gold'){F(g,6,8,12,8,'#e2a91c');F(g,10,5,4,4,'#e2a91c')}
-  else if(id==='exp3'){F(g,10,4,4,14,col);F(g,8,14,8,6,'#ff9a2a')}
-  else if(id==='hat'||id==='lviv'||id==='stad'){F(g,4,14,16,6,col);F(g,8,6,8,8,col)}
-  else if(id==='mil'||id==='maloros'){F(g,6,8,12,10,'#e2a91c');F(g,10,6,4,4,col)}
-  else {F(g,7,7,10,10,col);F(g,9,9,6,6,'#f8f1e3')}
+  F(g,7,7,10,10,col);F(g,9,9,6,6,'#f8f1e3');
   return c.toDataURL();
+}
+function loadAchs(){
+  ACH.forEach(a=>{
+    const im=new Image();
+    im.onload=()=>{ACH_IMGS[a.id]=im;if(!$('colScr').hidden)paintCol()};
+    im.src='art/achs/'+a.id+'.png';
+  });
 }
 function paintAchCount(){const el=$('achCount');if(el)el.textContent=Object.keys(ACH_HAVE).filter(k=>ACH[k]||ACH.some(a=>a.id===k)).length+'/20'}
 function paintCol(){
@@ -571,7 +577,7 @@ function fillNewAchs(){
   const box=$('newAchs');if(!box)return;
   const uniq=[];for(const a of newAchs)if(!uniq.some(x=>x.id===a.id))uniq.push(a);
   if(!uniq.length){box.hidden=true;box.innerHTML='';return}
-  box.hidden=false;box.innerHTML='<p>Нові ачивки</p><ul>'+uniq.map(a=>'<li>'+a.name+'</li>').join('')+'</ul>';
+  box.hidden=false;box.innerHTML='<p>Нові досягнення</p><ul>'+uniq.map(a=>'<li>'+a.name+'</li>').join('')+'</ul>';
 }
 function paintMute(){const b=$('muteBtn');b.textContent=muted?'✕':'♪';b.classList.toggle('off',muted);b.setAttribute('aria-label',muted?'Увімкнути звук':'Вимкнути звук')}
 function paintBgm(){const b=$('bgmBtn');b.textContent=bgmOn?'♫':'♫';b.classList.toggle('off',!bgmOn);b.setAttribute('aria-label',bgmOn?'Вимкнути музику':'Увімкнути музику')}
@@ -1232,7 +1238,7 @@ function makeCard(sc,s){
   g.fillText(sum?'Зібрав '+fmt(sum)+' '+plural(sum,'ярлик','ярлики','ярликів')+' хейту:':'Хейт ще не налип',540,1078,900);
   if(top.length){g.fillStyle='#c42626';g.font='800 32px Manrope, sans-serif';g.fillText(top.map(([l,n])=>'«'+l+'» ×'+n).join('   '),540,1126,920)}
   g.fillStyle='#2a1722';g.font='700 28px Manrope, sans-serif';g.fillText('Етап '+(zoneIdx+1)+' / '+ZONES.length+' · '+ZONES[zoneIdx].name+' · '+LOOKS[lookIdx].name.toLowerCase(),540,1188,900);
-  if(newAchs.length){g.fillStyle='#8f5f08';g.font='700 26px Manrope, sans-serif';g.fillText('Ачивки: '+newAchs.map(a=>a.name).slice(0,3).join(' · '),540,1232,920)}
+  if(newAchs.length){g.fillStyle='#8f5f08';g.font='700 26px Manrope, sans-serif';g.fillText('Досягнення: '+newAchs.map(a=>a.name).slice(0,3).join(' · '),540,1232,920)}
   g.fillStyle='#d63434';g.font='800 34px Manrope, sans-serif';g.fillText('Побий мій рекорд!',540,1280);
   return c;
 }
@@ -1299,7 +1305,7 @@ document.addEventListener('visibilitychange',()=>{
   }else syncBgm();
 });
 
-loadFaces();loadBackgrounds();
+loadFaces();loadAchs();loadBackgrounds();
 resize();reset();$('best').textContent=fmt(best);paintAchCount();
 function jumpTo(gs){
   const y=player0-gs/SC;player.y=y;camY=y-H*.45;
