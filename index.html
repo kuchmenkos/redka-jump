@@ -577,7 +577,13 @@ function makeCloth(zi){
 function mkC(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.imageSmoothingEnabled=false;return {c,g}}
 function F(g,x,y,w,h,col){g.fillStyle=col;g.fillRect(x|0,y|0,Math.max(1,w|0),Math.max(1,h|0))}
 const BG_FILES=['0-sumy','1-lviv','2-prince','3-sudzha','4-kyiv','5-odyssey','6-stadium'],BG=[];
-function loadBackgrounds(){BG_FILES.forEach((f,i)=>{const im=new Image();im.decoding='async';im.src='art/bg/'+f+'.webp';BG[i]=im})}
+function loadImg(src){
+  const im=new Image();im.decoding='async';
+  let retried=false;
+  im.onerror=()=>{if(retried)return;retried=true;im.src=src+(src.indexOf('?')>=0?'&':'?')+'r=1'};
+  im.src=src;return im;
+}
+function loadBackgrounds(){BG_FILES.forEach((f,i)=>{BG[i]=loadImg('art/bg/'+f+'.webp')})}
 const bgReady=i=>BG[i]&&BG[i].complete&&BG[i].naturalWidth>0;
 let bgShown=0,bgPrev=-1,bgFade=1;
 function zoneFrac(){const gs=hs(),z=ZONES[zoneIdx],nx=ZONES[zoneIdx+1];return nx?ramp(gs,z.from,nx.from):ramp(gs,z.from,z.from+250000)}
@@ -1287,8 +1293,14 @@ function drawGordonTitle(){
 function loadFaces(){
   const names=['felix','felix-fail','felix-fly','koms','threads','stuk','cancel'];let left=names.length;
   const done=()=>{if(--left)return;for(const k in REDKA_CH)delete REDKA_CH[k];for(const k in WARD_TH)delete WARD_TH[k];for(const k in ECH)delete ECH[k];for(const k in EOUT)delete EOUT[k];paintIcons();if(!$('colScr').hidden)paintCol()};
-  for(const n of names){const im=new Image();im.onload=()=>{FACES[n]=im;done()};im.onerror=done;im.src='art/faces/'+n+'.png'}
-  for(let n=1;n<=9;n++){const im=new Image();im.src='art/gordon/'+n+'.webp';GORDON_IMGS.push(im)}
+  for(const n of names){
+    const src='art/faces/'+n+'.png';let retried=false;
+    const im=new Image();
+    im.onload=()=>{FACES[n]=im;done()};
+    im.onerror=()=>{if(retried){done();return}retried=true;im.src=src+'?r=1'};
+    im.src=src;
+  }
+  for(let n=1;n<=9;n++)GORDON_IMGS.push(loadImg('art/gordon/'+n+'.webp'))
 }
 function drawItem(it){
   const y=it.y-camY+Math.sin(it.t)*4;
