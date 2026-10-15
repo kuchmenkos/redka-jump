@@ -135,6 +135,9 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .extchip{pointer-events:auto;touch-action:manipulation;-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto;cursor:pointer;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--ink);font-weight:800;font-size:15px;padding:10px 12px;min-height:44px;background:var(--well);box-shadow:inset 0 0 0 2px var(--card-line);border-radius:10px;width:100%;flex:none;box-sizing:border-box}
 .extchip svg{width:22px;height:22px;flex:none;pointer-events:none}
 button.extchip{font-family:var(--body)}
+.extchip-txt{display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0;text-align:left}
+.extchip-txt b{font-size:14px;font-weight:800;line-height:1.2}
+.extchip-txt i{font-style:normal;font-size:11px;font-weight:700;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px;user-select:all;-webkit-user-select:all}
 .about .fine{margin:0}
 .patch.fake{background:rgba(255,248,240,.9);outline:1.5px dashed #e53935;outline-offset:-2px}
 .patch.worn{opacity:.7;outline-color:rgba(255,255,255,.35)}
@@ -254,7 +257,7 @@ button.extchip{font-family:var(--body)}
           <p><b>Фанатська пародія-стрибалка.</b> Редька лізе хронологією кенселів. Рахунок — підписники з хейту. Тицяй половину екрана, ярлик тримає два стрибки, хейтерів топчеш зверху, квитки — в гардероб.</p>
           <button type="button" class="extchip" id="gameLinkBtn">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3.9 12a5 5 0 0 1 5-5h4v2h-4a3 3 0 1 0 0 6h4v2h-4a5 5 0 0 1-5-5m7.1 1h4v-2h-4zm5.1-6h4a5 5 0 0 1 0 10h-4v-2h4a3 3 0 1 0 0-6h-4z"/></svg>
-            <span id="gameLinkLbl">Посилання на гру</span>
+            <span class="extchip-txt"><b id="gameLinkLbl">Посилання на гру</b><i id="gameLinkUrl">kuchmenkos.github.io/redka-jump</i></span>
           </button>
           <p>Я люблю розказувати історії в Тредс і готую нові кльові релізи. Якщо гра зайшла — підпишись, там буде першим.</p>
           <a class="extchip threads" href="https://www.threads.com/@saintfame23/" target="_blank" rel="noopener noreferrer">
@@ -1576,8 +1579,13 @@ function liveGameUrl(){
 }
 const gameUrl=()=>' '+liveGameUrl();
 function copyText(txt){
-  try{if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(txt)}catch(e){}
-  return new Promise((res,rej)=>{try{const t=document.createElement('textarea');t.value=txt;t.setAttribute('readonly','');t.style.cssText='position:fixed;left:-9999px';document.body.appendChild(t);t.select();const ok=document.execCommand('copy');t.remove();ok?res():rej()}catch(e){rej(e)}});
+  const fallback=()=>new Promise((res,rej)=>{try{
+    const t=document.createElement('textarea');t.value=txt;t.setAttribute('readonly','');t.style.cssText='position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
+    document.body.appendChild(t);t.focus();t.select();t.setSelectionRange(0,txt.length);
+    const ok=document.execCommand('copy');t.remove();ok?res():rej(new Error('exec'));
+  }catch(e){rej(e)}});
+  try{if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(txt).catch(fallback)}catch(e){}
+  return fallback();
 }
 function shareText(){
   const top=hateTop()[0],s=$('finalScore').textContent;
@@ -1632,10 +1640,11 @@ document.querySelectorAll('a.threads').forEach(a=>a.addEventListener('click',e=>
 $('gameLinkBtn').addEventListener('click',e=>{
   e.preventDefault();e.stopPropagation();
   const url=liveGameUrl(),lbl=$('gameLinkLbl');
-  const done=ok=>{if(lbl)lbl.textContent=ok?'Скопійовано':'kuchmenkos.github.io/redka-jump';setTimeout(()=>{if(lbl)lbl.textContent='Посилання на гру'},1600)};
+  const done=ok=>{if(lbl)lbl.textContent=ok?'Скопійовано':'Посилання на гру';setTimeout(()=>{if(lbl)lbl.textContent='Посилання на гру'},1600)};
   Promise.resolve(copyText(url)).then(()=>done(true)).catch(()=>done(false));
 });
-wrap.addEventListener('contextmenu',e=>e.preventDefault());
+{const u=$('gameLinkUrl');if(u)u.textContent=liveGameUrl().replace(/^https?:\/\//,'').replace(/\/$/,'')}
+wrap.addEventListener('contextmenu',e=>{if(!e.target.closest('.extchip'))e.preventDefault()});
 document.addEventListener('touchmove',e=>{if(!e.target.closest('.card'))e.preventDefault()},{passive:false});
 document.addEventListener('gesturestart',e=>e.preventDefault());
 wrap.addEventListener('pointermove',e=>{if(pointers.has(e.pointerId)){pointers.set(e.pointerId,e.clientX);setPtr()}});
