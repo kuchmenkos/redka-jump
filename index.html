@@ -132,8 +132,8 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .about{display:flex;flex-direction:column;gap:8px;text-align:left;font-size:12.5px;font-weight:600;line-height:1.4;color:var(--muted)}
 .about p{margin:0}
 .about p b{color:var(--ink);font-weight:800}
-.threads{pointer-events:auto;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--ink);font-weight:800;font-size:15px;padding:10px 12px;min-height:44px;background:var(--well);box-shadow:inset 0 0 0 2px var(--card-line);border-radius:10px}
-.threads svg{width:22px;height:22px;flex:none}
+.threads{pointer-events:auto;touch-action:manipulation;-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto;cursor:pointer;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--ink);font-weight:800;font-size:15px;padding:10px 12px;min-height:44px;background:var(--well);box-shadow:inset 0 0 0 2px var(--card-line);border-radius:10px}
+.threads svg{width:22px;height:22px;flex:none;pointer-events:none}
 .about .fine{margin:0}
 .patch.fake{background:rgba(255,248,240,.9);outline:1.5px dashed #e53935;outline-offset:-2px}
 .patch.worn{opacity:.7;outline-color:rgba(255,255,255,.35)}
@@ -1607,7 +1607,12 @@ document.addEventListener('click',e=>{
 paintMute();paintBgm();
 
 function setPtr(){input.l=false;input.r=false;const r=wrap.getBoundingClientRect();for(const x of pointers.values()){if(x-r.left<r.width/2)input.l=true;else input.r=true}if(mode==='play')noteSteer()}
-wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.card,.menu,.soundchip,.demo,.achbtn,#menuBtn,#yellScr,#pauseScr'))return;audioOn();pointers.set(e.pointerId,e.clientX);setPtr()});
+wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.card,.menu,.soundchip,.demo,.achbtn,.threads,#menuBtn,#yellScr,#pauseScr'))return;audioOn();pointers.set(e.pointerId,e.clientX);setPtr()});
+document.querySelectorAll('a.threads').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault();e.stopPropagation();
+  const url=a.href;const w=window.open(url,'_blank','noopener,noreferrer');
+  if(!w)location.assign(url);
+}));
 wrap.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('touchmove',e=>{if(!e.target.closest('.card'))e.preventDefault()},{passive:false});
 document.addEventListener('gesturestart',e=>e.preventDefault());
