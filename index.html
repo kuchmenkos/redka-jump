@@ -1131,8 +1131,8 @@ function drawRedka(){
 function draw(){
   ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);ctx.imageSmoothingEnabled=false;
   if(player&&player.fly>0&&mode==='play'){
-    const g=player.flyKind==='gordon',a=g?6.2:3.4;
-    ctx.translate((Math.sin(tick*1.7)*.55+Math.sin(tick*3.1)*.45)*a,(Math.cos(tick*1.9)*.4+Math.sin(tick*4.4)*.6)*a+(g?Math.sin(tick*.13)*2:0));
+    const g=player.flyKind==='gordon',a=g?4.6:3.4;
+    ctx.translate((Math.sin(tick*1.7)*.55+Math.sin(tick*3.1)*.45)*a,(Math.cos(tick*1.9)*.4+Math.sin(tick*4.4)*.6)*a+(g?Math.sin(tick*.13)*1.2:0));
   }
   if(bgShown!==zoneIdx){bgPrev=bgShown;bgShown=zoneIdx;bgFade=0}
   bgFade=Math.min(1,bgFade+.025);
