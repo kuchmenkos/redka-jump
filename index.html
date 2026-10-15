@@ -225,7 +225,7 @@ const PX=3;
 /* ---------- sound ---------- */
 let AC=null,muted=false,bgmOn=true,bgmAudio=null,bgmPrimed=false;try{muted=localStorage.getItem('redkaMute')==='1'}catch(e){}try{bgmOn=localStorage.getItem('redkaBgm')!=='0'}catch(e){}
 const BGM_VOL=.7,DEMO=true;
-function audioOn(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}}
+function audioOn(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();loadGordonBuf()}catch(e){}}
 function tone(type,f0,f1,dur,vol,delay){
   if(!AC||muted)return;const t=AC.currentTime+(delay||0),o=AC.createOscillator(),g=AC.createGain();
   o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(30,f1),t+dur);
@@ -870,36 +870,68 @@ function drawEnv(e){ctx.save();ctx.translate(e.x,e.y-camY);ctx.rotate(Math.sin(e
   if(e.kind==='thread'){ctx.drawImage(THREAD_SPR,-THREAD_SPR.width/2,-THREAD_SPR.height/2);ctx.font='800 10px Manrope, sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('@ ТРЕД',0,-2);ctx.restore();return}
   ctx.drawImage(ENV_SPR,-ENV_SPR.width/2,-ENV_SPR.height/2);
   ctx.font='800 9px Manrope, sans-serif';ctx.fillStyle='#b02020';ctx.textAlign='center';ctx.fillText('СКАРГА',0,ENV_SPR.height/2+9);ctx.restore()}
+const GORDON_RATE=1.2,GORDON_VOL=.7;
+let gordonBuf=null,gordonSrc=null,gordonGain=null,gordonT0=0,gordonLoading=false,gordonPrimed=false;
+function loadGordonBuf(){
+  if(!AC||gordonBuf||gordonLoading)return;gordonLoading=true;
+  fetch('art/gordon-intro.mp3').then(r=>{if(!r.ok)throw new Error('gordon mp3');return r.arrayBuffer()}).then(b=>AC.decodeAudioData(b.slice(0))).then(buf=>{gordonBuf=buf;gordonLoading=false}).catch(()=>{gordonLoading=false});
+}
+function stopGordonSource(){
+  if(gordonSrc){try{gordonSrc.stop()}catch(e){}try{gordonSrc.disconnect()}catch(e){}gordonSrc=null}
+  if(gordonGain){try{gordonGain.disconnect()}catch(e){}gordonGain=null}
+}
 function ensureGordonAudio(){
   if(gordonAudio)return gordonAudio;
   const a=new Audio('art/gordon-intro.mp3');
-  a.preload='auto';a.playbackRate=1.2;a.preservesPitch=false;a.volume=.7;
-  try{a.webkitPreservesPitch=false}catch(e){}
+  a.preload='auto';a.playsInline=true;a.volume=0;
   gordonAudio=a;return a;
 }
 function startGordonMusic(){
-  const a=ensureGordonAudio();
-  a.playbackRate=1.2;a.preservesPitch=false;a.volume=.7;
+  audioOn();loadGordonBuf();
   if(bgmAudio)bgmAudio.pause();
-  if(muted){a.pause();return}
+  if(muted){stopGordonSource();if(gordonAudio)gordonAudio.pause();return}
+  stopGordonSource();
+  if(gordonBuf){
+    const g=AC.createGain();g.gain.value=GORDON_VOL;
+    const src=AC.createBufferSource();src.buffer=gordonBuf;src.playbackRate.value=GORDON_RATE;
+    src.connect(g);g.connect(AC.destination);src.start(0);
+    gordonSrc=src;gordonGain=g;gordonT0=AC.currentTime;
+    src.onended=()=>{if(gordonSrc===src)gordonSrc=null};
+    if(gordonAudio){gordonAudio.pause();gordonAudio.volume=0;try{gordonAudio.currentTime=0}catch(e){}}
+    if(player){const tot=gordonBuf.duration/GORDON_RATE*60;player.flyMax=tot;player.fly=tot}
+    return;
+  }
+  const a=ensureGordonAudio();
+  a.loop=false;a.muted=false;a.volume=GORDON_VOL;a.playbackRate=GORDON_RATE;
+  try{a.preservesPitch=false}catch(e){}try{a.webkitPreservesPitch=false}catch(e){}
   try{a.currentTime=0}catch(e){}
-  a.muted=false;a.play().catch(()=>{});
+  a.play().catch(()=>{gordonAudio=null;gordonPrimed=false;const b=ensureGordonAudio();b.volume=GORDON_VOL;b.playbackRate=GORDON_RATE;b.play().catch(()=>{})});
 }
-// iOS Safari only lets an <audio> play outside a tap once it has been played inside one.
-let gordonPrimed=false;
 function primeGordonAudio(){
+  loadGordonBuf();
   if(gordonPrimed)return;gordonPrimed=true;
-  const a=ensureGordonAudio();a.muted=true;
-  const p=a.play();
-  const done=()=>{if(player&&player.flyKind==='gordon')return;a.pause();try{a.currentTime=0}catch(e){}a.muted=false};
-  if(p&&p.then)p.then(done,()=>{a.muted=false;gordonPrimed=false});else done();
+  const a=ensureGordonAudio();a.volume=0;a.muted=false;a.loop=true;
+  a.play().then(()=>{},()=>{gordonPrimed=false});
 }
-function stopGordonMusic(){if(gordonAudio){gordonAudio.pause();try{gordonAudio.currentTime=0}catch(e){}}syncBgm()}
+function stopGordonMusic(){
+  stopGordonSource();
+  if(gordonAudio){
+    gordonAudio.volume=0;gordonAudio.loop=true;
+    try{gordonAudio.currentTime=0}catch(e){}
+    if(gordonPrimed&&!muted)gordonAudio.play().catch(()=>{});
+    else{gordonAudio.pause();try{gordonAudio.currentTime=0}catch(e){}}
+  }
+  syncBgm();
+}
 function syncGordonFly(p,dt){
+  if(gordonSrc&&AC&&gordonBuf){
+    const elapsed=AC.currentTime-gordonT0,total=gordonBuf.duration/GORDON_RATE;
+    p.flyMax=total*60;p.fly=Math.max(0,(total-elapsed)*60);return;
+  }
   const a=gordonAudio;
-  const timed=a&&!muted&&!a.paused&&isFinite(a.duration)&&a.duration>0;
+  const timed=a&&!muted&&!a.paused&&a.volume>0&&isFinite(a.duration)&&a.duration>0;
   if(timed){
-    const rate=a.playbackRate||1.2,total=a.duration/rate*60;
+    const rate=a.playbackRate||GORDON_RATE,total=a.duration/rate*60;
     p.flyMax=total;p.fly=Math.max(0,(a.duration-a.currentTime)/rate*60);
   }else p.fly-=dt;
 }
@@ -1126,7 +1158,7 @@ showBestStart();
 $('demoBtn').onclick=function(e){
   e.stopPropagation();this.blur();
   if(mode!=='play'||player.flyKind==='gordon')return;
-  audioOn();gordonDemo=true;gordonDecided=true;items=items.filter(it=>it.kind!=='gordon');beginGordon(player);
+  audioOn();primeGordonAudio();gordonDemo=true;gordonDecided=true;items=items.filter(it=>it.kind!=='gordon');beginGordon(player);
 };
 $('colBtn').onclick=()=>{paintCol();$('colScr').hidden=false};
 $('colClose').onclick=()=>{$('colScr').hidden=true};
@@ -1178,11 +1210,12 @@ $('shareBtn').onclick=function(){
 $('muteBtn').onclick=function(e){
   e.stopPropagation();muted=!muted;try{localStorage.setItem('redkaMute',muted?'1':'0')}catch(err){}
   paintMute();
-  if(muted){if(gordonAudio)gordonAudio.pause();return}
+  if(muted){if(gordonGain)gordonGain.gain.value=0;if(gordonAudio)gordonAudio.pause();if(bgmAudio)bgmAudio.pause();return}
   audioOn();SFX.jump();
-  if(player&&player.flyKind==='gordon'&&player.fly>0){
-    const a=ensureGordonAudio();a.playbackRate=1.2;a.preservesPitch=false;a.volume=.7;
-    if(isFinite(a.duration)&&a.duration>0&&player.flyMax>0){const rate=a.playbackRate||1.2;a.currentTime=Math.max(0,a.duration-player.fly/60*rate)}
+  if(gordonGain)gordonGain.gain.value=GORDON_VOL;
+  if(player&&player.flyKind==='gordon'&&player.fly>0&&!gordonSrc){
+    const a=ensureGordonAudio();a.playbackRate=GORDON_RATE;a.volume=GORDON_VOL;a.muted=false;
+    if(isFinite(a.duration)&&a.duration>0&&player.flyMax>0){a.currentTime=Math.max(0,a.duration-player.fly/60*GORDON_RATE)}
     a.play().catch(()=>{});
   }
 };
@@ -1212,8 +1245,11 @@ if(window.visualViewport)visualViewport.addEventListener('resize',resize);
 addEventListener('blur',()=>{input.l=input.r=false;pointers.clear()});
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){if(gordonAudio)gordonAudio.pause();if(bgmAudio)bgmAudio.pause();return}
-  if(gordonAudio&&player&&player.flyKind==='gordon'&&!muted)gordonAudio.play().catch(()=>{});
-  else syncBgm();
+  if(AC&&AC.state==='suspended')AC.resume();
+  if(player&&player.flyKind==='gordon'&&!muted){
+    if(gordonGain)gordonGain.gain.value=GORDON_VOL;
+    else if(gordonAudio)gordonAudio.play().catch(()=>{});
+  }else syncBgm();
 });
 
 loadFaces();loadBackgrounds();
@@ -1224,7 +1260,7 @@ function jumpTo(gs){
   const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
   topY=player.y+FEET+2;while(topY>camY-280)genStep();
 }
-window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},setInput(l,r){input.l=!!l;input.r=!!r}};
+window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},setInput(l,r){input.l=!!l;input.r=!!r}};
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode!=='over')update(dt);draw();requestAnimationFrame(loop)}
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});
