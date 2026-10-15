@@ -4,7 +4,7 @@
 
 Уся гра — один файл `index.html` без збірки й залежностей (тільки Google Fonts). Картинки й звук лежать в `art/`, тож гру треба віддавати статичним сервером разом із цією папкою (наприклад, `python3 -m http.server`), а не відкривати як файл.
 
-Онлайн після GitHub Pages: [https://kuchmenkos.github.io/redka-jump/](https://kuchmenkos.github.io/redka-jump/). Репозиторій зараз приватний — зробіть його публічним і в Settings → Pages увімкніть Source: GitHub Actions. Вкладка «Про гру» копіює це посилання; «Поділитись» додає його в текст.
+Онлайн після GitHub Pages: [https://kuchmenkos.github.io/redka-jump/](https://kuchmenkos.github.io/redka-jump/). Репозиторій зараз приватний — зробіть його публічним і в Settings → Pages увімкніть Source: GitHub Actions. «Поділитись» додає посилання на гру в текст.
 
 ## Керування
 

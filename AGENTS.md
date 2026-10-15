@@ -27,7 +27,7 @@
 - Інтро Гордона грає через WebAudio (`decodeAudioData`) лише в режимі Гордона, гучність 0.7, швидкість 1.2. `primeGordonAudio()` на «Стрибати» розблоковує HTMLAudio muted+pause без звуку; `stopGordonMusic()` тільки pause, без повторного `play()`. HTMLAudio — запасний шлях, якщо буфер ще не розкодовано.
 - Пауза: `mode='pause'`, `openPause` / `resumePlay` / `quitToStart` (без `saveRun`). Гардероб з паузи — `openCol('ward','pause')`. `update` і `draw` лише коли `mode==='play'`.
 - HUD: нашивка рахунку зліва, `#hudTix` по центру, «Меню» справа — той самий пунктирний крій. Підказка `#steerHint` якщо `STATS.steerN < 3`; `steerN++` лише на реальний ввід.
-- Канонічне посилання `GAME_LINK` (`https://kuchmenkos.github.io/redka-jump/`). На localhost шеринг і чіп «Посилання на гру» копіюють його; на живому http(s) — поточний origin. `touch-action:none` на `#wrap` — чіпи `.extchip` відкриваються JS-кліком.
+- Канонічне посилання `GAME_LINK` (`https://kuchmenkos.github.io/redka-jump/`) іде в текст «Поділитись». На живому http(s) — поточний origin. У «Про гру» чіп Threads `@saintfame23` (`window.open`, бо `touch-action:none` на `#wrap`).
 - `DEMO=true` показує кнопку примусового режиму Гордона в меню паузи. DEMO не рахується в ачивку «Був у гостях».
 - ♪/♫ на старті й у паузі (`[data-mute]` / `[data-bgm]`, `touch-action:manipulation`, JS click/pointerup). Перший жест на `#wrap` — `unlockAudio()` (`audioOn` + `primeBgm` + `syncBgm`). Якщо ♫ увімкнена, але трек ще не грає, тап лише стартує, не вимикає. Оверлеї `z-index:6`, HUD `4`.
 - Повідомлення про етапи, образи, хейтерів і ачивки йдуть чергою тостів під HUD. Плавальний текст лишається лише для «+2500» і комбо.
