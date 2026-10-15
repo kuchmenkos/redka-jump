@@ -311,8 +311,10 @@ const SFX={
 const sfx=k=>{if(mode==='play'||k==='fall'||k==='lose')try{SFX[k]()}catch(e){}};
 
 /* ---------- pixel sprites ---------- */
-const REDKA=["........GGG....GGG....GGG.....", ".......GGGGG..GGGGG..GGGGG....", "......GGGgGGGGGGgGGGGGGgGGG...", "......GGGGgGGGGGgGGGGGgGGGG...", "......GGGGGgGGGGgGGGGgGGGGG...", ".......GGGGGgGGGgGGGgGGGGG....", "........GGGGGgGGgGGgGGGGG.....", ".........GGGGGggggGGGGG.......", "...........GGGGggGGGG.........", "............RRRRRRRR..........", "..........RRRRRRRRRRRR........", ".........RRRRRRRRRRRRRRr......", "..KKK...RRKKKRRRKKKRRRRrr.....", ".KKKKK..RKWWWKRKWWWKRRRrr.....", ".WWWWW.RRKWPPKRKWPPKRRRrrr....", ".KKKKK.RRKWKPKRKWKPKRRRrrr....", "..KKK..RRKWWWKRKWWWKRRRrrr....", "...K...RRRKKKRRRKKKRRRRrrr....", "..RKR..RRRRRRRRRRRRRRRRrrr....", ".RRKRR.RRRRRKKKKKKKRRRRrr.....", ".RRKRRYYRRRRKTTTTTKRRRrrYY....", "..RKRYYYYRRRRKKKKKRRRrrYYYY...", "...KYYYYYYRRRRRRRRRRrYYYYYYY..", "...YYYYYYYYKRRRRRRRrKYYYYYYYY.", "....YYYYYYYYKRRRRRrKYYYYYYYYy.", "....yYYYYYYYYKRRRrKYYYYYYYyyy.", ".....yYYYYYYYYKRrKYYYYYYYyRRy.", ".....yYYYYYYYYYKKYYYYYYYyRRRR.", "......yYYYYYYYYKKYYYYYYYyRRRr.", "......yYYYYYYYYKKYYYYYYYYyrr..", ".......yyYYYYYYKKYYYYYYyyy....", "........yyyyyyyKKyyyyyyy......", "........KKKKKKK..KKKKKKK......", "........KKKKKKK..KKKKKKK......", "........KKKKKK....KKKKKK......"];
+const REDKA=["...KGGGGGgKGGGGGGggKGGGGGgK...", "...KGGGGGgKGGGGGGggKGGGGGgK...", "..KGGGGGGgGGGGGGGggGGGGGGggK..", "..KGGGGGGgGGGGGGGggGGGGGGggK..", "..KGGGGGGggGGGGGGggGGGGGGggK..", "..KGGGGGGggGGGGGGggGGGGGGggK..", "...KGGGGGgKKGGGGGgKKGGGGGgK...", "...KGGGGGgKKGGGGGGGKGGGGGgK...", "....KKKKKK.KGGGGGGGKKKKKKK....", "..........KKRRRRRRGK..........", ".........KRRRRRRRRRrK.........", "........KRRRRRRRRRRRRK........", ".KKKKK..KRRRRRRRRRRRRK........", ".KWWWK.KRRRWWWRRWWWrrrK.......", ".KWMWK.KRRRWPWRRWPWrrrK.......", ".KWWWK.KRRRWWWRRWWWrrrK.......", ".KKKKK.KRRRRRRRRRRRrrrK.......", "...K...KRRRRRTTTTTRrrrK.......", "..KKK..KRRRRRTTTTTRrrrK.......", ".KRKRKKKKRRRRRRRRRRrrKKKK.....", "..KKKKYYYYYRrrrrrrrRYYYYYK....", "...K.KYYYYYRRRTTTRRRYYYYYK....", "...K.KYYyyyyRRTKTRRyyyyYYK....", ".....KYYYyyyRRTTTRRyyyYYYK....", "....KYYYYYYRRRTKTRRRYYYYYYK...", "....KYYYYYYRRRTTTRRRYYYYYYK...", "....KYYYYYYRRRTKTRRRYYYYYYK...", "....KYYYYYYRRRRRRRRRYYYYYYK...", "....KYYYYYYYYYYYYYYYYYYYYYK...", "....KyyyYYYYYYYYYYYYYYYyyyK...", "....KyyyYYYYYYYYYYYYYYYyyyK...", ".....KKKKnnnnnKKKnnnnnKKKK....", "........KnnnnnK.KnnnnnK.......", "........KKKKKK...KKKKKK.......", "........KKKKKK...KKKKKK......."];
 const REDKA_NOMIC=REDKA.map((r,y)=>y>=12&&y<=22?'......'+r.slice(6):r);
+const CLOWN=["..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", ".........KKKKKKKKKKKK.........", ".......KKSSSSSSSSSSSsKK.......", "......KSSSSSSSSSSSSSsssK......", ".....KSSSSSSSWWWWSSSssssK.....", ".....KSSSWWWWWWWWWssssssK.....", ".....KSSWWWWWWWWWWssssssK.....", "......KKWWWWSSSSSSSsssKK......", "....KKKKAKKWBWWWCWsKAK..KKK...", "...KAAAAAaKBBbKCCcKAAaKKBBBK..", "...KAAAAAaBBBbCCCcAAAaaKBBBK..", "...KAAAAABKBBCKCCAKAAAKKBBBK..", "...KAAAKBBbKCCcKAAaKAAaKBBBK..", "...KAAABBBbCCCcAAAaAAAaaBBBK..", "...KAAAKABbKBCcKCAaKAAaKBBBK..", "...KAAAAAaKBBbKCCcKAAaKKBBBK..", "...KAAAAAaBBBbCCCcAAAaaKBBBK..", "..KFFFFAABKBBCKCCAKAAAKKFFFFK.", "..KFFFFKBBbKCCcKAAaKAAaKFFFFK.", "...KKKKBBBbCCCcAAAaAAAaaKKKK..", ".......KKKKKKKKCKKKKKKKK......", "........KSSSSSKKKSSSSSK.......", "........KSSSSSK.KSSSSSK.......", "........KsssssK.KsssssK.......", "........KKKAKK...KKBKKK.......", "........KKKKKK...KKKKKK......."];
+const ODYSSEY=["..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", ".................KKKKKK.......", "...............KKUUUUUUKK.....", ".............KKUUUUUUUUuuK....", "..........KKKFFFFFUUUUUuuuKKK.", ".........KDDDDDDFFUUUUUUUUUUUK", "........KDDDDDDDDOOEEEUUUUUUUK", ".....KKKDDDDDDDDDOoEEEUUUUUUUK", "....KFFFDDDDDDDDDOOoOUUUUUUUUK", "....KFhFDddddddddOOOOUUUUUUUUK", "....KFFFDdddddddddDdUUuuuuuuuu", "....KFFFDDDDDODDDDDdUUuuuuuuuu", "....KFFFDDDDDDDDDDDdUUuuuuuuuu", "....KFFFDdddddddddDdUUuuuuuuuu", "....KFFFDDDDDODDDDDdUUuuuuuuuu", "....KFFFDDDDDDDDDDDdUUuuuuuuuu", "...KFFFFDdddddddddDdUUuuuuuuuu", "...KFFFDDDDDDDDDDDDUUUuuuuuuuu", "....KKKKDDDDDDDDDDDUUUuuuuuuuu", ".......KDDDDDDDDDDDUUUuuuuuuuu", ".......KNNNNNNNNNNNUUUuuuuuuuu", ".......KDNDNDNDNDNDUUUuuuuuuuu", ".......KDNDNDNDNDNDUUUuuuuuuuu", ".......KDKDKDKDUDUDUUUuuuuuuuu", ".......KNNNNNKKUNNNNNUuuuuuuuu", ".......KKOKKK..KKKOKKKuuuuuuuu", ".......KKKKKK...KKKKKKKKKKKKKK"];
 const STUK=[
 "....KKKKKK....",
 "...KKKKKKKK...",
@@ -374,26 +376,36 @@ const LOOKS=[
   {at:90000,name:'Жовтий піджак',mic:1,J:'#f5cb26',j:'#c88e12',Z:'#fff0a0',sh:8},
   {at:180000,name:'Синій оксамит',mic:1,J:'#2f5fd0',j:'#1b3a8a',Z:'#86a9ff',sh:7},
   {at:300000,name:'Малиновий смокінг',mic:1,J:'#b81f52',j:'#6e0d2b',Z:'#ff7aa4',sh:7},
+  {at:370000,name:'Клоун',id:'clown',body:CLOWN,cut:10,face:{chin:16,sink:1,ax:15},pal:{A:'#e22b2b',a:'#9e1212',B:'#2ea043',b:'#1a6b32',C:'#f5cb26',c:'#c88e12',S:'#fff8ee',s:'#e4d4b8',W:'#ffffff',F:'#f2c9a0'}},
   {at:450000,name:'Смарагдовий костюм',mic:1,J:'#18946a',j:'#0b553d',Z:'#7ff0c4',sh:7},
+  {at:530000,name:'Одіссей',id:'odyssey',body:ODYSSEY,cut:10,face:{chin:14,sink:.8,ax:14},pal:{D:'#4a3a32',d:'#2e241e',U:'#6a6560',u:'#3e3a38',O:'#c4a35a',o:'#8a6a28',N:'#3a322c',E:'#c9b08a',F:'#f2c9a0',h:'#ff9a7a'}},
   {at:650000,name:'Срібний костюм',mic:1,J:'#c3c9d3',j:'#7d8695',Z:'#ffffff',sh:5,out:'#eef2f8'},
-  {at:900000,name:'Золотий костюм',mic:1,J:'#e2a91c',j:'#8f5f08',Z:'#fff4b8',sh:4,gold:1,out:'#ffe08a'}
+  {at:900000,name:'Золотий костюм',id:'gold',mic:1,J:'#e2a91c',j:'#8f5f08',Z:'#fff4b8',sh:4,gold:1,out:'#ffe08a'}
 ];
 function lookPal(L){
-  const p=Object.assign({},BASEPAL,{R:'#e2452a',r:'#b0241c',W:'#fafafa',P:'#c8281e',T:'#8f1a1a',G:'#4ca038',g:'#1d6626'});
+  const p=Object.assign({},BASEPAL,{R:'#e2452a',r:'#b0241c',W:'#fafafa',P:'#c8281e',T:'#8f1a1a',G:'#4ca038',g:'#1d6626',n:'#2a2230'});
   if(L.J){p.Y=L.J;p.y=L.j;p.Z=L.Z}else{p.Y='#f1ede4';p.y='#cfc7b8'}
+  if(L.pal)Object.assign(p,L.pal);
   if(L.gold){p.M='#ffd75a';p.H='#8f5f08'}else if(L.mic)p.M='#b4b4ba';
   return p;
 }
-const lookGrid=L=>{const g=L.mic?REDKA:REDKA_NOMIC;if(!L.J)return g;return g.map((r,y)=>r.split('').map((c,x)=>c==='Y'&&(x+y)%L.sh===0?'Z':c).join(''))};
+const lookGrid=L=>{
+  if(L.body)return L.body;
+  const g=L.mic?REDKA:REDKA_NOMIC;if(!L.J)return g;
+  return g.map((r,y)=>r.split('').map((c,x)=>c==='Y'&&(x+y)%L.sh===0?'Z':c).join(''));
+};
 const SPX=4,SSC=.72,CK=3;
 const hl=g=>g.map((r,y)=>r.split('').map((c,x)=>c==='R'&&((y===11&&(x===11||x===12))||(y===12&&x===10))?'h':c).join(''));
-// Redka's radish head and leaves give way to the photo face; the red tip below the collar stays as his shirt.
-const headlessRedka=g=>g.map((r,y)=>r.split('').map((c,x)=>{
-  if(y<=11)return '.';
-  if(y<=19)return x>=7?'.':c;
-  if(y<=21&&x>=7&&c!=='.'&&c!=='Y'&&c!=='y')return c==='r'?'r':'R';
-  return c;
-}).join(''));
+// Redka's radish head and leaves give way to the photo face; unique costumes only strip rows above `cut`.
+function headlessRedka(g,L){
+  if(L&&L.body){const top=L.cut||0;return g.map((r,y)=>y<top?'.'.repeat(r.length):r)}
+  return g.map((r,y)=>r.split('').map((c,x)=>{
+    if(y<=11)return '.';
+    if(y<=19)return x>=7?'.':c;
+    if(y<=21&&x>=7&&c!=='.'&&c!=='Y'&&c!=='y'&&c!=='Z')return c==='r'?'r':'R';
+    return c;
+  }).join(''));
+}
 const headlessEnemy=(g,rows)=>g.map((r,y)=>y<rows?'.'.repeat(r.length):r);
 const FACES={};
 function silhouette(img,col){const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const g=c.getContext('2d');g.drawImage(img,0,0);g.globalCompositeOperation='source-in';g.fillStyle=col;g.fillRect(0,0,c.width,c.height);return c}
@@ -428,20 +440,21 @@ const REDKA_CH={};
 function redkaChar(li,px,faceKey){
   const fk=faceKey&&FACES[faceKey]?faceKey:'felix';
   const key=li+':'+px+':'+fk;if(REDKA_CH[key])return REDKA_CH[key];
-  const L=LOOKS[li],f=FACES[fk]||FACES.felix,grid=f?headlessRedka(lookGrid(L)):hl(lookGrid(L));
-  const ch=makeChar(grid,Object.assign(lookPal(L),{h:'#ff9a7a'}),px,L.out||'#ffffff',f,REDKA_FACE[fk]||REDKA_FACE.felix);
+  const L=LOOKS[li],f=FACES[fk]||FACES.felix,grid=f?headlessRedka(lookGrid(L),L):hl(lookGrid(L));
+  const faceO=Object.assign({},REDKA_FACE[fk]||REDKA_FACE.felix,L.face||{});
+  const ch=makeChar(grid,Object.assign(lookPal(L),{h:'#ff9a7a'}),px,L.out||'#ffffff',f,faceO);
   if(f)REDKA_CH[key]=ch;return ch;
 }
-const EGRID={"stuk":[".....KKHHHHHHKK.....","....KHHHHHHHHHHK....","...KHHHHHHHHHHHHK...","...KHHHHHHHHHHHHK...","..KKhhhhhhhhhhhhKK..",".KHHHHHHHHHHHHHHHHK.","..KKFFKFFFFFFFKfKK..","..KFFFFKFFFFFKfffK..","..KFFFFWKFFFWKfffK..","...KFFFFFFFFFFffK...","...KFpFFFFFFFFfpK...","....KFFFKFFFFFfK....","....KFFFFKKKKFfK....",".....KKCCCCCCKK.....",".....KCCSSSSCcKKKKK.","....KCCCSSSSCcPPPPPK","...KCCCCCccCCcPLLLPK","...KCCCCCccCCFPPPPPK","..KCCCCCCccCCFPLLLPK","...KCCCCCccCCcPPPPPK","...KCCCCCccCCcPPPPPK","....KCCCCccCCccKKKK.",".....KCCCccCCcK.....",".....KnnnCCnnnK.....",".....KnnnKKnnnK.....",".....KKKK..KKKK....."],"koms":["....KKAAAAAAAAKK....","...KAAAAAAAAAAAAK...","..KAAAAAAAAAAAAAAK..","..KAAAAAAAAAAAAAAK..","...KAAAAAAAAAAAAAK..","...KAFAAAAAAAAfAK...","...KFFKFFFFFFFKfK...","..KFFFFKFFFFFKfffK..","..KFFFFWKFFFWKfffK..","...KFFFKKFFFKKffK...","...KFpFFFFFFFFfpK...","....KFFFKKKKFFfK....","....KFFFKTTKFFfK....",".....KKFKTTKFKK..KKK","......KSSSSSsK.KKMMM",".....KSSTTTTTsKMMMMM","....KSSSSTTTsssMMMMM","...KSSSSSTTTssFMMMMM","...KSSSSSStSsssMMmmm","...KSSSSSSSSsssMMmmm","...KSSSSSSSSssssKmmm","....KSSSSSSSsssK.KKK",".....KSSSSSSssK.....",".....KNNNSSNNNK.....",".....KNNNKKNNNK.....",".....KKKK..KKKK....."],"cancel":[".....KKKKKKKKKK.....","....KBBBBBBBBBBK....","...KGGGGGGGGGGGGK...","...KBBBBBBBBBBBBBK..","..KGBBBBBBBBBBBBGK..","..KGFFBBBBBBBBffGK..","..KGFFKFFFFFFFKfGK..","..KGFFFKFFFFFKffGK..","..KGFFFWKFFFWKffGK..","..KGFFFKKFFFKKffGK..","..KGFpFFFFFFFFfpGK..","...KKFFFFFFFFFGGK...","....KFFFKKKKFKfYYK..",".....KKFFFFFFKKYYK..","......KDSSSSdKKYYK..",".....KDDDddDddFYYK..","....KDDDDddDddFYYK..","...KDDDDDddDdddYYKKK","...KDDDDDddDdRRRRRRR","...KDDDDDddDdRRRRRRR","...KDDDDDddDdRRRRRRR","....KDDDDddDdrrrrrrr",".....KDDDddDddKKKKKK",".....KdddDDdddK.....",".....KdddKKdddK.....",".....KKKK..KKKK....."],"lang":[".......KOOOoK.......","....KKKOOOOOOKKK....","...KOOOOOOOOOOooK...","..KOOOOOOOOOOOoooK..","..KOOOOOOOOOOOoooK..","..KOOOOOOOOOOOoooK..","..KOOOKKOOOOKKoooK..","..KOOFVVVVOVVVVfoK..","..KOOFVWKVFVWKVfoK..","..KOOFVKKVFVKKVfoK..","..KOOpVVVVFVVVVpoK..","..KOOFFFKKKKFFfKoK..","...KKFFFKTTKFFfKFK..",".....KKFKTTKFKKFFK..",".KKKK.KKXSSSKKKFFK..","KUZZUKXXXSSSXxKFFK..","KUPPPXXXXXXXXxxKK...","KUPPPFXXXXXXXxxxK...","KUPPPXXXXXXXXxxxxK..","KUPPPXXXXXXXXxxxxK..",".KKKXXXXXXXXXxxxK...","...KXXXXXXXXXxxxK...","....KXXXXXXXXxxK....",".....KxxxXXxxxK.....",".....KxxxKKxxxK.....",".....KKKK..KKKK....."],"threads":[".....KKKJJJJKKK.....","...KKJJJJJJJJJjKK...","..KJJJJJJJJJJJjjjK..","..KJJJJJJJJJJJjjjK..","..KJJJJJJJJJJJjjjKK.","..KJJJJJJJJJJJjjjjjK","...KFFFFJJJJFFffKKK.","..KFFFFFFFFFFFfffK..","..KFFFFKKFFFKKfffK..","...KFFFFFFFFFFffK...","...KFpFFFFFFFFfpK...","....KFFFKFFFFFfK....","....KFFFFKKKKFfK....",".....KKFFFFFFKK.....",".....KKIIIIIIIKKKK..","....KIIIWIIIWiEEEEK.","...KIIIIIIIIIiEeeEK.","...KIIIIIWWWIFEeeEK.","..KIIIIIWIeIWFEeeEK.","..KIIIIIIWWWWiEeeEK.","..KIIIIIIIIIIiEEEEK.","...KIIIIIIIIIiiiKK..","....KIIIIIIIIiiK....",".....KiiiIIiiiK.....",".....KiiiKKiiiK.....",".....KKKK..KKKK....."]};
+const EGRID={"stuk":["....................","....................","....................","....................","....................","....................","....................","....................",".....KKKKKKKKKK.....","...KKHHHHHHHHHhKK...","..KHHHHHHHHHHHhhhK..","..KHHhhhhhhhhhhhhK..","...KHHHHfFFfHHhhK...","....KKKCCCCCCKKKKKK.","....KCCCCSSSCcPPPPPK","...KCCCCCSSSCcPLLLPK","...KCCCCCccCCFPPPPPK","..KCCCCCCccCCFPLLLPK","..KCCCCCCccCCcPPPPPK","..KCCCCCCccCCcPTTTPK","...KCCCCCccCCcPPPPPK","...KCCCCCccCCcPPPPPK","....KCCCCccCCccKKKK.",".....KnnnCCnnnK.....",".....KnnnKKnnnK.....",".....KKKK..KKKK....."],"koms":["....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","........KKKK........",".......KfFFfK.......",".......KFFFFKK...KKK",".....KKTTTTTttKKKMMM","....KSSTTTTTttsMMMmm","....KSSTTTTTttFMMMmm","...KSSSTTTTTttFMMMmm","...KSSSTTStSsssMMMmm","...KSSSSSSSSssssKMMM","...KSSSSSSSSssssKKKK","....KSSSSSSSsssK....","....KSSSSSSSsssK....",".....KNNNSSNNNK.....",".....KNNNKKNNNK.....",".....KKKK..KKKK....."],"cancel":[".....KKKKKKKKKK.....","....KBBBBBBBBBBK....","...KGGGGGGGGGGGGK...","...KBBBBBBBBBBBBBK..","..KGBBBBBBBBBBBBGK..","..KGFFBBBBBBBBffGK..","..KGFFKFFFFFFFKfGK..","..KGFFFKFFFFFKffGK..","..KGFFFWKFFFWKffGK..","..KGFFFKKFFFKKffGK..","..KGFpFFFFFFFFfpGK..","...KKFFFFFFFFFGGK...","....KFFFKKKKFKYYYK..",".....KKFFFFFFKYYYK..",".....KKDDSSSDKYYYK..","....KDDDDddDDdFYYK..","...KDDDDDddDDdFYYK..","...KDDDDDddDDdYYYKKK","...KDDDDDddDDRRRRRRR","...KDDDDDddDDRRRRRRR","...KDDDDDddDDRRRRRRR","...KDDDDDddDDrrrrrrr","....KDDDDddDDddKKKKK",".....KdddDDdddK.....",".....KdddKKdddK.....",".....KKKK..KKKK....."],"lang":["....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","........KKKK........",".......KfFFfK.......","......KKFFFFKK......","..KKKKXXSSSSSxKK....",".KUUZUXXSSSSSxFFK...",".KUPPPXXXSSSXxFFK...",".KUPKPFXXXXXXxFFK...",".KUPPPXXXXXXXxxxK...",".KUPVPXXXXXXXxxxK...",".KUUUUXXXXXXXxxxK...","..KKKXXXXXXXXxxK....",".....KxxxXXxxxK.....",".....KxxxKKxxxK.....",".....KKKK..KKKK....."],"threads":["....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","........KKKK........",".......KfFFfK.......",".......KFFFFKKKKKK..",".....KKIIIIIIIEEEEK.","....KIIIWIIIWiEeeEK.","...KIIIIIIIIIiEeeEK.","..KIIIIIIWWWIFEeeEK.","..KIIIIIWIeIWFEeeEK.","..KIIIIIIWWWWiEeeEK.","..KIIIIIIIIIIiEeeEK.","...KIIIIIIIIIiEEEEK.","...KIIIIIIIIIiiiKK..","....KKiiiIIiiiKK....",".....KiiiIIiiiK.....",".....KKKKKKKKKK....."]};
 const EPAL={"K":"#1e1820","F":"#f3c6a0","f":"#d99c72","p":"#f08f86","W":"#ffffff","H":"#4a4a55","h":"#22222a","C":"#c9a46a","c":"#9c7a44","P":"#fbfbf2","L":"#8aa0c8","n":"#3b3b46","A":"#5a3a22","T":"#d9302c","t":"#9e1b1b","S":"#f4f4ee","s":"#c4c8d0","M":"#f0b93a","m":"#b07d16","N":"#2c3a66","B":"#2a2320","G":"#59606c","R":"#d63434","r":"#8f1c1c","D":"#5e6675","d":"#3f4552","Y":"#a8743e","O":"#ecc062","o":"#b98a2c","V":"#c22a3a","Q":"#c0303a","X":"#2a9a8c","x":"#1b6660","Z":"#9a9aa4","U":"#9a6a3a","J":"#2b6fd6","j":"#1b4a99","I":"#2c2c36","i":"#17171d","E":"#3a3a44","e":"#7cd2ff"};
 const IGRID={"ROCKET":["....KRRK....","...KRRRRK...","...KRRRRK...","..KWWWWwwK..","..KWWWWwwK..","..KWBbbBwK..","..KWBbbBwK..","..KWBBBBwK..","..KWBBBBwK..",".KKWRRRRwKK.","KRRWWWWwwRRK","KRRWWWWwwRRK","KRRRRRRRRRRK","KRRRRRRRRRRK","KRRRRRRRRRRK",".KKKKKKKKKK.","...KOOOOK...","....KYYK....","....KYYK...."],"TRAIN":["...KKKKK......KKKKKKKKK.","..KkkkkkK....KkkkkkkkkkK","...KkkkK.KKK..KZZZZZZZK.","...KkkkKKZZZK.KYYYYYYyK.","...KkkkKKYYYKKKYYLLLYyK.","..KZZZZZyZZZyZZYYLLLYyK.","..KZZZZZyZZZyZZYYLLLYyK.","..KYYYYYyYYYyYYYYYYYYyK.",".KKYYYYYyYYYyYYYYYYYYyK.","KkkYYYYYyYYYyYYYYYYYYyK.","kkkyyyyyyyyyyyyYYYYYYyK.","kkkkkkkkkkkkkkkkkkkkkkkK","KKKKKkZZkKkZZkKKKKkZkKK.","....KkZZkKkZZkK..KkZkK..","....KkkkkKkkkkK..KkkkK.."],"ENV":["WWWWWWWWWWWWWW","WKWWWWWWWWWWKW","WWKWWWWWWWWKWW","WWWKWWWWWWKWWW","WWWWKWWWWKWWWW","WWWWWKWWKWWWWW","WWWWWWRRWWWWWW","WWWWWWRRWWWWWW","WWWWWWWWWWWWWW","ssssssssssssss"],"THREAD":["KIIIIIIIIIIIIIIIIIIIIIIIIK","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","IIIIIIIIIIIIIIIIIIIIIIIIII","KIIIIIIIIIIIIIIIIIIIIIIIIK",".KKIIIKKKKKKKKKKKKKKKKKKK.","..KIKK....................","...K......................"]};
 const IPAL={R:'#d63434',W:'#f6f6f0',w:'#c9ccd4',B:'#2b6fd6',b:'#9fd6ff',O:'#ff9a2a',Y:'#ffd23a',K:'#1e1820',Z:'#fff3b0',y:'#a8740f',L:'#7cc4f0',k:'#4a320a',s:'#c9c2b0',I:'#1e1e26',e:'#7cd2ff'};
 const EPAL_X={cancel:{D:'#4a5fd6',d:'#2c3a96',G:'#e0473a',B:'#2a2320'},koms:{A:'#8a4a1e',S:'#fff7e6',s:'#e0cfae',M:'#ffcc33',m:'#d18f00'}};
 const EFACE={
-  stuk:{img:'stuk',rows:13,o:{ax:9.5,chin:13,sink:.6,cells:15}},
-  koms:{img:'koms',rows:13,o:{ax:9.5,chin:13,sink:.6,cells:15}},
-  lang:{img:'lang',rows:14,o:{ax:9.5,chin:14,sink:.6,cells:18}},
-  threads:{img:'threads',rows:14,o:{ax:9.5,chin:14,sink:.6,cells:16}},
+  stuk:{img:'stuk',rows:8,o:{ax:9.5,chin:13,sink:.6,cells:15}},
+  koms:{img:'koms',rows:12,o:{ax:9.5,chin:13,sink:.6,cells:15}},
+  lang:{img:'lang',rows:12,o:{ax:9.5,chin:13,sink:.5,cells:18}},
+  threads:{img:'threads',rows:12,o:{ax:9.5,chin:13,sink:.6,cells:16}},
   cancel:{img:'cancel',rows:13,o:{ax:9.5,chin:13,sink:.6,cells:15}}
 };
 const ECH={},EOUT={};
@@ -557,8 +570,8 @@ const ACH=[
   {id:'stoic',name:'Стоїк',hint:'Впади, простоявши понад 3 с',test:(r)=>r.fromOver&&r.causeKind==='fall'&&r.idlePeak>180},
   {id:'lviv',name:'Лев не вражений',hint:'Дострибай до Львова',test:(r,S)=>r.zoneIdx>=1||(S.bestZone||0)>=1},
   {id:'stad',name:'Стадіон зібрано',hint:'Дострибай до стадіону',test:(r,S)=>r.zoneIdx>=6||(S.bestZone||0)>=6},
-  {id:'gold',name:'Золотий хлопчик',hint:'Відкрий золотий піджак',test:(r,S)=>r.lookIdx>=7||(S.looks||0)>=7},
-  {id:'ward',name:'Повний гардероб',hint:'Усі вісім піджаків',test:(r,S)=>Math.max(r.lookIdx,S.looks||0)>=7}
+  {id:'gold',name:'Золотий хлопчик',hint:'Відкрий золотий піджак',test:(r,S)=>{const n=Math.max(r.lookIdx,S.looks||0);for(let i=0;i<=n&&i<LOOKS.length;i++)if(LOOKS[i].gold)return true;return false}},
+  {id:'ward',name:'Повний гардероб',hint:'Усі костюми',test:(r,S)=>Math.max(r.lookIdx,S.looks||0)>=LOOKS.length-1}
 ];
 function runSnap(){return {score:Math.max(0,Math.floor(score())),causeKind,zoneIdx,lookIdx,hat,malorosN,expressN,minusCnt,fakeCnt,threadHits,idlePeak,stompKind,gordonCaught,gordonDemo,gordonMissed,fromOver:false}}
 function saveAch(){try{localStorage.setItem('redkaAch',JSON.stringify(ACH_HAVE))}catch(e){}}
