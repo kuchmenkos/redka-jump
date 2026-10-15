@@ -25,15 +25,15 @@ body{box-sizing:border-box;background:var(--frame);color:var(--ink);font-family:
   padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
 #wrap{position:relative;height:100vh;height:100dvh;max-width:460px;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow:hidden}
 canvas{display:block;width:100%;height:100%;touch-action:none}
-.hud{position:absolute;top:max(6px,env(safe-area-inset-top,0px));left:8px;right:8px;z-index:4;display:flex;justify-content:space-between;align-items:flex-start;gap:6px;pointer-events:none}
-.hud .scorebox{background:rgba(248,241,227,.92);padding:6px 10px 5px;border-radius:6px;box-shadow:0 2px 0 rgba(43,30,25,.25);min-width:92px}
-.hud .val{font-family:var(--pixel);font-size:18px;color:var(--ink);font-variant-numeric:tabular-nums}
+.hud{position:absolute;top:max(6px,env(safe-area-inset-top,0px));left:8px;right:8px;z-index:4;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none}
+.hud .scorebox{background:rgba(248,241,227,.92);padding:8px 12px 6px;border-radius:8px;box-shadow:0 2px 0 rgba(43,30,25,.25);min-width:104px}
+.hud .val{font-family:var(--pixel);font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
 .hud .combo{font-size:12px;font-weight:800;color:#1a7a32;margin-top:2px;min-height:14px}
-.hud .right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:auto}
-.hud .best{background:rgba(248,241,227,.88);padding:5px 8px;border-radius:6px;box-shadow:0 2px 0 rgba(43,30,25,.25);font-family:var(--pixel);font-size:12px;color:var(--muted)}
-.demo{pointer-events:auto;flex:none;min-width:0;margin-top:2px;padding:5px 8px;font-size:10px;font-weight:800;border-radius:5px;background:linear-gradient(#ffe48a,#e2a91c);color:#2a1722;box-shadow:inset 0 0 0 1.5px #2a1722,0 2px 0 rgba(43,30,25,.35);letter-spacing:.04em}
+.hud .right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:auto}
+.hud .best{background:rgba(248,241,227,.88);padding:6px 10px;border-radius:8px;box-shadow:0 2px 0 rgba(43,30,25,.25);font-family:var(--pixel);font-size:12px;color:var(--muted)}
+.demo{pointer-events:auto;flex:none;min-width:0;padding:8px 10px;font-size:11px;font-weight:800;border-radius:8px;background:linear-gradient(#ffe48a,#e2a91c);color:#2a1722;box-shadow:inset 0 0 0 1.5px #2a1722,0 2px 0 rgba(43,30,25,.35);letter-spacing:.04em}
 .demo:disabled{opacity:.45}
-.mute{pointer-events:auto;width:34px;height:34px;min-width:34px;padding:0;font-size:16px;line-height:1;border-radius:6px;background:rgba(248,241,227,.92);color:var(--ink);box-shadow:0 2px 0 rgba(43,30,25,.25)}
+.mute{pointer-events:auto;width:44px;height:44px;min-width:44px;padding:0;font-size:18px;line-height:1;border-radius:10px;background:rgba(248,241,227,.92);color:var(--ink);box-shadow:0 2px 0 rgba(43,30,25,.25)}
 .mute.off{color:var(--muted);text-decoration:line-through}
 .overlay{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;background:rgba(43,30,25,.45);padding:12px max(16px,env(safe-area-inset-left,0px));overflow-y:auto;box-sizing:border-box}
 .card{position:relative;background:var(--card);color:var(--ink);border-radius:10px;padding:22px 20px 18px;width:100%;max-width:350px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;text-align:center;margin:auto;
@@ -52,8 +52,9 @@ h1{font-family:var(--pixel);font-size:22px;line-height:1.35;margin:0;font-weight
 .cause{font-size:15px;font-weight:800;margin:0;color:var(--stamp)}
 .look{display:inline-block;align-self:center;background:var(--ink);color:var(--card);font-weight:800;font-size:13px;padding:6px 10px;border-radius:6px}
 .gold{background:var(--gold);color:var(--ink)}
-.btns{display:flex;gap:8px;flex-wrap:wrap}
-button{flex:1;min-width:120px;font-family:var(--body);font-weight:800;font-size:15px;border:0;border-radius:8px;padding:13px 14px;cursor:pointer;background:var(--stamp);color:#fff}
+.btns{display:flex;gap:8px;flex-wrap:nowrap;align-items:stretch}
+.btns .cta{width:auto;flex:1.35;font-size:17px;min-height:48px;padding:14px}
+button{flex:1;min-width:0;font-family:var(--body);font-weight:800;font-size:16px;border:0;border-radius:10px;padding:14px 14px;min-height:48px;cursor:pointer;background:var(--stamp);color:#fff}
 button.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
 button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .fine{font-size:12px;color:var(--muted);margin:0}
@@ -62,11 +63,11 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .overlay{padding-top:max(12px,env(safe-area-inset-top,0px));padding-bottom:max(12px,env(safe-area-inset-bottom,0px));overscroll-behavior:contain}
 .card{max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 10px 0 rgba(20,10,16,.35)}
 .card.start{gap:9px;padding:18px 18px 14px}
-.cta{flex:none;width:100%;font-size:18px;padding:14px;letter-spacing:.02em;background:#2ea043;box-shadow:0 4px 0 #1a6b32;transition:transform .08s}
+.cta{flex:none;width:100%;font-size:20px;padding:16px;min-height:52px;letter-spacing:.02em;background:#2ea043;box-shadow:0 4px 0 #1a6b32;transition:transform .08s}
 .cta:active{transform:translateY(3px);box-shadow:0 1px 0 #1a6b32}
 .bestline{margin:-2px 0 0;font-size:12px;font-weight:700;color:var(--muted)}
 .bestline b{color:var(--ink)}
-.achbtn{width:100%;flex:none;min-width:0;padding:10px;font-size:14px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line)}
+.achbtn{width:100%;flex:none;min-width:0;padding:12px 14px;min-height:48px;font-size:15px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line)}
 .achbtn b{font-family:var(--pixel);font-size:11px;font-weight:400}
 .achgrid,.wardgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left;max-height:min(52vh,380px);overflow-y:auto}
 .achcard,.wardcard{background:var(--well);border-radius:8px;padding:10px 9px;min-height:86px;display:flex;flex-direction:column;gap:4px}
@@ -84,7 +85,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .newachs ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 .newachs li{font-size:13px;font-weight:700}
 .tabs{display:flex;gap:4px;background:var(--well);padding:4px;border-radius:9px}
-.tab{flex:1;min-width:0;padding:8px 4px;font-size:13px;background:transparent;color:var(--muted);border-radius:6px;box-shadow:none}
+.tab{flex:1;min-width:0;padding:10px 8px;min-height:44px;font-size:14px;background:transparent;color:var(--muted);border-radius:8px;box-shadow:none}
 .tab[aria-selected="true"]{background:var(--ink);color:var(--card)}
 .panels{height:204px;overflow-y:auto}
 .panels .legend{gap:5px 10px;font-size:12.5px;line-height:1.25}
@@ -114,7 +115,8 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .hatelist li span,.hatelist li b{position:relative}
 .hatelist li b{color:var(--stamp);font-family:var(--pixel);font-size:11px;font-weight:400}
 .hatelist .none{justify-content:center;color:var(--muted);font-weight:700}
-@media (max-height:720px){.card.over .scene{max-height:170px;object-fit:cover}.overpanels{min-height:300px}.card.over{gap:8px}}
+.card.over .scene{min-height:180px;object-fit:cover}
+@media (max-height:720px){.card.over .scene{min-height:160px;max-height:200px;object-fit:cover}.overpanels{min-height:300px}.card.over{gap:8px}}
 #shareTxt{font-size:12px;background:var(--well);border-radius:8px;padding:8px;margin:0;user-select:text;-webkit-user-select:text;text-align:left}
 #yellScr{z-index:3;background:rgba(43,30,25,.72)}
 .card.yell{gap:12px;padding:28px 18px 24px;outline-color:var(--stamp);transform:rotate(-2deg);animation:yellIn .35s cubic-bezier(.2,1.4,.4,1),yellShake .4s .35s ease-in-out 4}
@@ -127,9 +129,9 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
   <canvas id="cv" aria-label="Ігрове поле: Редька стрибає по ярликах угору"></canvas>
   <div class="hud" id="hud">
     <div class="scorebox" id="scorebox" hidden><div class="val" id="score">0</div><div class="combo" id="combo"></div></div>
-    <button id="demoBtn" class="demo" hidden aria-label="Демо: увімкнути режим Гордона">DEMO</button>
     <div class="right">
       <div class="best" id="best" hidden>0</div>
+      <button id="demoBtn" class="demo" hidden aria-label="Демо: увімкнути режим Гордона">DEMO</button>
       <button id="bgmBtn" class="mute" type="button" aria-label="Вимкнути музику">♫</button>
       <button id="muteBtn" class="mute" type="button" aria-label="Вимкнути звук">♪</button>
     </div>
@@ -205,9 +207,9 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
       <div class="overpanels">
         <div class="respanel" role="tabpanel" data-panel="res">
           <p class="cause" id="cause">Впав</p>
+          <div class="scenewrap"><img class="scene" id="endImg" alt="Як скінчився забіг"><span class="record" id="recordBadge" hidden>НОВИЙ РЕКОРД!</span></div>
           <p class="big" id="finalScore">0</p>
           <p class="sub" style="margin-top:-6px">підписників на хейті</p>
-          <div class="scenewrap"><img class="scene" id="endImg" alt="Як скінчився забіг"><span class="record" id="recordBadge" hidden>НОВИЙ РЕКОРД!</span></div>
           <div class="lookrow"><span class="look" id="look">Без піджака</span><span class="rankmini" id="rankMini"></span></div>
           <div id="newAchs" class="newachs" hidden></div>
         </div>
@@ -219,8 +221,8 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
         </div>
       </div>
       <div class="btns">
-        <button id="shareBtn">Поділитись</button>
-        <button class="ghost" id="againBtn">Ще раз</button>
+        <button id="againBtn" class="cta">Ще раз</button>
+        <button class="ghost" id="shareBtn">Поділитись</button>
       </div>
       <p id="shareTxt" hidden></p>
       <img id="shareImg" class="scene" alt="Картка результату" hidden>
@@ -237,48 +239,48 @@ const PX=3;
 
 /* ---------- sound ---------- */
 let AC=null,muted=false,bgmOn=true,bgmAudio=null,bgmPrimed=false;try{muted=localStorage.getItem('redkaMute')==='1'}catch(e){}try{bgmOn=localStorage.getItem('redkaBgm')!=='0'}catch(e){}
-const BGM_VOL=.7,DEMO=true;
+const BGM_VOL=.7,SFX_VOL=2.8,DEMO=true;
 function audioOn(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();loadGordonBuf()}catch(e){}}
 function tone(type,f0,f1,dur,vol,delay){
   if(!AC||muted)return;const t=AC.currentTime+(delay||0),o=AC.createOscillator(),g=AC.createGain();
   o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(30,f1),t+dur);
-  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur+.02);
+  g.gain.setValueAtTime(vol*SFX_VOL,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur+.02);
 }
 function noise(dur,vol,cut){
   if(!AC||muted)return;const n=AC.sampleRate*dur,b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);
   for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);
-  const src=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();src.buffer=b;f.type='lowpass';f.frequency.value=cut;g.gain.value=vol;
+  const src=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();src.buffer=b;f.type='lowpass';f.frequency.value=cut;g.gain.value=vol*SFX_VOL;
   src.connect(f);f.connect(g);g.connect(AC.destination);src.start();
 }
 const SFX={
   jump:()=>{const j=Math.random()*40-20;tone('sine',400+j,680+j,.09,.055);tone('triangle',560+j,840+j,.07,.025,.015)},
-  spring:()=>{tone('sine',240,980,.26,.08);tone('triangle',480,1400,.2,.03,.03)},
+  spring:()=>{tone('sine',240,980,.26,.065);tone('triangle',480,1400,.2,.03,.03)},
   minus:()=>{tone('sine',380,280,.18,.05);tone('triangle',300,160,.28,.04,.16)},
-  break:()=>{noise(.14,.16,1600);tone('sine',240,80,.1,.03)},
-  peel:()=>{noise(.08,.08,2000);tone('triangle',520,160,.12,.035)},
-  stomp:()=>{tone('sine',190,70,.11,.07);noise(.05,.08,650)},
+  break:()=>{noise(.14,.08,1600);tone('sine',240,80,.1,.03)},
+  peel:()=>{noise(.08,.05,2000);tone('triangle',520,160,.12,.035)},
+  stomp:()=>{tone('sine',190,70,.11,.07);noise(.05,.06,650)},
   hit:()=>{tone('triangle',480,150,.16,.05);noise(.05,.04,1800)},
   unlock:()=>[523,659,784].forEach((f,i)=>tone('sine',f,f,.08,.04,i*.07)),
-  stage:()=>{tone('triangle',784,784,.12,.06);tone('triangle',1175,1175,.2,.055,.1)},
+  stage:()=>{tone('triangle',784,784,.12,.05);tone('triangle',1175,1175,.2,.045,.1)},
   combo:()=>{tone('triangle',659,784,.08,.04);tone('sine',988,1175,.12,.03,.05)},
   breakCombo:()=>{tone('sine',380,160,.22,.045);tone('triangle',280,110,.24,.03,.06)},
-  whoosh:()=>{noise(.22,.08,800);tone('sine',160,70,.2,.025)},
+  whoosh:()=>{noise(.22,.05,800);tone('sine',160,70,.2,.025)},
   gordonGet:()=>{[784,988,1175].forEach((f,i)=>tone('sine',f,f,.08,.035,i*.05));tone('triangle',1568,1568,.16,.04,.16)},
   spawn:()=>tone('sine',760,620,.05,.022),
-  fall:()=>tone('sine',720,70,.85,.1),
-  rocket:()=>{noise(.4,.1,1000);tone('sine',140,520,.4,.04)},
-  express:()=>{[392,523,659,784,1046].forEach((f,i)=>tone('triangle',f,f,.1,.045,i*.08));tone('sine',1318,1318,.4,.05,.42)},
-  shout:()=>{tone('triangle',260,140,.14,.045);tone('sine',220,130,.12,.03,.03)},
-  stamp:()=>{tone('sine',150,70,.09,.06);noise(.04,.1,500)},
-  lose:()=>{tone('sine',280,110,.4,.07);noise(.2,.08,600)}
+  fall:()=>tone('sine',720,70,.85,.08),
+  rocket:()=>{noise(.4,.06,1000);tone('sine',140,520,.4,.04)},
+  express:()=>{[392,523,659,784,1046].forEach((f,i)=>tone('triangle',f,f,.1,.04,i*.08));tone('sine',1318,1318,.4,.045,.42)},
+  shout:()=>{tone('triangle',260,140,.14,.05);tone('sine',220,130,.12,.03,.03)},
+  stamp:()=>{tone('sine',150,70,.09,.05);noise(.04,.05,500)},
+  lose:()=>{tone('sine',280,110,.4,.08);noise(.2,.05,600)}
 };
 const sfx=k=>{if(mode==='play'||k==='fall'||k==='lose')try{SFX[k]()}catch(e){}};
 
 /* ---------- pixel sprites ---------- */
-const REDKA=["...KGGGGGgKGGGGGGggKGGGGGgK...", "...KGGGGGgKGGGGGGggKGGGGGgK...", "..KGGGGGGgGGGGGGGggGGGGGGggK..", "..KGGGGGGgGGGGGGGggGGGGGGggK..", "..KGGGGGGggGGGGGGggGGGGGGggK..", "..KGGGGGGggGGGGGGggGGGGGGggK..", "...KGGGGGgKKGGGGGgKKGGGGGgK...", "...KGGGGGgKKGGGGGGGKGGGGGgK...", "....KKKKKK.KGGGGGGGKKKKKKK....", "..........KKRRRRRRGK..........", ".........KRRRRRRRRRrK.........", "........KRRRRRRRRRRRRK........", ".KKKKK..KRRRRRRRRRRRRK........", ".KWWWK.KRRRWWWRRWWWrrrK.......", ".KWMWK.KRRRWPWRRWPWrrrK.......", ".KWWWK.KRRRWWWRRWWWrrrK.......", ".KKKKK.KRRRRRRRRRRRrrrK.......", "...K...KRRRRRTTTTTRrrrK.......", "..KKK..KRRRRRTTTTTRrrrK.......", ".KRKRKKKKRRRRRRRRRRrrKKKK.....", "..KKKKYYYYYRrrrrrrrRYYYYYK....", "...K.KYYYYYRRRTTTRRRYYYYYK....", "...K.KYYyyyyRRTKTRRyyyyYYK....", ".....KYYYyyyRRTTTRRyyyYYYK....", "....KYYYYYYRRRTKTRRRYYYYYYK...", "....KYYYYYYRRRTTTRRRYYYYYYK...", "....KYYYYYYRRRTKTRRRYYYYYYK...", "....KYYYYYYRRRRRRRRRYYYYYYK...", "....KYYYYYYYYYYYYYYYYYYYYYK...", "....KyyyYYYYYYYYYYYYYYYyyyK...", "....KyyyYYYYYYYYYYYYYYYyyyK...", ".....KKKKnnnnnKKKnnnnnKKKK....", "........KnnnnnK.KnnnnnK.......", "........KKKKKK...KKKKKK.......", "........KKKKKK...KKKKKK......."];
+const REDKA=["...KGGGGGgKGGGGGGggKGGGGGgK...", "...KGGGGGgKGGGGGGggKGGGGGgK...", "..KGGGGGGgGGGGGGGggGGGGGGggK..", "..KGGGGGGgGGGGGGGggGGGGGGggK..", "..KGGGGGGggGGGGGGggGGGGGGggK..", "..KGGGGGGggGGGGGGggGGGGGGggK..", "...KGGGGGgKKGGGGGgKKGGGGGgK...", "...KGGGGGgKKGGGGGGGKGGGGGgK...", "....KKKKKK.KGGGGGGGKKKKKKK....", "..........KKRRRRRRGK..........", ".........KRRRRRRRRRrK.........", "........KRRRRRRRRRRRRK........", ".KKKKK..KRRRRRRRRRRRRK........", ".KWWWK.KRRRWWWRRWWWrrrK.......", ".KWMWK.KRRRWPWRRWPWrrrK.......", ".KWWWK.KRRRWWWRRWWWrrrK.......", ".KKKKK.KRRRRRRRRRRRrrrK.......", "...K...KRRRRRTTTTTRrrrK.......", "..KKK..KRRRRRTTTTTRrrrK.......", ".KRKRK..KRRRRRRRRRRrrKK.......", "..KKK..KYYYYrrrrrrrYYYYK......", "...K...KYYYYRRTTTRRYYYYK......", "...K...KYYyyyRTKTRyyyYYK......", ".......KYYyyyRTTTRyyyYYK......", "......KYYYYYRRTKTRRYYYYYK.....", "......KYYYYYRRTTTRRYYYYYK.....", "......KYYYYYRRTKTRRYYYYYK.....", "......KYYYYYRRRRRRRYYYYYK.....", "......KYYYYYYYYYYYYYYYYYK.....", "......KyyyYYYYYYYYYYYyyyK.....", "......KyyyYYYYYYYYYYYyyyK.....", ".......KKKnnnnKKKnnnnKKK......", ".........KnnnnK.KnnnnK........", ".........KKKKK...KKKKK........", ".........KKKKK...KKKKK........"];
 const REDKA_NOMIC=REDKA.map((r,y)=>y>=12&&y<=22?'......'+r.slice(6):r);
-const CLOWN=["..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", ".........KKKKKKKKKKKK.........", ".......KKSSSSSSSSSSSsKK.......", "......KSSSSSSSSSSSSSsssK......", ".....KSSSSSSSWWWWSSSssssK.....", ".....KSSSWWWWWWWWWssssssK.....", ".....KSSWWWWWWWWWWssssssK.....", "......KKWWWWSSSSSSSsssKK......", "....KKKKAKKWBWWWCWsKAK..KKK...", "...KAAAAAaKBBbKCCcKAAaKKBBBK..", "...KAAAAAaBBBbCCCcAAAaaKBBBK..", "...KAAAAABKBBCKCCAKAAAKKBBBK..", "...KAAAKBBbKCCcKAAaKAAaKBBBK..", "...KAAABBBbCCCcAAAaAAAaaBBBK..", "...KAAAKABbKBCcKCAaKAAaKBBBK..", "...KAAAAAaKBBbKCCcKAAaKKBBBK..", "...KAAAAAaBBBbCCCcAAAaaKBBBK..", "..KFFFFAABKBBCKCCAKAAAKKFFFFK.", "..KFFFFKBBbKCCcKAAaKAAaKFFFFK.", "...KKKKBBBbCCCcAAAaAAAaaKKKK..", ".......KKKKKKKKCKKKKKKKK......", "........KSSSSSKKKSSSSSK.......", "........KSSSSSK.KSSSSSK.......", "........KsssssK.KsssssK.......", "........KKKAKK...KKBKKK.......", "........KKKKKK...KKKKKK......."];
-const ODYSSEY=["..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", ".................KKKKKK.......", "...............KKUUUUUUKK.....", ".............KKUUUUUUUUuuK....", "..........KKKFFFFFUUUUUuuuKKK.", ".........KDDDDDDFFUUUUUUUUUUUK", "........KDDDDDDDDOOEEEUUUUUUUK", ".....KKKDDDDDDDDDOoEEEUUUUUUUK", "....KFFFDDDDDDDDDOOoOUUUUUUUUK", "....KFhFDddddddddOOOOUUUUUUUUK", "....KFFFDdddddddddDdUUuuuuuuuu", "....KFFFDDDDDODDDDDdUUuuuuuuuu", "....KFFFDDDDDDDDDDDdUUuuuuuuuu", "....KFFFDdddddddddDdUUuuuuuuuu", "....KFFFDDDDDODDDDDdUUuuuuuuuu", "....KFFFDDDDDDDDDDDdUUuuuuuuuu", "...KFFFFDdddddddddDdUUuuuuuuuu", "...KFFFDDDDDDDDDDDDUUUuuuuuuuu", "....KKKKDDDDDDDDDDDUUUuuuuuuuu", ".......KDDDDDDDDDDDUUUuuuuuuuu", ".......KNNNNNNNNNNNUUUuuuuuuuu", ".......KDNDNDNDNDNDUUUuuuuuuuu", ".......KDNDNDNDNDNDUUUuuuuuuuu", ".......KDKDKDKDUDUDUUUuuuuuuuu", ".......KNNNNNKKUNNNNNUuuuuuuuu", ".......KKOKKK..KKKOKKKuuuuuuuu", ".......KKKKKK...KKKKKKKKKKKKKK"];
+const CLOWN=["..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", ".........KKKKKKKKKKKK.........", ".......KKSSSSSSSSSSSsKK.......", "......KSSSSSSSSSSSSSsssK......", ".....KSSSSSSSWWWWSSSssssK.....", ".....KSSSWWWWWWWWWssssssK.....", ".....KSSWWWWWWWWWWssssssK.....", "......KKWWWWSSSSSSSsssKK......", "......KKKKAWWWBWWWCKKKKKK.....", ".....KAAAAAaKBBbKCCcKKBBBK....", ".....KAAAAAaBBBbCCCccKBBBK....", ".....KAAAAABKBBCKCCAKKBBBK....", ".....KAAAKBBbKCCcKAAaKBBBK....", ".....KAAABBBbCCCcAAAaaBBBK....", ".....KAAAKABbKBCcKCAaKBBBK....", ".....KAAAAAaKBBbKCCcKKBBBK....", ".....KAAAAAaBBBbCCCccKBBBK....", "....KFFFFAABKBBCKCCAKKFFFFK...", "....KFFFFKBBbKCCcKAAaKFFFFK...", ".....KKKKBBBbCCCcAAAaaKKKK....", ".........KKKKKKCKKKKKK........", ".........KSSSSKCKSSSSK........", ".........KSSSSKKKSSSSK........", ".........KssssK.KssssK........", ".........KKAKK...KKBKK........", ".........KKKKK...KKKKK........"];
+const ODYSSEY=["..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", "..............................", ".................KKKK.........", "...............KKUUUUKK.......", ".............KKUUUUUUUuK......", "...........KKFFFFFUUUUuuKKK...", "..........KDDDDDDFUUUUUUUUUK..", ".........KDDDDDDDOOEEEUUUUUK..", "......KKKDDDDDDDDOoEEEUUUUUK..", ".....KFFFDDDDDDDDOOoOUUUUUUK..", ".....KFhFDdddddddOOOOUUUUUUK..", ".....KFFFDddddddddDdUuuuuuuuK.", ".....KFFFDDDDDODDDDdUuuuuuuuK.", ".....KFFFDDDDDDDDDDdUuuuuuuuK.", ".....KFFFDddddddddDdUuuuuuuuK.", ".....KFFFDDDDDODDDDdUuuuuuuuK.", ".....KFFFDDDDDDDDDDdUuuuuuuuK.", "....KFFFFDddddddddDdUuuuuuuuK.", "....KFFFKDDDDDDDDDDUUuuuuuuuK.", ".....KKKKDDDDDDDDDDUUuuuuuuuK.", "........KDDDDDDDDDDUUuuuuuuuK.", "........KNNNNNNNNNNUUuuuuuuuK.", "........KDNDNDNDNDNUUuuuuuuuK.", "........KDNDNDNDNDNUUuuuuuuuK.", "........KDKDKDUDUDUUUuuuuuuuK.", "........KNNNNKKUNNNNUuuuuuuuK.", "........KOKKK..KKKOKKuuuuuuuK.", "........KKKKK...KKKKKKKKKKKK.."];
 const STUK=[
 "....KKKKKK....",
 "...KKKKKKKK...",
@@ -340,9 +342,9 @@ const LOOKS=[
   {at:90000,name:'Жовтий піджак',mic:1,J:'#f5cb26',j:'#c88e12',Z:'#fff0a0',sh:8},
   {at:180000,name:'Синій оксамит',mic:1,J:'#2f5fd0',j:'#1b3a8a',Z:'#86a9ff',sh:7},
   {at:300000,name:'Малиновий смокінг',mic:1,J:'#b81f52',j:'#6e0d2b',Z:'#ff7aa4',sh:7},
-  {at:370000,name:'Клоун',id:'clown',body:CLOWN,cut:10,face:{chin:18,sink:.4,ax:15,cells:17},pal:{A:'#e22b2b',a:'#9e1212',B:'#2ea043',b:'#1a6b32',C:'#f5cb26',c:'#c88e12',S:'#fff8ee',s:'#e4d4b8',W:'#ffffff',F:'#f2c9a0'}},
+  {at:370000,name:'Клоун',id:'clown',body:CLOWN,cut:10,face:{chin:18,sink:.4,ax:15,cells:15},pal:{A:'#e22b2b',a:'#9e1212',B:'#2ea043',b:'#1a6b32',C:'#f5cb26',c:'#c88e12',S:'#fff8ee',s:'#e4d4b8',W:'#ffffff',F:'#f2c9a0'}},
   {at:450000,name:'Смарагдовий костюм',mic:1,J:'#18946a',j:'#0b553d',Z:'#7ff0c4',sh:7},
-  {at:530000,name:'Одіссей',id:'odyssey',body:ODYSSEY,cut:10,face:{chin:16,sink:.4,ax:14.5,cells:17},pal:{D:'#4a3a32',d:'#2e241e',U:'#6a6560',u:'#3e3a38',O:'#c4a35a',o:'#8a6a28',N:'#3a322c',E:'#c9b08a',F:'#f2c9a0',h:'#ff9a7a'}},
+  {at:530000,name:'Одіссей',id:'odyssey',body:ODYSSEY,cut:10,face:{chin:16,sink:.4,ax:14.5,cells:15},pal:{D:'#4a3a32',d:'#2e241e',U:'#6a6560',u:'#3e3a38',O:'#c4a35a',o:'#8a6a28',N:'#3a322c',E:'#c9b08a',F:'#f2c9a0',h:'#ff9a7a'}},
   {at:650000,name:'Срібний костюм',mic:1,J:'#c3c9d3',j:'#7d8695',Z:'#ffffff',sh:5,out:'#eef2f8'},
   {at:900000,name:'Золотий костюм',id:'gold',mic:1,J:'#e2a91c',j:'#8f5f08',Z:'#fff4b8',sh:4,gold:1,out:'#ffe08a'}
 ];
@@ -358,7 +360,7 @@ const lookGrid=L=>{
   const g=L.mic?REDKA:REDKA_NOMIC;if(!L.J)return g;
   return g.map((r,y)=>r.split('').map((c,x)=>c==='Y'&&(x+y)%L.sh===0?'Z':c).join(''));
 };
-const SPX=4,SSC=.72,CK=3;
+const SPX=4,SSC=.72,SSX=.62,CK=3;
 const hl=g=>g.map((r,y)=>r.split('').map((c,x)=>c==='R'&&((y===11&&(x===11||x===12))||(y===12&&x===10))?'h':c).join(''));
 // Redka's radish head and leaves give way to the photo face; unique costumes only strip rows above `cut`.
 function headlessRedka(g,L){
@@ -396,9 +398,9 @@ function drawChar(g,ch,x,y,sx,sy,anchor,rot){
   g.drawImage(ch.c,-ch.cx,anchor==='feet'?-ch.fy:-ch.cy);g.restore();
 }
 const REDKA_FACE={
-  felix:{ax:15.5,chin:20,sink:1.5,cells:21},
-  'felix-fail':{ax:15.5,chin:21,sink:1.2,cells:21},
-  'felix-fly':{ax:15.5,chin:19.5,sink:1,cells:28}
+  felix:{ax:15.5,chin:20,sink:1.5,cells:16},
+  'felix-fail':{ax:15.5,chin:21,sink:1.2,cells:16},
+  'felix-fly':{ax:15.5,chin:19.5,sink:1,cells:22}
 };
 const REDKA_CH={};
 function redkaChar(li,px,faceKey){
@@ -431,8 +433,13 @@ function enemyChar(kind){
 const ROCKET_SPR=buildSprite(IGRID.ROCKET,IPAL,3,'#ffffff');
 const ENV_SPR=buildSprite(IGRID.ENV,IPAL,2,null);
 const THREAD_SPR=buildSprite(IGRID.THREAD,IPAL,2,'#ffffff');
+function charThumb(ch){
+  const pad=4,w=Math.ceil(ch.c.width*SSX/ch.k)+pad*2,h=Math.ceil(ch.c.height*SSC/ch.k)+pad*2;
+  const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
+  drawChar(g,ch,w/2,h-pad,SSX,SSC,'feet',0);return c;
+}
 function paintIcons(){
-  $('heroImg').src=redkaChar(2,4).c.toDataURL();
+  $('heroImg').src=charThumb(redkaChar(2,4)).toDataURL();
   for(const [id,k] of [['icStuk','stuk'],['icKoms','koms'],['icThreads','threads'],['icLang','lang'],['icCancel','cancel']]){const el=$(id);if(el)el.src=enemyChar(k).c.toDataURL()}
   const r=$('icRocket');if(r)r.src=ROCKET_SPR.toDataURL();
 }
@@ -584,9 +591,9 @@ function paintCol(){
   LOOKS.forEach((L,i)=>{
     const on=best>=L.at||(STATS.looks||0)>=i,el=document.createElement('div');el.className='wardcard'+(on?'':' locked');
     const img=document.createElement('img');img.alt='';
-    const ch=redkaChar(i,3);
-    if(on)img.src=ch.c.toDataURL();
-    else{const s=document.createElement('canvas');s.width=ch.c.width;s.height=ch.c.height;const sg=s.getContext('2d');sg.drawImage(ch.c,0,0);sg.globalCompositeOperation='source-in';sg.fillStyle='#3a2a28';sg.fillRect(0,0,s.width,s.height);img.src=s.toDataURL()}
+    const ch=redkaChar(i,3),pic=charThumb(ch);
+    if(on)img.src=pic.toDataURL();
+    else{const s=document.createElement('canvas');s.width=pic.width;s.height=pic.height;const sg=s.getContext('2d');sg.drawImage(pic,0,0);sg.globalCompositeOperation='source-in';sg.fillStyle='#3a2a28';sg.fillRect(0,0,s.width,s.height);img.src=s.toDataURL()}
     const n=document.createElement('div');n.className='an';n.textContent=on?L.name:'???';
     const h=document.createElement('div');h.className='ah';h.textContent=(on?'від ':'з ')+fmt(L.at);
     el.append(img,n,h);wg.append(el);
@@ -1069,12 +1076,12 @@ function drawRedka(){
   const lean=flying?(gordon?0.22:0.12)*p.face+Math.sin(tick*(gordon?0.28:0.18))*(gordon?0.12:0.05):0;
   if(flying){
     const n=gordon?4:3;
-    for(let i=n;i>=1;i--){ctx.save();ctx.globalAlpha=gordon?0.22:0.16;drawChar(ctx,ch,p.x-p.vx*i*1.8-p.face*i*4,py+FEET+i*7,sx*p.face*SSC,sy*SSC,'feet',lean);ctx.restore()}
+    for(let i=n;i>=1;i--){ctx.save();ctx.globalAlpha=gordon?0.22:0.16;drawChar(ctx,ch,p.x-p.vx*i*1.8-p.face*i*4,py+FEET+i*7,sx*p.face*SSX,sy*SSC,'feet',lean);ctx.restore()}
     ctx.save();ctx.strokeStyle=gordon?'rgba(255,243,176,.55)':'rgba(255,154,42,.5)';ctx.lineWidth=2;
     for(let i=0;i<(gordon?12:7);i++){const x=p.x+((i*41+tick*9)%90)-45,y=py+8+((i*57+tick*16)%100);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,y+(gordon?22:12));ctx.stroke()}
     ctx.restore();
   }
-  drawChar(ctx,ch,p.x,py+FEET,sx*p.face*SSC,sy*SSC,'feet',lean);
+  drawChar(ctx,ch,p.x,py+FEET,sx*p.face*SSX,sy*SSC,'feet',lean);
   const star=(x,y,sz,c)=>{ctx.fillStyle=c;ctx.fillRect(x-1,y-sz,3,sz*2+1);ctx.fillRect(x-sz,y-1,sz*2+1,3)};
   if(L.gold){const a=tick*.06;for(let i=0;i<4;i++){const ang=a+i*1.57,x=Math.round(p.x+Math.cos(ang)*42),y=Math.round(py+20+Math.sin(ang)*44);star(x,y,4+Math.round(2*Math.sin(tick*.2+i)),'#f5c542')}}
   if(gordon){const a=tick*.1;for(let i=0;i<8;i++){const ang=a+i*.785,x=Math.round(p.x+Math.cos(ang)*54),y=Math.round(py+20+Math.sin(ang)*58);star(x,y,5,i%2?'#fff3b0':'#e2a91c')}}
@@ -1132,16 +1139,33 @@ function draw(){
   }
 }
 
+const END_ART={};
+function loadEnds(){
+  for(const k of ['fall','stuk','threads','lang','cancel','koms']){
+    const im=new Image();im.onload=()=>{END_ART[k]=im};im.src='art/ends/'+k+'.webp';
+  }
+}
 function scene(kind,li){
   const c=document.createElement('canvas'),Wd=320,Hd=200,k=2;c.width=Wd*k;c.height=Hd*k;const g=c.getContext('2d');g.scale(k,k);g.imageSmoothingEnabled=false;
-  bgCrop(g,zoneIdx,0,0,Wd,Hd,'rgba(255,248,236,.22)');
+  const art=END_ART[kind];
+  if(art&&art.naturalWidth){g.imageSmoothingEnabled=true;g.drawImage(art,0,0,Wd,Hd);g.imageSmoothingEnabled=false}
+  else bgCrop(g,zoneIdx,0,0,Wd,Hd,'rgba(255,248,236,.22)');
   const R=redkaChar(li,3,'felix-fail');
   const spr=(im,x,y,sc,rot)=>{g.save();g.translate(x,y);g.rotate(rot||0);g.scale(sc,sc);g.drawImage(im,-im.width/2,-im.height/2);g.restore()};
-  const sprRedka=(x,y,sc,rot,flip)=>drawChar(g,R,x,y,(flip?-1:1)*sc,sc,'center',rot);
+  const sprRedka=(x,y,sc,rot,flip)=>drawChar(g,R,x,y,(flip?-1:1)*sc*SSX/SSC,sc,'center',rot);
   const sprEnemy=(ek,x,y,sc,flip)=>drawChar(g,enemyChar(ek),x,y,(flip?-1:1)*sc,sc,'center',0);
   const stamp=(t,x,y,rot)=>{g.save();g.translate(x,y);g.rotate(rot);g.font='800 15px Manrope, sans-serif';const w=g.measureText(t).width+18;g.strokeStyle='#c42626';g.lineWidth=3;g.strokeRect(-w/2,-14,w,28);g.fillStyle='#c42626';g.textAlign='center';g.textBaseline='middle';g.fillText(t,0,1);g.restore()};
   const bubble=(t,x,y)=>{g.font='800 11px Manrope, sans-serif';const w=g.measureText(t).width+14;const bx=Math.max(4,Math.min(Wd-w-4,x-w/2));g.fillStyle='#fff';g.fillRect(bx,y,w,20);g.strokeStyle='#1a141a';g.lineWidth=2;g.strokeRect(bx,y,w,20);g.fillStyle='#b02020';g.textAlign='center';g.textBaseline='middle';g.fillText(t,bx+w/2,y+10.5)};
   const sign=(t,x,y,w)=>{g.fillStyle='#2a1722';g.fillRect(x,y,w,28);g.fillStyle='#f8f1e3';g.fillRect(x+2,y+2,w-4,24);g.fillStyle='#2a1722';g.font='800 11px Manrope, sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,x+w/2,y+14,w-8)};
+  if(art&&art.naturalWidth){
+    if(kind==='fall'){stamp('СКАСОВАНО',246,22,-.18);sign('ПРІРВА СКАСУВАННЯ, глибина: ∞',16,168,288)}
+    else if(kind==='stuk'){bubble('Я ще й у Мінкульт написав',248,8);stamp('СКАРГУ ПРИЙНЯТО',90,22,-.12)}
+    else if(kind==='threads'){bubble('Зберігаю скріни',250,8);stamp('1/47',70,22,-.1)}
+    else if(kind==='lang'){bubble('Ще раз «шо»!',70,8);stamp('ШТРАФ',246,22,.12)}
+    else if(kind==='cancel'){bubble('Повернути квитки',250,8);stamp('СКАСОВАНО',160,168,0)}
+    else{stamp('ЗБОРИ',70,22,-.08);bubble('ГАНЬБА',160,8)}
+    return c;
+  }
   if(kind==='fall'){
     g.fillStyle='#2a1722';g.fillRect(50,138,220,8);
     for(let i=1;i<5;i++){const w=220-i*i*6;g.fillRect(160-w/2,138+i*8,w,8)}
@@ -1334,7 +1358,7 @@ document.addEventListener('visibilitychange',()=>{
   }else syncBgm();
 });
 
-loadFaces();loadAchs();loadBackgrounds();
+loadFaces();loadEnds();loadAchs();loadBackgrounds();
 resize();reset();$('best').textContent=fmt(best);paintAchCount();
 function jumpTo(gs){
   const y=player0-gs/SC;player.y=y;camY=y-H*.45;

@@ -75,26 +75,26 @@ def redka():
     g.rect(12, 20, 18, 20, 'r')
     g.rect(14, 21, 16, 26, 'T')  # tie
     g.px(15, 22, 'K'); g.px(15, 24, 'K'); g.px(15, 26, 'K')  # buttons
-    # jacket — lapels + body
-    g.rect(6, 20, 10, 30, 'Y')
-    g.rect(20, 20, 24, 30, 'Y')
-    g.rect(7, 21, 10, 29, 'Y')
-    g.rect(20, 21, 23, 29, 'Y')
-    g.rect(8, 22, 11, 22, 'y')   # left lapel
-    g.rect(19, 22, 22, 22, 'y')
-    g.rect(9, 23, 11, 23, 'y')
-    g.rect(19, 23, 21, 23, 'y')
-    g.rect(5, 24, 8, 30, 'Y')
-    g.rect(22, 24, 25, 30, 'Y')
-    g.rect(6, 28, 24, 30, 'Y')
-    g.rect(5, 29, 7, 30, 'y')
-    g.rect(23, 29, 25, 30, 'y')
+    # jacket — slimmer lapels + body (2 cells in from each side)
+    g.rect(8, 20, 11, 30, 'Y')
+    g.rect(19, 20, 22, 30, 'Y')
+    g.rect(9, 21, 11, 29, 'Y')
+    g.rect(19, 21, 21, 29, 'Y')
+    g.rect(10, 22, 12, 22, 'y')   # left lapel
+    g.rect(18, 22, 20, 22, 'y')
+    g.rect(10, 23, 12, 23, 'y')
+    g.rect(18, 23, 20, 23, 'y')
+    g.rect(7, 24, 9, 30, 'Y')
+    g.rect(21, 24, 23, 30, 'Y')
+    g.rect(8, 28, 22, 30, 'Y')
+    g.rect(7, 29, 9, 30, 'y')
+    g.rect(21, 29, 23, 30, 'y')
     # trousers
-    g.rect(9, 31, 13, 32, 'n')
-    g.rect(17, 31, 21, 32, 'n')
+    g.rect(10, 31, 13, 32, 'n')
+    g.rect(17, 31, 20, 32, 'n')
     # shoes
-    g.rect(8, 33, 13, 34, 'K')
-    g.rect(17, 33, 22, 34, 'K')
+    g.rect(9, 33, 13, 34, 'K')
+    g.rect(17, 33, 21, 34, 'K')
     g.outline()
     return g
 
@@ -112,27 +112,27 @@ def clown():
             w = s - abs(y)
             for x in range(-w, w + 1):
                 g.px(cx + x, cy + y, dark if x > 0 else lite)
-    cols = [('A', 'a'), ('B', 'b'), ('C', 'c'), ('A', 'a')]
+    cols = [('A', 'a'), ('B', 'b'), ('C', 'c')]
     for i, (cy, shift) in enumerate(((19, 0), (22, 1), (25, 0), (28, 1))):
-        for j in range(4):
-            lite, dark = cols[(j + shift) % 4]
-            dia(8 + j * 4 + (1 if shift else 0), cy, 2, lite, dark)
+        for j in range(3):
+            lite, dark = cols[(j + shift) % 3]
+            dia(10 + j * 4 + (1 if shift else 0), cy, 2, lite, dark)
     # belt
-    g.rect(8, 29, 22, 29, 'K')
+    g.rect(9, 29, 21, 29, 'K')
     g.px(15, 29, 'C')
     # arms
-    g.rect(4, 18, 6, 26, 'A')
-    g.rect(24, 18, 26, 26, 'B')
-    g.rect(3, 26, 6, 27, 'F')
-    g.rect(24, 26, 27, 27, 'F')
+    g.rect(6, 18, 8, 26, 'A')
+    g.rect(22, 18, 24, 26, 'B')
+    g.rect(5, 26, 8, 27, 'F')
+    g.rect(22, 26, 25, 27, 'F')
     # pants
-    g.rect(9, 30, 13, 32, 'S')
-    g.rect(17, 30, 21, 32, 'S')
-    g.rect(9, 32, 13, 32, 's')
-    g.rect(17, 32, 21, 32, 's')
+    g.rect(10, 30, 13, 32, 'S')
+    g.rect(17, 30, 20, 32, 'S')
+    g.rect(10, 32, 13, 32, 's')
+    g.rect(17, 32, 20, 32, 's')
     # shoes
-    g.rect(8, 33, 13, 34, 'K')
-    g.rect(17, 33, 22, 34, 'K')
+    g.rect(9, 33, 13, 34, 'K')
+    g.rect(17, 33, 21, 34, 'K')
     g.px(11, 33, 'A'); g.px(19, 33, 'B')
     g.outline()
     return g
@@ -142,36 +142,36 @@ def odyssey():
     """Leather cuirass, grey cloak, bronze brooch, bare arms. Headless."""
     g = G()
     # cloak behind, right shoulder
-    g.ell(20, 22, 9.5, 12, 'U', 'u', .35)
-    g.rect(16, 13, 28, 32, 'U')
-    g.rect(22, 18, 29, 33, 'u')
-    g.rect(18, 14, 24, 16, 'U')
+    g.ell(19, 22, 8.2, 12, 'U', 'u', .35)
+    g.rect(16, 13, 26, 32, 'U')
+    g.rect(21, 18, 27, 33, 'u')
+    g.rect(17, 14, 23, 16, 'U')
     # neck
     g.rect(13, 12, 17, 14, 'F')
     # cuirass
-    g.ell(13, 21, 7.2, 8.2, 'D', 'd', .5)
-    g.rect(8, 16, 18, 27, 'D')
-    g.rect(9, 17, 17, 18, 'd')  # muscle bands
-    g.rect(9, 21, 17, 21, 'd')
-    g.rect(9, 24, 17, 24, 'd')
-    g.px(13, 19, 'O'); g.px(13, 22, 'O')
+    g.ell(14, 21, 6.2, 8.2, 'D', 'd', .5)
+    g.rect(9, 16, 18, 27, 'D')
+    g.rect(10, 17, 17, 18, 'd')  # muscle bands
+    g.rect(10, 21, 17, 21, 'd')
+    g.rect(10, 24, 17, 24, 'd')
+    g.px(14, 19, 'O'); g.px(14, 22, 'O')
     # brooch + drape
     g.rect(17, 14, 20, 17, 'O')
     g.px(18, 15, 'o'); g.px(19, 16, 'o')
     g.rect(19, 14, 21, 15, 'E')
     # left bare arm
-    g.rect(5, 16, 7, 24, 'F')
-    g.rect(4, 24, 6, 25, 'F')
-    g.px(6, 17, 'h')
+    g.rect(6, 16, 8, 24, 'F')
+    g.rect(5, 24, 7, 25, 'F')
+    g.px(7, 17, 'h')
     # skirt / pteruges
-    g.rect(8, 28, 18, 30, 'N')
-    for x in range(8, 19, 2):
+    g.rect(9, 28, 18, 30, 'N')
+    for x in range(9, 19, 2):
         g.rect(x, 29, x, 31, 'D')
     # sandals
-    g.rect(8, 32, 12, 32, 'N')
-    g.rect(16, 32, 20, 32, 'N')
-    g.rect(7, 33, 12, 34, 'K')
-    g.rect(16, 33, 21, 34, 'K')
+    g.rect(9, 32, 12, 32, 'N')
+    g.rect(16, 32, 19, 32, 'N')
+    g.rect(8, 33, 12, 34, 'K')
+    g.rect(16, 33, 20, 34, 'K')
     g.px(9, 33, 'O'); g.px(18, 33, 'O')
     g.outline()
     return g
