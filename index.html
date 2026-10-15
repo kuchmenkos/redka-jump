@@ -37,14 +37,11 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 .hud .tixchip .wallet{font-size:10px;font-weight:700;opacity:.78}
 .hud .right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:auto;pointer-events:none}
 .menu{pointer-events:auto;flex:none;height:44px;min-width:44px;padding:0 12px;font-size:13px;font-weight:800;border-radius:10px;background:var(--card);color:var(--ink);outline:2px dashed var(--card-line);outline-offset:-5px;box-shadow:0 3px 0 rgba(43,30,25,.28)}
-.steerhint{position:absolute;inset:0;z-index:3;pointer-events:none;display:flex;align-items:center;justify-content:space-between;padding:0 6%;opacity:0;transition:opacity .4s}
+.steerhint{position:absolute;inset:0;z-index:3;pointer-events:none;display:flex;align-items:center;justify-content:space-between;padding:0 8%;opacity:0;transition:opacity .4s}
 .steerhint.on{opacity:1}
-.steerhint .arr{display:flex;flex-direction:column;align-items:center;gap:8px;width:28%;opacity:.72}
-.steerhint .arr i{display:block;width:76px;height:76px;border-radius:50%;background:rgba(248,241,227,.78);box-shadow:0 3px 0 rgba(43,30,25,.28);position:relative}
-.steerhint .arr i::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-style:solid}
-.steerhint .arr.l i::after{margin:-18px 0 0 -6px;border-width:18px 26px 18px 0;border-color:transparent #2a1722 transparent transparent}
-.steerhint .arr.r i::after{margin:-18px 0 0 -20px;border-width:18px 0 18px 26px;border-color:transparent transparent transparent #2a1722}
-.steerhint .arr span{font-family:var(--body);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#f8f1e3;text-shadow:0 1px 0 #2a1722,0 0 6px rgba(42,23,34,.85)}
+.steerhint .arr{display:flex;flex-direction:column;align-items:center;gap:4px;width:22%;opacity:.4}
+.steerhint .arr i{font-style:normal;font-size:22px;line-height:1;background:var(--ink);color:var(--card);border-radius:4px;padding:6px 8px}
+.steerhint .arr span{font-family:var(--body);font-size:11px;font-weight:700;color:var(--ink)}
 .achbtn.demo{color:#8f5f08;letter-spacing:.06em}
 .soundrow{display:flex;gap:8px}
 .soundchip{flex:1;min-width:0;min-height:48px;padding:10px 8px;font-size:14px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line)}
@@ -190,8 +187,8 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
     </div>
   </div>
   <div class="steerhint" id="steerHint" hidden aria-hidden="true">
-    <div class="arr l"><i></i><span>тримай</span></div>
-    <div class="arr r"><i></i><span>тримай</span></div>
+    <div class="arr l"><i>◀</i><span>тицяй</span></div>
+    <div class="arr r"><i>▶</i><span>тицяй</span></div>
   </div>
   <div id="achPop" class="achpop" hidden>
     <img id="achPopImg" class="achpop-ico" alt="">
@@ -220,7 +217,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
       </div>
       <div class="panels">
         <div class="legend" role="tabpanel" data-panel="how">
-          <span class="ic"><span class="keys"><i>◀</i><i>▶</i></span></span><span>Тримай ліву або праву половину</span>
+          <span class="ic"><span class="keys"><i>◀</i><i>▶</i></span></span><span>Тицяй ліворуч або праворуч, щоб керувати</span>
           <span class="ic"><span class="patch" style="background:#2ea043"></span></span><span>Ярлик — стрибай по ньому</span>
           <span class="ic"><span class="patch" style="background:#7bcf3a"></span></span><span>Скандал підкидає вище</span>
           <span class="ic"><span class="patch" style="background:#ff7a1a"></span></span><span>Перевзувалка повзає</span>
@@ -383,15 +380,15 @@ function buildSprite(rows,pal,px,outline){
 }
 const LOOKS=[
   {at:0,cost:0,name:'Без піджака'},
-  {at:30000,cost:6,name:'Перший піджак'},
-  {at:90000,cost:10,name:'Жовтий піджак',J:'#f5cb26',j:'#c88e12',Z:'#fff0a0',sh:8},
-  {at:180000,cost:16,name:'Синій оксамит',J:'#2f5fd0',j:'#1b3a8a',Z:'#86a9ff',sh:7},
-  {at:300000,cost:24,name:'Малиновий смокінг',J:'#b81f52',j:'#6e0d2b',Z:'#ff7aa4',sh:7},
-  {at:370000,cost:36,name:'Клоун',id:'clown',body:CLOWN,cut:10,face:{chin:18,sink:.4,ax:15,cells:15},pal:{A:'#e22b2b',a:'#9e1212',B:'#2ea043',b:'#1a6b32',C:'#f5cb26',c:'#c88e12',S:'#fff8ee',s:'#e4d4b8',W:'#ffffff',F:'#f2c9a0'}},
-  {at:450000,cost:48,name:'Смарагдовий костюм',J:'#18946a',j:'#0b553d',Z:'#7ff0c4',sh:7},
-  {at:530000,cost:64,name:'Одіссей',id:'odyssey',body:ODYSSEY,cut:10,face:{chin:16,sink:.4,ax:14.5,cells:15},pal:{D:'#4a3a32',d:'#2e241e',U:'#6a6560',u:'#3e3a38',O:'#c4a35a',o:'#8a6a28',N:'#3a322c',E:'#c9b08a',F:'#f2c9a0',h:'#ff9a7a'}},
-  {at:650000,cost:80,name:'Срібний костюм',J:'#c3c9d3',j:'#7d8695',Z:'#ffffff',sh:5,out:'#eef2f8'},
-  {at:900000,cost:100,name:'Золотий костюм',id:'gold',J:'#e2a91c',j:'#8f5f08',Z:'#fff4b8',sh:4,gold:1,out:'#ffe08a'}
+  {at:30000,cost:12,name:'Перший піджак'},
+  {at:90000,cost:20,name:'Жовтий піджак',J:'#f5cb26',j:'#c88e12',Z:'#fff0a0',sh:8},
+  {at:180000,cost:32,name:'Синій оксамит',J:'#2f5fd0',j:'#1b3a8a',Z:'#86a9ff',sh:7},
+  {at:300000,cost:48,name:'Малиновий смокінг',J:'#b81f52',j:'#6e0d2b',Z:'#ff7aa4',sh:7},
+  {at:370000,cost:72,name:'Клоун',id:'clown',body:CLOWN,cut:10,face:{chin:18,sink:.4,ax:15,cells:15},pal:{A:'#e22b2b',a:'#9e1212',B:'#2ea043',b:'#1a6b32',C:'#f5cb26',c:'#c88e12',S:'#fff8ee',s:'#e4d4b8',W:'#ffffff',F:'#f2c9a0'}},
+  {at:450000,cost:96,name:'Смарагдовий костюм',J:'#18946a',j:'#0b553d',Z:'#7ff0c4',sh:7},
+  {at:530000,cost:128,name:'Одіссей',id:'odyssey',body:ODYSSEY,cut:10,face:{chin:16,sink:.4,ax:14.5,cells:15},pal:{D:'#4a3a32',d:'#2e241e',U:'#6a6560',u:'#3e3a38',O:'#c4a35a',o:'#8a6a28',N:'#3a322c',E:'#c9b08a',F:'#f2c9a0',h:'#ff9a7a'}},
+  {at:650000,cost:160,name:'Срібний костюм',J:'#c3c9d3',j:'#7d8695',Z:'#ffffff',sh:5,out:'#eef2f8'},
+  {at:900000,cost:200,name:'Золотий костюм',id:'gold',J:'#e2a91c',j:'#8f5f08',Z:'#fff4b8',sh:4,gold:1,out:'#ffe08a'}
 ];
 function lookPal(L){
   const p=Object.assign({},BASEPAL,{R:'#e2452a',r:'#b0241c',W:'#fafafa',P:'#c8281e',T:'#8f1a1a',G:'#4ca038',g:'#1d6626',n:'#2a2230'});
