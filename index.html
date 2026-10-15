@@ -97,8 +97,16 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .wardcard img{image-rendering:pixelated;height:80px;width:auto;grid-row:1/3;align-self:center;justify-self:center}
 .newachs{background:var(--well);border-radius:8px;padding:8px 10px;text-align:left}
 .newachs p{margin:0 0 6px;font-size:12px;font-weight:800;color:var(--stamp)}
-.newachs ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
-.newachs li{font-size:13px;font-weight:700}
+.newach{display:flex;gap:8px;align-items:center;margin:0 0 6px}
+.newach:last-child{margin:0}
+.newach img{width:36px;height:36px;image-rendering:pixelated;flex:none}
+.newach span{font-size:13px;font-weight:700;line-height:1.3}
+.achpop{position:absolute;left:12px;right:12px;top:max(62px,calc(env(safe-area-inset-top,0px) + 56px));z-index:5;pointer-events:none;display:flex;gap:10px;align-items:center;max-width:280px;margin:0 auto;background:var(--card);color:var(--ink);border-radius:8px;padding:8px 10px;outline:1.5px dashed var(--card-line);outline-offset:-4px;box-shadow:0 4px 0 rgba(20,10,16,.25);transform:rotate(-2deg);animation:achPopIn .35s cubic-bezier(.2,1.4,.4,1)}
+.achpop-ico{width:44px;height:44px;image-rendering:pixelated;flex:none}
+.achpop-k{font-size:10px;font-weight:800;color:var(--stamp);letter-spacing:.08em;text-transform:uppercase;margin:0}
+.achpop-n{font-size:13px;font-weight:800;margin:2px 0 0;line-height:1.25}
+@keyframes achPopIn{from{transform:translateY(-14px) rotate(-4deg);opacity:0}to{transform:rotate(-2deg);opacity:1}}
+@keyframes achPopFade{from{opacity:0}to{opacity:1}}
 .tabs{display:flex;gap:4px;background:var(--well);padding:4px;border-radius:9px}
 .tab{flex:1;min-width:0;padding:10px 8px;min-height:44px;font-size:14px;background:transparent;color:var(--muted);border-radius:8px;box-shadow:none}
 .tab[aria-selected="true"]{background:var(--ink);color:var(--card)}
@@ -114,7 +122,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .badge.gold{background:linear-gradient(#ffe48a,#e2a91c);color:var(--ink)}
 @media (max-height:720px){.hero img{height:88px}h1{font-size:19px}.card.start{gap:7px}.card.start .sub{font-size:13px}.panels{height:210px}.panels .legend img{height:30px}}
 @media (max-height:620px){.card.start .sub{display:none}.hero img{height:72px}.panels{height:180px}}
-@media (prefers-reduced-motion:reduce){.hero img,#playBtn{animation:none}}
+@media (prefers-reduced-motion:reduce){.hero img,#playBtn{animation:none}.achpop{animation:achPopFade .25s ease;transform:none}}
 .card.over{gap:10px;padding:18px 18px 14px}
 .overpanels{min-height:0;display:flex;flex-direction:column}
 .respanel,.hatepanel{display:flex;flex-direction:column;gap:9px}
@@ -151,6 +159,13 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
       <button id="demoBtn" class="demo" hidden aria-label="Демо: увімкнути режим Гордона">DEMO</button>
       <button id="bgmBtn" class="mute" type="button" aria-label="Вимкнути музику">♫</button>
       <button id="muteBtn" class="mute" type="button" aria-label="Вимкнути звук">♪</button>
+    </div>
+  </div>
+  <div id="achPop" class="achpop" hidden>
+    <img id="achPopImg" class="achpop-ico" alt="">
+    <div>
+      <p class="achpop-k">Досягнення</p>
+      <p id="achPopName" class="achpop-n"></p>
     </div>
   </div>
 
@@ -293,9 +308,10 @@ const SFX={
   express:()=>{[392,523,659,784,1046].forEach((f,i)=>tone('triangle',f,f,.1,.04,i*.08));tone('sine',1318,1318,.4,.045,.42)},
   shout:()=>{tone('triangle',260,140,.14,.05);tone('sine',220,130,.12,.03,.03)},
   stamp:()=>{tone('sine',150,70,.09,.05);noise(.04,.05,500)},
+  ach:()=>{noise(.05,.045,900);[659,784,988,1318].forEach((f,i)=>tone('sine',f,f,.07,.045,i*.06))},
   lose:()=>{tone('sine',280,110,.4,.08);noise(.2,.05,600)}
 };
-const sfx=k=>{if(mode==='play'||k==='fall'||k==='lose')try{SFX[k]()}catch(e){}};
+const sfx=k=>{if(mode==='play'||k==='fall'||k==='lose'||k==='ach')try{SFX[k]()}catch(e){}};
 
 /* ---------- pixel sprites ---------- */
 const REDKA=["...KGGGGGgKGGGGGGggKGGGGGgK...", "...KGGGGGgKGGGGGGggKGGGGGgK...", "..KGGGGGGgGGGGGGGggGGGGGGggK..", "..KGGGGGGgGGGGGGGggGGGGGGggK..", "..KGGGGGGggGGGGGGggGGGGGGggK..", "..KGGGGGGggGGGGGGggGGGGGGggK..", "...KGGGGGgKKGGGGGgKKGGGGGgK...", "...KGGGGGgKKGGGGGGGKGGGGGgK...", "....KKKKKK.KGGGGGGGKKKKKKK....", "..........KKRRRRRRGK..........", ".........KRRRRRRRRRrK.........", "........KRRRRRRRRRRRRK........", ".KKKKK..KRRRRRRRRRRRRK........", ".KWWWK.KRRRWWWRRWWWrrrK.......", ".KWMWK.KRRRWPWRRWPWrrrK.......", ".KWWWK.KRRRWWWRRWWWrrrK.......", ".KKKKK.KRRRRRRRRRRRrrrK.......", "...K...KRRRRRTTTTTRrrrK.......", "..KKK..KRRRRRTTTTTRrrrK.......", ".KRKRK..KRRRRRRRRRRrrKK.......", "..KKK..KYYYYrrrrrrrYYYYK......", "...K...KYYYYRRTTTRRYYYYK......", "...K...KYYyyyRTKTRyyyYYK......", ".......KYYyyyRTTTRyyyYYK......", "......KYYYYYRRTKTRRYYYYYK.....", "......KYYYYYRRTTTRRYYYYYK.....", "......KYYYYYRRTKTRRYYYYYK.....", "......KYYYYYRRRRRRRYYYYYK.....", "......KYYYYYYYYYYYYYYYYYK.....", "......KyyyYYYYYYYYYYYyyyK.....", "......KyyyYYYYYYYYYYYyyyK.....", ".......KKKnnnnKKKnnnnKKK......", ".........KnnnnK.KnnnnK........", ".........KKKKK...KKKKK........", ".........KKKKK...KKKKK........"];
@@ -573,11 +589,27 @@ function saveRun(){
   for(const k of Object.keys(stompKind))STATS.stomp[k]=(STATS.stomp[k]||0)+stompKind[k];
   STATS.death[causeKind]=(STATS.death[causeKind]||0)+1;saveStats();
 }
+let achQ=[],achPopT=null;
+function hideAchPop(){
+  clearTimeout(achPopT);achPopT=null;achQ=[];
+  const el=$('achPop');if(el)el.hidden=true;
+}
+function pushAchPop(a){
+  achQ.push(a);if(achPopT==null)showNextAchPop();
+}
+function showNextAchPop(){
+  const el=$('achPop'),a=achQ.shift();
+  if(!el||!a){if(el)el.hidden=true;achPopT=null;return}
+  $('achPopImg').dataset.ach=a.id;$('achPopImg').src=achIco(a.id,true);$('achPopName').textContent=a.name;
+  el.hidden=false;el.style.animation='none';void el.offsetWidth;el.style.animation='';
+  sfx('ach');
+  achPopT=setTimeout(showNextAchPop,2200);
+}
 function checkAch(fromOver){
   const r=runSnap();r.fromOver=!!fromOver;
   const S=STATS;let n=0;
-  for(const a of ACH){if(ACH_HAVE[a.id])continue;if(a.test(r,S)){ACH_HAVE[a.id]=1;newAchs.push(a);n++;if(!fromOver)pushToast('Досягнення',a.name)}}
-  if(n){saveAch();paintAchCount()}
+  for(const a of ACH){if(ACH_HAVE[a.id])continue;if(a.test(r,S)){ACH_HAVE[a.id]=1;newAchs.push(a);n++;if(!fromOver)pushAchPop(a)}}
+  if(n){saveAch();paintAchCount();if(fromOver)sfx('ach')}
 }
 function checkAchLive(){checkAch(false)}
 const ACH_IMGS={},WARD_TH={};
@@ -631,7 +663,7 @@ function fillNewAchs(){
   const box=$('newAchs');if(!box)return;
   const uniq=[];for(const a of newAchs)if(!uniq.some(x=>x.id===a.id))uniq.push(a);
   if(!uniq.length){box.hidden=true;box.innerHTML='';return}
-  box.hidden=false;box.innerHTML='<p>Нові досягнення</p><ul>'+uniq.map(a=>'<li>'+a.name+'</li>').join('')+'</ul>';
+  box.hidden=false;box.innerHTML='<p>Нові досягнення</p>'+uniq.map(a=>'<div class="newach"><img data-ach="'+a.id+'" src="'+achIco(a.id,true)+'" alt=""><span>'+a.name+'</span></div>').join('');
 }
 function paintMute(){const b=$('muteBtn');b.textContent=muted?'✕':'♪';b.classList.toggle('off',muted);b.setAttribute('aria-label',muted?'Увімкнути звук':'Вимкнути звук')}
 function paintBgm(){const b=$('bgmBtn');b.textContent=bgmOn?'♫':'♫';b.classList.toggle('off',!bgmOn);b.setAttribute('aria-label',bgmOn?'Вимкнути музику':'Увімкнути музику')}
@@ -774,7 +806,7 @@ function reset(){
   hateLog={};minusCnt=0;fakeCnt=0;
   camY=0;bonus=0;zoneIdx=0;lookIdx=0;banner=null;cities=new Set();stomps=0;hat=false;cause='Впав у прірву скасування';causeKind='fall';recent=[];stepN=0;million=false;streak=0;mult=1;shownCnt={};lastItemStep=-99;lastExpressGs=-1e9;seenNew=new Set();
   gordonDecided=false;gordonBits=[];gordonTitle=0;gordonLastEdge=-1;gordonDeck=[];gordonDeckI=0;gordonCaught=false;gordonDemo=false;gordonMissed=false;gordonOffered=false;stopGordonMusic();
-  toasts=[];toastNow=null;stompKind={};expressN=0;malorosN=0;threadHits=0;idlePeak=0;newAchs=[];
+  toasts=[];toastNow=null;stompKind={};expressN=0;malorosN=0;threadHits=0;idlePeak=0;newAchs=[];hideAchPop();
   floats=[];plats=[];enemies=[];envs=[];items=[];waves=[];
   const sy=H*.8;player0=sy;
   lastCx=W/2;lastW=130;centreHist=[1,1,1];
@@ -1245,7 +1277,7 @@ function scene(kind,li){
   return c;
 }
 function gameOver(){
-  stopGordonMusic();gordonBits=[];
+  stopGordonMusic();gordonBits=[];hideAchPop();
   sfx(causeKind==='fall'?'fall':'lose');
   mode='over';const s=Math.max(0,Math.floor(score()));
   isRecord=s>best&&s>0;
@@ -1416,7 +1448,7 @@ function jumpTo(gs){
   const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
   topY=player.y+FEET+2;while(topY>camY-280)genStep();
 }
-window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},SFX,setInput(l,r){input.l=!!l;input.r=!!r}};
+window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r}};
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode!=='over')update(dt);draw();requestAnimationFrame(loop)}
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});
