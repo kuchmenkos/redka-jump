@@ -1,4 +1,4 @@
-"""Hater bodies: costume + props, no pixel faces (PNG overlay). cancel keeps a pixel head as fallback."""
+"""Hater bodies: costume + props, no pixel faces (PNG overlay). cancel's pixel head is fallback if cancel.png is missing."""
 from PIL import Image
 import json, os
 
@@ -123,7 +123,7 @@ def koms():
 
 
 def cancel():
-    """No PNG — keep a pixel head as fallback."""
+    """Pixel head kept as fallback if art/faces/cancel.png is missing."""
     g = G()
     head(g)
     g.ell(10, 3.4, 6.2, 2.8, 'B', 'B')

@@ -428,7 +428,7 @@ function enemyChar(kind){
   if(ECH[kind])return ECH[kind];
   const s=EFACE[kind],face=s&&FACES[s.img];
   const ch=makeChar(face?headlessEnemy(EGRID[kind],s.rows):EGRID[kind],Object.assign({},EPAL,EPAL_X[kind]||{}),3,'#ffffff',face,s&&s.o);
-  if(face||!s||!s.img||kind==='cancel'&&!face)ECH[kind]=ch;return ch;
+  if(face)ECH[kind]=ch;return ch;
 }
 const ROCKET_SPR=buildSprite(IGRID.ROCKET,IPAL,3,'#ffffff');
 const ENV_SPR=buildSprite(IGRID.ENV,IPAL,2,null);
@@ -945,7 +945,7 @@ function stopGordonSource(){
 function ensureGordonAudio(){
   if(gordonAudio)return gordonAudio;
   const a=new Audio('art/gordon-intro.mp3');
-  a.preload='auto';a.playsInline=true;a.volume=0;
+  a.preload='auto';a.playsInline=true;a.volume=0;a.muted=true;a.loop=false;
   gordonAudio=a;return a;
 }
 function startGordonMusic(){
@@ -972,16 +972,20 @@ function startGordonMusic(){
 function primeGordonAudio(){
   loadGordonBuf();
   if(gordonPrimed)return;gordonPrimed=true;
-  const a=ensureGordonAudio();a.volume=0;a.muted=false;a.loop=true;
-  a.play().then(()=>{},()=>{gordonPrimed=false});
+  const a=ensureGordonAudio();
+  a.muted=true;a.volume=0;a.loop=false;
+  a.play().then(()=>{
+    a.pause();
+    try{a.currentTime=0}catch(e){}
+    a.muted=true;a.volume=0;
+  },()=>{gordonPrimed=false});
 }
 function stopGordonMusic(){
   stopGordonSource();
   if(gordonAudio){
-    gordonAudio.volume=0;gordonAudio.loop=true;
+    gordonAudio.pause();
+    gordonAudio.muted=true;gordonAudio.volume=0;gordonAudio.loop=false;
     try{gordonAudio.currentTime=0}catch(e){}
-    if(gordonPrimed&&!muted)gordonAudio.play().catch(()=>{});
-    else{gordonAudio.pause();try{gordonAudio.currentTime=0}catch(e){}}
   }
   syncBgm();
 }
