@@ -115,6 +115,11 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .hatelist .none{justify-content:center;color:var(--muted);font-weight:700}
 @media (max-height:720px){.card.over .scene{max-height:170px;object-fit:cover}.overpanels{min-height:300px}.card.over{gap:8px}}
 #shareTxt{font-size:12px;background:var(--well);border-radius:8px;padding:8px;margin:0;user-select:text;-webkit-user-select:text;text-align:left}
+#yellScr{z-index:3;background:rgba(43,30,25,.72)}
+.card.yell{gap:14px;padding:28px 18px 22px;outline-color:var(--stamp);transform:rotate(-2deg);animation:yellIn .35s cubic-bezier(.2,1.4,.4,1),yellShake .4s .35s ease-in-out 4}
+.card.yell h2{font-family:var(--pixel);font-size:15px;line-height:1.55;color:var(--stamp);margin:0;font-weight:400;text-wrap:balance}
+@keyframes yellIn{from{transform:scale(.55) rotate(-10deg);opacity:0}to{transform:scale(1) rotate(-2deg);opacity:1}}
+@keyframes yellShake{0%,100%{transform:rotate(-2deg)}25%{transform:rotate(2deg) translateX(4px)}50%{transform:rotate(-4deg)}75%{transform:rotate(1deg) translateX(-3px)}}
 </style>
 
 <div id="wrap">
@@ -150,7 +155,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
           <span class="ic"><span class="patch" style="background:#ff7a1a"></span></span><span>Перевзувалка повзає</span>
           <span class="ic"><span class="patch" style="background:#4f5866"></span></span><span>Відписка мінусує рахунок</span>
           <span class="ic"><span class="patch fake"></span></span><span>Фейк рветься під ногами</span>
-          <span class="ic"><span class="patch worn" style="background:#2ea043"></span></span><span>Ярлик відклеюється — не стій</span>
+          <span class="ic"><span class="patch worn" style="background:#2ea043"></span></span><span>Ярлик відклеюється після двох стрибків</span>
         </div>
         <div class="legend" role="tabpanel" data-panel="haters" hidden>
           <span class="ic"><img id="icStuk" alt=""></span><span><b>Стукач</b> — скарги збивають стрибок</span>
@@ -166,6 +171,14 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
           <span class="ic"><span class="badge gold">???</span></span><span>Після <b>300 000</b> інколи заходить гість</span>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="yellScr" hidden>
+    <div class="card yell" role="dialog" aria-label="Хто не скаче — той москаль">
+      <p class="eyebrow">УВАГА</p>
+      <h2>ХТО НЕ СКАЧЕ - ТОЙ МОСКАЛЬ</h2>
+      <p class="fine">тицяй, щоб стрибати</p>
     </div>
   </div>
 
@@ -349,25 +362,32 @@ function makeChar(grid,pal,px,outline,face,o){
   let fw=0,fh=0;
   if(face){const fs=Math.max(1,Math.round(o.cells*u/face.width));fw=face.width*fs;fh=face.height*fs}
   const ol=Math.max(2,Math.round(u*.45)),rest=face?(o.chin+1+o.sink)*u:0,head=face?Math.max(0,fh+ol-rest):0;
-  const c=document.createElement('canvas');c.width=body.width;c.height=body.height+head;
-  const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(body,0,head);
+  const fx0=face?Math.round((o.ax+1)*u-fw/2):0;
+  const padL=face?Math.max(0,ol-fx0):0,padR=face?Math.max(0,fx0+fw+ol-body.width):0;
+  const c=document.createElement('canvas');c.width=body.width+padL+padR;c.height=body.height+head;
+  const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(body,padL,head);
   if(face){
-    const fx=Math.round((o.ax+1)*u-fw/2),fy=Math.round(head+rest-fh),sil=silhouette(face,outline||'#ffffff');
+    const fx=fx0+padL,fy=Math.round(head+rest-fh),sil=silhouette(face,outline||'#ffffff');
     for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,-1],[-1,1],[1,1]])g.drawImage(sil,fx+dx*ol,fy+dy*ol,fw,fh);
     g.drawImage(face,fx,fy,fw,fh);
   }
-  return {c,k:CK,cx:body.width/2,cy:head+body.height/2,fy:head+(grid.length+1)*u,top:0};
+  return {c,k:CK,cx:padL+body.width/2,cy:head+body.height/2,fy:head+(grid.length+1)*u,top:0};
 }
 function drawChar(g,ch,x,y,sx,sy,anchor,rot){
   g.save();g.translate(x,y);if(rot)g.rotate(rot);g.scale(sx/ch.k,sy/ch.k);g.imageSmoothingEnabled=false;
   g.drawImage(ch.c,-ch.cx,anchor==='feet'?-ch.fy:-ch.cy);g.restore();
 }
-const REDKA_FACE={ax:15.5,chin:20,sink:1.5,cells:21};
+const REDKA_FACE={
+  felix:{ax:15.5,chin:20,sink:1.5,cells:21},
+  'felix-fail':{ax:15.5,chin:21,sink:1.2,cells:21},
+  'felix-fly':{ax:15.5,chin:19.5,sink:1,cells:28}
+};
 const REDKA_CH={};
-function redkaChar(li,px){
-  const key=li+':'+px;if(REDKA_CH[key])return REDKA_CH[key];
-  const L=LOOKS[li],f=FACES.felix,grid=f?headlessRedka(lookGrid(L)):hl(lookGrid(L));
-  const ch=makeChar(grid,Object.assign(lookPal(L),{h:'#ff9a7a'}),px,L.out||'#ffffff',f,REDKA_FACE);
+function redkaChar(li,px,faceKey){
+  const fk=faceKey&&FACES[faceKey]?faceKey:'felix';
+  const key=li+':'+px+':'+fk;if(REDKA_CH[key])return REDKA_CH[key];
+  const L=LOOKS[li],f=FACES[fk]||FACES.felix,grid=f?headlessRedka(lookGrid(L)):hl(lookGrid(L));
+  const ch=makeChar(grid,Object.assign(lookPal(L),{h:'#ff9a7a'}),px,L.out||'#ffffff',f,REDKA_FACE[fk]||REDKA_FACE.felix);
   if(f)REDKA_CH[key]=ch;return ch;
 }
 const EGRID={"stuk":[".....KKHHHHHHKK.....","....KHHHHHHHHHHK....","...KHHHHHHHHHHHHK...","...KHHHHHHHHHHHHK...","..KKhhhhhhhhhhhhKK..",".KHHHHHHHHHHHHHHHHK.","..KKFFKFFFFFFFKfKK..","..KFFFFKFFFFFKfffK..","..KFFFFWKFFFWKfffK..","...KFFFFFFFFFFffK...","...KFpFFFFFFFFfpK...","....KFFFKFFFFFfK....","....KFFFFKKKKFfK....",".....KKCCCCCCKK.....",".....KCCSSSSCcKKKKK.","....KCCCSSSSCcPPPPPK","...KCCCCCccCCcPLLLPK","...KCCCCCccCCFPPPPPK","..KCCCCCCccCCFPLLLPK","...KCCCCCccCCcPPPPPK","...KCCCCCccCCcPPPPPK","....KCCCCccCCccKKKK.",".....KCCCccCCcK.....",".....KnnnCCnnnK.....",".....KnnnKKnnnK.....",".....KKKK..KKKK....."],"koms":["....KKAAAAAAAAKK....","...KAAAAAAAAAAAAK...","..KAAAAAAAAAAAAAAK..","..KAAAAAAAAAAAAAAK..","...KAAAAAAAAAAAAAK..","...KAFAAAAAAAAfAK...","...KFFKFFFFFFFKfK...","..KFFFFKFFFFFKfffK..","..KFFFFWKFFFWKfffK..","...KFFFKKFFFKKffK...","...KFpFFFFFFFFfpK...","....KFFFKKKKFFfK....","....KFFFKTTKFFfK....",".....KKFKTTKFKK..KKK","......KSSSSSsK.KKMMM",".....KSSTTTTTsKMMMMM","....KSSSSTTTsssMMMMM","...KSSSSSTTTssFMMMMM","...KSSSSSStSsssMMmmm","...KSSSSSSSSsssMMmmm","...KSSSSSSSSssssKmmm","....KSSSSSSSsssK.KKK",".....KSSSSSSssK.....",".....KNNNSSNNNK.....",".....KNNNKKNNNK.....",".....KKKK..KKKK....."],"cancel":[".....KKKKKKKKKK.....","....KBBBBBBBBBBK....","...KGGGGGGGGGGGGK...","...KBBBBBBBBBBBBBK..","..KGBBBBBBBBBBBBGK..","..KGFFBBBBBBBBffGK..","..KGFFKFFFFFFFKfGK..","..KGFFFKFFFFFKffGK..","..KGFFFWKFFFWKffGK..","..KGFFFKKFFFKKffGK..","..KGFpFFFFFFFFfpGK..","...KKFFFFFFFFFGGK...","....KFFFKKKKFKfYYK..",".....KKFFFFFFKKYYK..","......KDSSSSdKKYYK..",".....KDDDddDddFYYK..","....KDDDDddDddFYYK..","...KDDDDDddDdddYYKKK","...KDDDDDddDdRRRRRRR","...KDDDDDddDdRRRRRRR","...KDDDDDddDdRRRRRRR","....KDDDDddDdrrrrrrr",".....KDDDddDddKKKKKK",".....KdddDDdddK.....",".....KdddKKdddK.....",".....KKKK..KKKK....."],"lang":[".......KOOOoK.......","....KKKOOOOOOKKK....","...KOOOOOOOOOOooK...","..KOOOOOOOOOOOoooK..","..KOOOOOOOOOOOoooK..","..KOOOOOOOOOOOoooK..","..KOOOKKOOOOKKoooK..","..KOOFVVVVOVVVVfoK..","..KOOFVWKVFVWKVfoK..","..KOOFVKKVFVKKVfoK..","..KOOpVVVVFVVVVpoK..","..KOOFFFKKKKFFfKoK..","...KKFFFKTTKFFfKFK..",".....KKFKTTKFKKFFK..",".KKKK.KKXSSSKKKFFK..","KUZZUKXXXSSSXxKFFK..","KUPPPXXXXXXXXxxKK...","KUPPPFXXXXXXXxxxK...","KUPPPXXXXXXXXxxxxK..","KUPPPXXXXXXXXxxxxK..",".KKKXXXXXXXXXxxxK...","...KXXXXXXXXXxxxK...","....KXXXXXXXXxxK....",".....KxxxXXxxxK.....",".....KxxxKKxxxK.....",".....KKKK..KKKK....."],"threads":[".....KKKJJJJKKK.....","...KKJJJJJJJJJjKK...","..KJJJJJJJJJJJjjjK..","..KJJJJJJJJJJJjjjK..","..KJJJJJJJJJJJjjjKK.","..KJJJJJJJJJJJjjjjjK","...KFFFFJJJJFFffKKK.","..KFFFFFFFFFFFfffK..","..KFFFFKKFFFKKfffK..","...KFFFFFFFFFFffK...","...KFpFFFFFFFFfpK...","....KFFFKFFFFFfK....","....KFFFFKKKKFfK....",".....KKFFFFFFKK.....",".....KKIIIIIIIKKKK..","....KIIIWIIIWiEEEEK.","...KIIIIIIIIIiEeeEK.","...KIIIIIWWWIFEeeEK.","..KIIIIIWIeIWFEeeEK.","..KIIIIIIWWWWiEeeEK.","..KIIIIIIIIIIiEEEEK.","...KIIIIIIIIIiiiKK..","....KIIIIIIIIiiK....",".....KiiiIIiiiK.....",".....KiiiKKiiiK.....",".....KKKK..KKKK....."]};
@@ -579,7 +599,7 @@ function resize(){const r=wrap.getBoundingClientRect();dpr=Math.min(window.devic
 const PFONT=13,PH=26;
 function fontFor(t,maxW){let s=PFONT;ctx.font='800 '+s+'px Manrope, system-ui, sans-serif';while(s>9&&ctx.measureText(t).width>maxW){s--;ctx.font='800 '+s+'px Manrope, system-ui, sans-serif'}return s}
 // Labels peel off after a few landings, so standing still eventually drops Redka into the abyss.
-const platLife=gs=>gs<80000?3:2;
+const platLife=_gs=>2;
 function makePlat(type,y,label,extra){
   ctx.font='800 '+PFONT+'px Manrope, system-ui, sans-serif';
   const d=diff(),w=Math.round(Math.max(60,Math.min(160-30*d,ctx.measureText(label).width+20)));
@@ -700,7 +720,7 @@ function reset(){
   floats=[];plats=[];enemies=[];envs=[];items=[];waves=[];
   const sy=H*.8;player0=sy;
   lastCx=W/2;lastW=130;centreHist=[1,1,1];
-  plats.push({type:'normal',label:'ПЕРШИЙ ЖАРТ',x:W/2-65,y:sy,w:130,h:PH,vx:0,broken:false,fy:0,alpha:1,visited:true,hits:0,life:3,fs:PFONT});
+  plats.push({type:'normal',label:'ПЕРШИЙ ЖАРТ',x:W/2-65,y:sy,w:130,h:PH,vx:0,broken:false,fy:0,alpha:1,visited:true,hits:0,life:2,fs:PFONT});
   player={x:W/2,y:sy-FEET+10,vx:0,vy:-10.3,face:1,sq:0,fly:0,flyMax:0,flyKind:null,push:0,idle:0};
   topY=sy;while(topY>camY-160)genStep();makeCloth(0);bgShown=0;bgPrev=-1;bgFade=1;
 }
@@ -719,7 +739,8 @@ function update(dt){
   if(p.fly>0){
     if(p.flyKind==='gordon')syncGordonFly(p,dt);else p.fly-=dt;
     p.vy=-16;
-    if(Math.random()<.7)floats.push({puff:1,x:p.x+rnd(-8,8),y:p.y+FEET+4,life:.7,gold:p.flyKind==='gordon'});
+    const nPuff=p.flyKind==='gordon'?2:1;
+    if(Math.random()<.9)for(let i=0;i<nPuff;i++)floats.push({puff:1,x:p.x+rnd(-12,12),y:p.y+FEET+rnd(0,10),life:.8,gold:p.flyKind==='gordon'});
     if(p.flyKind==='gordon')spinGordon(dt);
     if(p.fly<=0){p.flyKind=null;p.vy=-8;stopGordonMusic();gordonBits=[]}
   }
@@ -981,7 +1002,7 @@ function drawGordonTitle(){
   ctx.restore();
 }
 function loadFaces(){
-  const names=['felix','koms','threads','lang','stuk','cancel'];let left=names.length;
+  const names=['felix','felix-fail','felix-fly','koms','threads','lang','stuk','cancel'];let left=names.length;
   const done=()=>{if(--left)return;for(const k in REDKA_CH)delete REDKA_CH[k];for(const k in ECH)delete ECH[k];for(const k in EOUT)delete EOUT[k];paintIcons()};
   for(const n of names){const im=new Image();im.onload=()=>{FACES[n]=im;done()};im.onerror=done;im.src='art/faces/'+n+'.png'}
   for(let n=1;n<=9;n++){const im=new Image();im.src='art/gordon/'+n+'.webp';GORDON_IMGS.push(im)}
@@ -1009,14 +1030,34 @@ function drawGordonBits(){
 }
 function drawRedka(){
   const p=player,L=LOOKS[lookIdx],sx=1+.15*p.sq,sy=1-.15*p.sq,py=p.y-camY;
-  drawChar(ctx,redkaChar(lookIdx,SPX),p.x,py+FEET,sx*p.face*SSC,sy*SSC,'feet');
+  const flying=p.flyKind==='express'||p.flyKind==='gordon',gordon=p.flyKind==='gordon';
+  const ch=redkaChar(lookIdx,SPX,flying?'felix-fly':null);
+  const lean=flying?(gordon?0.22:0.12)*p.face+Math.sin(tick*(gordon?0.28:0.18))*(gordon?0.12:0.05):0;
+  if(flying){
+    const n=gordon?4:3;
+    for(let i=n;i>=1;i--){ctx.save();ctx.globalAlpha=gordon?0.22:0.16;drawChar(ctx,ch,p.x-p.vx*i*1.8-p.face*i*4,py+FEET+i*7,sx*p.face*SSC,sy*SSC,'feet',lean);ctx.restore()}
+    ctx.save();ctx.strokeStyle=gordon?'rgba(255,243,176,.55)':'rgba(255,154,42,.5)';ctx.lineWidth=2;
+    for(let i=0;i<(gordon?12:7);i++){const x=p.x+((i*41+tick*9)%90)-45,y=py+8+((i*57+tick*16)%100);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,y+(gordon?22:12));ctx.stroke()}
+    ctx.restore();
+  }
+  drawChar(ctx,ch,p.x,py+FEET,sx*p.face*SSC,sy*SSC,'feet',lean);
   const star=(x,y,sz,c)=>{ctx.fillStyle=c;ctx.fillRect(x-1,y-sz,3,sz*2+1);ctx.fillRect(x-sz,y-1,sz*2+1,3)};
   if(L.gold){const a=tick*.06;for(let i=0;i<4;i++){const ang=a+i*1.57,x=Math.round(p.x+Math.cos(ang)*42),y=Math.round(py+20+Math.sin(ang)*44);star(x,y,4+Math.round(2*Math.sin(tick*.2+i)),'#f5c542')}}
-  if(p.flyKind==='gordon'){const a=tick*.1;for(let i=0;i<8;i++){const ang=a+i*.785,x=Math.round(p.x+Math.cos(ang)*54),y=Math.round(py+20+Math.sin(ang)*58);star(x,y,5,i%2?'#fff3b0':'#e2a91c')}}
-  else if(p.flyKind==='express'){const rk=ROCKET_SPR;ctx.save();ctx.translate(p.x-p.face*24,py+30);ctx.drawImage(rk,-rk.width/2,-rk.height/2);ctx.restore()}
+  if(gordon){const a=tick*.1;for(let i=0;i<8;i++){const ang=a+i*.785,x=Math.round(p.x+Math.cos(ang)*54),y=Math.round(py+20+Math.sin(ang)*58);star(x,y,5,i%2?'#fff3b0':'#e2a91c')}}
+  else if(p.flyKind==='express'){
+    const rk=ROCKET_SPR,fl=6+Math.round(5*Math.abs(Math.sin(tick*.45)));
+    ctx.save();ctx.translate(p.x-p.face*26,py+32);ctx.rotate(lean*.6);
+    ctx.drawImage(rk,-rk.width/2,-rk.height/2);
+    ctx.fillStyle=tick%8<4?'#ff9a2a':'#ffd23a';ctx.fillRect(-3,rk.height/2-4,6,fl);
+    ctx.restore();
+  }
 }
 function draw(){
   ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);ctx.imageSmoothingEnabled=false;
+  if(player&&player.fly>0&&mode==='play'){
+    const g=player.flyKind==='gordon',a=g?12:3.4;
+    ctx.translate((Math.sin(tick*1.7)*.55+Math.sin(tick*3.1)*.45)*a,(Math.cos(tick*1.9)*.4+Math.sin(tick*4.4)*.6)*a+(g?Math.sin(tick*.13)*5:0));
+  }
   if(bgShown!==zoneIdx){bgPrev=bgShown;bgShown=zoneIdx;bgFade=0}
   bgFade=Math.min(1,bgFade+.025);
   let painted=false;
@@ -1027,7 +1068,7 @@ function draw(){
   if(painted){ctx.globalAlpha=.16;ctx.fillRect(0,0,W,H+48);ctx.globalAlpha=1;ctx.fillStyle='rgba(255,248,236,.16)';ctx.fillRect(0,0,W,H+48)}
   else ctx.fillRect(0,0,W,H+48);
   ctx.restore();
-  if(player.flyKind==='gordon'){ctx.save();ctx.globalAlpha=.78;ctx.fillStyle=goldCloth();ctx.fillRect(0,0,W,H);ctx.globalAlpha=.25;ctx.fillStyle='#fff3b0';for(let i=0;i<10;i++){ctx.save();ctx.translate(W/2,H*.45);ctx.rotate(tick*.004+i*.628);ctx.fillRect(-14,0,28,H);ctx.restore()}ctx.restore();drawGordonBits()}
+  if(player.flyKind==='gordon'){ctx.save();ctx.globalAlpha=.78;ctx.fillStyle=goldCloth();ctx.fillRect(0,0,W,H);ctx.globalAlpha=.25;ctx.fillStyle='#fff3b0';for(let i=0;i<10;i++){ctx.save();ctx.translate(W/2,H*.45);ctx.rotate(tick*.004+i*.628);ctx.fillRect(-14,0,28,H);ctx.restore()}ctx.globalAlpha=.4;for(let i=0;i<16;i++){const x=(i*47+tick*11)%W,y=(i*61+tick*5)%H;ctx.fillRect(x,y,2,18+i%10)}ctx.restore();drawGordonBits()}
   for(const w of waves){ctx.save();ctx.globalAlpha=w.life;ctx.strokeStyle='#b02020';ctx.lineWidth=3;ctx.setLineDash([6,5]);ctx.beginPath();ctx.arc(w.x,w.y-camY,w.r,0,7);ctx.stroke();ctx.restore()}
   for(const pl of plats)drawPlat(pl);
   for(const it of items)drawItem(it);
@@ -1060,7 +1101,7 @@ function draw(){
 function scene(kind,li){
   const c=document.createElement('canvas'),Wd=320,Hd=200,k=2;c.width=Wd*k;c.height=Hd*k;const g=c.getContext('2d');g.scale(k,k);g.imageSmoothingEnabled=false;
   bgCrop(g,zoneIdx,0,0,Wd,Hd,'rgba(255,248,236,.22)');
-  const R=redkaChar(li,3);
+  const R=redkaChar(li,3,'felix-fail');
   const spr=(im,x,y,sc,rot)=>{g.save();g.translate(x,y);g.rotate(rot||0);g.scale(sc,sc);g.drawImage(im,-im.width/2,-im.height/2);g.restore()};
   const sprRedka=(x,y,sc,rot,flip)=>drawChar(g,R,x,y,(flip?-1:1)*sc,sc,'center',rot);
   const sprEnemy=(ek,x,y,sc,flip)=>drawChar(g,enemyChar(ek),x,y,(flip?-1:1)*sc,sc,'center',0);
@@ -1145,9 +1186,16 @@ function fillHatePanel(){
   $('hateExtra').innerHTML='<span>Розібрано хейтерів: <b>'+stomps+'</b></span><span>Відписок: <b>'+minusCnt+'</b></span><span>Фейків: <b>'+fakeCnt+'</b></span>';
 }
 let bestAtStart=0,recordShown=false;
-function start(){reset();bestAtStart=best;recordShown=false;mode='play';$('startScr').hidden=true;$('colScr').hidden=true;$('overScr').hidden=true;showPlayHud(true);$('score').textContent='0';$('best').textContent=fmt(best);pushToast('Етап 1 / '+ZONES.length,ZONES[0].name);syncBgm()}
-
-$('playBtn').onclick=()=>{audioOn();primeGordonAudio();primeBgm();start()};$('againBtn').onclick=()=>{audioOn();primeGordonAudio();primeBgm();start()};
+function start(){reset();bestAtStart=best;recordShown=false;mode='play';$('startScr').hidden=true;$('colScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=true;showPlayHud(true);$('score').textContent='0';$('best').textContent=fmt(best);pushToast('Етап 1 / '+ZONES.length,ZONES[0].name);syncBgm()}
+let yellT=null;
+function showYell(){
+  $('startScr').hidden=true;$('colScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=false;
+  try{SFX.stamp()}catch(e){}
+  clearTimeout(yellT);yellT=setTimeout(finishYell,1800);
+}
+function finishYell(){if($('yellScr').hidden)return;clearTimeout(yellT);yellT=null;$('yellScr').hidden=true;start()}
+function goPlay(){if(mode==='play'&&$('yellScr').hidden)return;audioOn();primeGordonAudio();primeBgm();if(!$('yellScr').hidden){finishYell();return}showYell()}
+$('playBtn').onclick=goPlay;$('againBtn').onclick=goPlay;$('yellScr').onclick=finishYell;
 document.querySelectorAll('.tabs').forEach(t=>t.addEventListener('click',e=>{
   const b=e.target.closest('.tab');if(!b)return;const card=t.closest('.card');
   card.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
@@ -1227,7 +1275,7 @@ $('bgmBtn').onclick=function(e){
 paintMute();paintBgm();
 
 function setPtr(){input.l=false;input.r=false;const r=wrap.getBoundingClientRect();for(const x of pointers.values()){if(x-r.left<r.width/2)input.l=true;else input.r=true}}
-wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.card,.mute,.demo,.achbtn'))return;audioOn();pointers.set(e.pointerId,e.clientX);setPtr()});
+wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.card,.mute,.demo,.achbtn,#yellScr'))return;audioOn();pointers.set(e.pointerId,e.clientX);setPtr()});
 wrap.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('touchmove',e=>{if(!e.target.closest('.card'))e.preventDefault()},{passive:false});
 document.addEventListener('gesturestart',e=>e.preventDefault());
@@ -1237,7 +1285,7 @@ const KL=['ArrowLeft','a','A','ф','Ф'],KR=['ArrowRight','d','D','в','В'];
 addEventListener('keydown',e=>{
   if(KL.includes(e.key)){input.l=true;e.preventDefault()}
   if(KR.includes(e.key)){input.r=true;e.preventDefault()}
-  if((e.key===' '||e.key==='Enter')&&mode!=='play'&&document.activeElement.tagName!=='BUTTON'){audioOn();primeGordonAudio();primeBgm();start();e.preventDefault()}
+  if((e.key===' '||e.key==='Enter')&&document.activeElement.tagName!=='BUTTON'){if(!$('yellScr').hidden){finishYell();e.preventDefault();return}if(mode!=='play'){goPlay();e.preventDefault()}}
 });
 addEventListener('keyup',e=>{if(KL.includes(e.key))input.l=false;if(KR.includes(e.key))input.r=false});
 addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,250));
@@ -1260,7 +1308,7 @@ function jumpTo(gs){
   const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
   topY=player.y+FEET+2;while(topY>camY-280)genStep();
 }
-window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},setInput(l,r){input.l=!!l;input.r=!!r}};
+window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},setInput(l,r){input.l=!!l;input.r=!!r}};
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode!=='over')update(dt);draw();requestAnimationFrame(loop)}
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});
