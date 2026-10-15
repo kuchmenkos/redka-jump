@@ -778,7 +778,7 @@ function update(dt){
     if(p.fly<=0){p.flyKind=null;p.vy=-8;stopGordonMusic();gordonBits=[]}
   }
   else p.vy+=.3*dt;
-  p.y+=p.vy*dt;const bot=p.y+FEET;
+  p.y+=p.vy*dt;const bot=p.y+FEET,falling=p.vy>0;
   if(p.vy>0){
     for(const pl of plats){
       if(pl.broken)continue;
@@ -834,7 +834,8 @@ function update(dt){
     const ch=enemyChar(en.kind),etop=ey-ch.cy/ch.k;
     if(mode==='play'&&p.fly>0&&Math.abs(en.x-p.x)<36&&Math.abs(ey-(p.y+22))<46){stompHater(en,false);continue}
     if(mode==='play'&&Math.abs(en.x-p.x)<34){
-      if(p.vy>0&&prevB<=etop+10&&bot>=etop-2){stompHater(en,true);continue}
+      // Fall onto the upper half (tall PNG heads sit well above centre). Side/torso stays fatal.
+      if(falling&&prevB<=ey+8&&bot>=etop-2){stompHater(en,true);continue}
       if(Math.abs(ey-(p.y+22))<42){cause=ENEMIES[en.kind].cause;causeKind=en.kind;gameOver();return}
     }
   }
@@ -1342,7 +1343,7 @@ function jumpTo(gs){
   const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
   topY=player.y+FEET+2;while(topY>camY-280)genStep();
 }
-window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},SFX,setInput(l,r){input.l=!!l;input.r=!!r}};
+window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},SFX,setInput(l,r){input.l=!!l;input.r=!!r}};
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode!=='over')update(dt);draw();requestAnimationFrame(loop)}
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});
