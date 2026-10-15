@@ -1,0 +1,28 @@
+{
+  "host": "https://eu.posthog.com",
+  "note": "Paste each query into PostHog EU → SQL, save as insight, pin to a dashboard named «Редька — баланс». Project token cannot create insights; personal API key can.",
+  "dashboards": [
+    {
+      "name": "Редька Джамп — як грають",
+      "purpose": "traffic and engagement",
+      "insights": [
+        "play_start count by day",
+        "median duration_s / score on game_over",
+        "share after game_over",
+        "threads_click unique and raw"
+      ]
+    },
+    {
+      "name": "Редька Джамп — баланс",
+      "purpose": "difficulty and mechanic tuning",
+      "insights": [
+        "p50/p90 score and duration",
+        "end cause including quit",
+        "max zone on game_over",
+        "zone_enter funnel",
+        "express / gordon / tickets among runs that reached the gate",
+        "stomp by kind"
+      ]
+    }
+  ]
+}

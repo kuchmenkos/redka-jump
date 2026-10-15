@@ -6,7 +6,9 @@
 
 Онлайн: [https://redkajump.fun/](https://redkajump.fun/). Живий хост — **Cloudflare Pages** (проєкт `redkajump`). Push у `main` деплоїть через Actions job `cloudflare-pages` (`wrangler pages deploy`). «Поділитись» додає `https://redkajump.fun/` (або поточний origin, якщо відкрито не з localhost).
 
-Аналітика — PostHog (`posthog-js` у `index.html`, autocapture вимкнений). Project API key — константа `POSTHOG_KEY` (для статичної гри ключ і так публічний). Порожній ключ — гра працює без мережевих викликів. Події: `pageview`, `play_start`, `game_over` (`cause`, `score`, `zone`), `share`. Хост — `https://eu.i.posthog.com` (EU).
+Аналітика — PostHog EU (`https://eu.i.posthog.com`). Події в `index.html`: `play_start`, `game_over` / `run_abandon` (знімок катки: `duration_s`, `score`, `zone`, механіки), віхи (`zone_enter`, `express`, `gordon`, `ticket`, `stomp`, `look_buy` / `look_wear`, `ach`, `share`, `threads_click`).
+
+Два шари: кабінет [eu.posthog.com](https://eu.posthog.com) збирає гру; баланс для Cursor — [`analytics/optimize.md`](analytics/optimize.md) (імпорт `@analytics/optimize.md` + SQL-знімок). MCP PostHog у Cloud Agent не логіниться; щоб агент сам зібрав дашборди в PostHog — personal API key (`phx_…`).
 
 ### Деплой Cloudflare Pages
 
