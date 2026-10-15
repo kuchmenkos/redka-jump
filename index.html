@@ -85,18 +85,16 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .bestline b{color:var(--ink)}
 .achbtn{width:100%;flex:none;min-width:0;padding:12px 14px;min-height:48px;font-size:15px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line)}
 .achbtn b{font-family:var(--pixel);font-size:11px;font-weight:400}
-.achgrid,.wardgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left;max-height:min(52vh,380px);overflow-y:auto;align-items:stretch}
-.achcard,.wardcard{background:var(--well);border-radius:8px;padding:10px 9px;min-height:86px;display:flex;flex-direction:column;gap:4px}
-.achcard{display:grid;grid-template-columns:40px 1fr;grid-template-rows:auto auto;column-gap:8px;row-gap:2px;align-items:center;height:92px;min-height:92px;overflow:hidden;padding:8px}
+.achgrid,.wardgrid{display:grid;grid-template-columns:1fr;gap:8px;text-align:left;max-height:min(60vh,460px);overflow-y:auto;align-items:stretch}
+.achcard,.wardcard{background:var(--well);border-radius:8px;padding:10px 12px;display:grid;grid-template-rows:auto auto;column-gap:12px;row-gap:2px;align-items:center;text-align:left}
+.achcard{grid-template-columns:64px 1fr}
+.wardcard{grid-template-columns:80px 1fr}
 .achcard.locked,.wardcard.locked{opacity:.55;filter:grayscale(.8)}
-.achcard .an{font-size:12px;font-weight:800;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.achcard .ah{font-size:11px;color:var(--muted);font-weight:600;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.achico{image-rendering:pixelated;width:40px;height:40px;grid-row:1/3;align-self:center}
+.achcard .an,.wardcard .an{font-size:14px;font-weight:800;line-height:1.3}
+.achcard .ah,.wardcard .ah{font-size:12px;color:var(--muted);font-weight:600;line-height:1.35}
+.achico{image-rendering:pixelated;width:64px;height:64px;grid-row:1/3;align-self:center}
 .wardpic{image-rendering:pixelated;width:28px;height:28px}
-.wardcard{align-items:center;text-align:center}
-.wardcard img{image-rendering:pixelated;height:72px;width:auto}
-.wardcard .an{font-size:12px;font-weight:800}
-.wardcard .ah{font-size:11px;color:var(--muted);font-weight:700}
+.wardcard img{image-rendering:pixelated;height:80px;width:auto;grid-row:1/3;align-self:center;justify-self:center}
 .newachs{background:var(--well);border-radius:8px;padding:8px 10px;text-align:left}
 .newachs p{margin:0 0 6px;font-size:12px;font-weight:800;color:var(--stamp)}
 .newachs ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
