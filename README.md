@@ -8,10 +8,10 @@
 
 Аналітика — PostHog EU (`https://eu.i.posthog.com`). Події в `index.html`: `play_start`, `game_over` / `run_abandon` (знімок катки: `duration_s`, `score`, `zone`, механіки), віхи (`zone_enter`, `express`, `gordon`, `ticket`, `stomp`, `look_buy` / `look_wear`, `ach`, `share`, `threads_click`).
 
-Два дашборди в PostHog EU (проєкт redkajump):
+Два дашборди в PostHog EU (проєкт redkajump, період 30 днів):
 
-- [Як грають](https://eu.posthog.com/project/307751/dashboard/1027950) — забіги, тривалість, шеринг, Threads
-- [Баланс](https://eu.posthog.com/project/307751/dashboard/1027951) — легко vs складно, смерті, етапи, бонуси
+- [Як грають](https://eu.posthog.com/project/307751/dashboard/1027950) — KPI, медіани, воронки, Threads
+- [Баланс](https://eu.posthog.com/project/307751/dashboard/1027951) — легко vs складно: смерті, етапи, бонуси, гардероб
 
 Для Cursor: [`analytics/optimize.md`](analytics/optimize.md) (`@analytics/optimize.md` + SQL-знімок). MCP у Cloud Agent не логіниться; дашборди зібрані через personal API.
 

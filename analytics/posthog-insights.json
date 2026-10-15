@@ -5,28 +5,44 @@
     "play": "https://eu.posthog.com/project/307751/dashboard/1027950",
     "balance": "https://eu.posthog.com/project/307751/dashboard/1027951"
   },
-  "note": "Dashboards created via personal API. Project token only captures events.",
+  "note": "Dashboards laid out via personal API (12-col sm grid, markdown section tiles). Project token only captures events. Default date_from: -30d.",
   "dashboards": [
     {
+      "id": 1027950,
       "name": "Редька Джамп — як грають",
       "purpose": "traffic and engagement",
+      "layout": "intro → KPI row → Threads + medians → trend/funnels",
       "insights": [
-        "play_start count by day",
-        "median duration_s / score on game_over",
-        "share after game_over",
-        "threads_click unique and raw"
+        "Забіги",
+        "Унікальні гравці",
+        "Фінали",
+        "Поділитись",
+        "Кліки Threads",
+        "Медіана тривалості й рахунку",
+        "Забіги по днях",
+        "Старт → фінал → шеринг",
+        "Відкрив гру → Threads",
+        "Звідки старт (кнопка / ще раз)"
       ]
     },
     {
+      "id": 1027951,
       "name": "Редька Джамп — баланс",
       "purpose": "difficulty and mechanic tuning",
+      "layout": "how hard → deaths/zones → stage funnel → bonuses → progress",
       "insights": [
-        "p50/p90 score and duration",
-        "end cause including quit",
-        "max zone on game_over",
-        "zone_enter funnel",
-        "express / gordon / tickets among runs that reached the gate",
-        "stomp by kind"
+        "Рахунок і тривалість (p50 / p90)",
+        "Короткі смерті (до 40k)",
+        "Смерті за причиною",
+        "Де відвалюються",
+        "Чим кінчають",
+        "Воронка етапів",
+        "Гордон",
+        "Експреси",
+        "Квитки",
+        "Топти",
+        "Покупки луків",
+        "Ачивки"
       ]
     }
   ]
