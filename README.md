@@ -8,7 +8,12 @@
 
 Аналітика — PostHog EU (`https://eu.i.posthog.com`). Події в `index.html`: `play_start`, `game_over` / `run_abandon` (знімок катки: `duration_s`, `score`, `zone`, механіки), віхи (`zone_enter`, `express`, `gordon`, `ticket`, `stomp`, `look_buy` / `look_wear`, `ach`, `share`, `threads_click`).
 
-Два шари: кабінет [eu.posthog.com](https://eu.posthog.com) збирає гру; баланс для Cursor — [`analytics/optimize.md`](analytics/optimize.md) (імпорт `@analytics/optimize.md` + SQL-знімок). MCP PostHog у Cloud Agent не логіниться; щоб агент сам зібрав дашборди в PostHog — personal API key (`phx_…`).
+Два дашборди в PostHog EU (проєкт redkajump):
+
+- [Як грають](https://eu.posthog.com/project/307751/dashboard/1027950) — забіги, тривалість, шеринг, Threads
+- [Баланс](https://eu.posthog.com/project/307751/dashboard/1027951) — легко vs складно, смерті, етапи, бонуси
+
+Для Cursor: [`analytics/optimize.md`](analytics/optimize.md) (`@analytics/optimize.md` + SQL-знімок). MCP у Cloud Agent не логіниться; дашборди зібрані через personal API.
 
 ### Деплой Cloudflare Pages
 

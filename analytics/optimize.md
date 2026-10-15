@@ -2,7 +2,12 @@
 
 Другий шар аналітики — **не «скільки зайшло»**, а **як грається і що крутити**. Живі цифри збирає PostHog EU. Цей файл імпортуй у чат Cursor (`@analytics/optimize.md`), коли треба підкрутити механіки по даних, а не навмання.
 
-Кабінет: [https://eu.posthog.com](https://eu.posthog.com) → SQL / Insights. MCP у Cloud Agent не логіниться (немає sign-in link). Щоб агент сам зібрав дашборди в PostHog — personal API key (`phx_…`) з `insight:write`, `dashboard:write`, `query:read`. Project token `phc_…` лише пише події.
+Живі дашборди (PostHog EU, проєкт redkajump):
+
+- [Як грають](https://eu.posthog.com/project/307751/dashboard/1027950)
+- [Баланс](https://eu.posthog.com/project/307751/dashboard/1027951) — цей шар для крутіння механік
+
+MCP у Cloud Agent не логіниться. SQL нижче — якщо треба свіжий знімок у чат Cursor.
 
 ## Два шари
 

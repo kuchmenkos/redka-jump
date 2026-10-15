@@ -1,6 +1,11 @@
 {
   "host": "https://eu.posthog.com",
-  "note": "Paste each query into PostHog EU → SQL, save as insight, pin to a dashboard named «Редька — баланс». Project token cannot create insights; personal API key can.",
+  "project_id": 307751,
+  "dashboards_live": {
+    "play": "https://eu.posthog.com/project/307751/dashboard/1027950",
+    "balance": "https://eu.posthog.com/project/307751/dashboard/1027951"
+  },
+  "note": "Dashboards created via personal API. Project token only captures events.",
   "dashboards": [
     {
       "name": "Редька Джамп — як грають",
