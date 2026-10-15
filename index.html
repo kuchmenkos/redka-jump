@@ -29,6 +29,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 .hud .scorebox{background:rgba(248,241,227,.92);padding:8px 12px 6px;border-radius:8px;box-shadow:0 2px 0 rgba(43,30,25,.25);min-width:104px}
 .hud .val{font-family:var(--pixel);font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
 .hud .combo{font-size:12px;font-weight:800;color:#1a7a32;margin-top:2px;min-height:14px}
+.hud .tix{font-size:11px;font-weight:800;color:#8f5f08;margin-top:2px}
 .hud .right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:auto}
 .hud .best{background:rgba(248,241,227,.88);padding:6px 10px;border-radius:8px;box-shadow:0 2px 0 rgba(43,30,25,.25);font-family:var(--pixel);font-size:12px;color:var(--muted)}
 .demo{pointer-events:auto;flex:none;min-width:0;padding:8px 10px;font-size:11px;font-weight:800;border-radius:8px;background:linear-gradient(#ffe48a,#e2a91c);color:#2a1722;box-shadow:inset 0 0 0 1.5px #2a1722,0 2px 0 rgba(43,30,25,.35);letter-spacing:.04em}
@@ -95,6 +96,10 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .achico{image-rendering:pixelated;width:64px;height:64px;grid-row:1/3;align-self:center}
 .wardpic{image-rendering:pixelated;width:28px;height:28px}
 .wardcard img{image-rendering:pixelated;height:80px;width:auto;grid-row:1/3;align-self:center;justify-self:center}
+.wardcard{cursor:pointer}
+.wardcard .ah.price{color:var(--stamp)}
+.wardcard.wear{outline:2px solid var(--gold);outline-offset:-2px}
+.tixflash{color:var(--stamp)!important}
 .newachs{background:var(--well);border-radius:8px;padding:8px 10px;text-align:left}
 .newachs p{margin:0 0 6px;font-size:12px;font-weight:800;color:var(--stamp)}
 .newach{display:flex;gap:8px;align-items:center;margin:0 0 6px}
@@ -153,7 +158,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 <div id="wrap">
   <canvas id="cv" aria-label="Ігрове поле: Редька стрибає по ярликах угору"></canvas>
   <div class="hud" id="hud">
-    <div class="scorebox" id="scorebox" hidden><div class="val" id="score">0</div><div class="combo" id="combo"></div></div>
+    <div class="scorebox" id="scorebox" hidden><div class="val" id="score">0</div><div class="combo" id="combo"></div><div class="tix" id="hudTix">Квитки 0</div></div>
     <div class="right">
       <div class="best" id="best" hidden>0</div>
       <button id="demoBtn" class="demo" hidden aria-label="Демо: увімкнути режим Гордона">DEMO</button>
@@ -176,7 +181,8 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
       <p class="sub">Що більше наїжджають — то вище стрибає.</p>
       <button id="playBtn" class="cta">Стрибати</button>
       <p class="bestline" id="bestLine" hidden>Рекорд: <b id="bestStart">0</b></p>
-      <button id="colBtn" class="achbtn" type="button">Досягнення <b id="achCount">0/20</b></button>
+      <p class="bestline" id="tixLine">Квитки: <b id="tixStart">0</b></p>
+      <button id="colBtn" class="achbtn" type="button">Досягнення <b id="achCount">0/22</b></button>
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" data-tab="how" aria-selected="true">Як грати</button>
         <button class="tab" role="tab" data-tab="haters" aria-selected="false">Хейтери</button>
@@ -203,8 +209,9 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
         <div class="legend" role="tabpanel" data-panel="bonus" hidden>
           <span class="ic"><img id="icRocket" alt=""></span><span><b>Шакалячий експрес</b> — ракета проти хейтерів</span>
           <span class="ic"><span class="badge">×5</span></span><span><b>Комбо</b> — нові ярлики без пауз</span>
-          <span class="ic"><span class="badge red">3/3</span></span><span><b>Хет-трик</b> — три скасовані міста туру</span>
+          <span class="ic"><span class="badge red">3 / 7 / 12</span></span><span><b>Скасовані міста туру</b> — три, сім або дванадцять залів</span>
           <span class="ic"><span class="badge gold">???</span></span><span>Після <b>300 000</b> інколи заходить гість</span>
+          <span class="ic"><span class="badge gold">КВИТОК</span></span><span><b>Квитки</b> — збирай і купуй луки в гардеробі</span>
         </div>
       </div>
     </div>
@@ -220,6 +227,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
   <div class="overlay" id="colScr" hidden>
     <div class="card col">
       <h1>Колекція</h1>
+      <p class="bestline" id="wardTix">Квитки: <b>0</b></p>
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" data-tab="achs" aria-selected="true">Досягнення</button>
         <button class="tab" role="tab" data-tab="ward" aria-selected="false">Гардероб</button>
@@ -244,6 +252,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
           <p class="big" id="finalScore">0</p>
           <p class="sub" style="margin-top:-6px">підписників на хейті</p>
           <div class="lookrow"><span class="look" id="look">Без піджака</span><span class="rankmini" id="rankMini"></span></div>
+          <p class="fine" id="overTix"></p>
           <div id="newAchs" class="newachs" hidden></div>
         </div>
         <div class="hatepanel" role="tabpanel" data-panel="hate" hidden>
@@ -258,7 +267,6 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
       </div>
       <div class="btns overshare">
         <button class="ghost" id="shareBtn" type="button">Поділитись</button>
-        <button class="ghost" id="saveBtn" type="button">Зберегти картинку</button>
       </div>
       <p id="shareHint" class="fine" hidden></p>
       <img id="shareImg" class="scene shareprev" alt="Картка результату" hidden>
@@ -308,6 +316,7 @@ const SFX={
   express:()=>{[392,523,659,784,1046].forEach((f,i)=>tone('triangle',f,f,.1,.04,i*.08));tone('sine',1318,1318,.4,.045,.42)},
   shout:()=>{tone('triangle',260,140,.14,.05);tone('sine',220,130,.12,.03,.03)},
   stamp:()=>{tone('sine',150,70,.09,.05);noise(.04,.05,500)},
+  ticket:()=>{tone('triangle',784,988,.08,.04);tone('sine',1175,1318,.12,.035,.05)},
   ach:()=>{noise(.05,.045,900);[659,784,988,1318].forEach((f,i)=>tone('sine',f,f,.07,.045,i*.06))},
   lose:()=>{tone('sine',280,110,.4,.08);noise(.2,.05,600)}
 };
@@ -373,16 +382,16 @@ function buildSprite(rows,pal,px,outline){
   return c;
 }
 const LOOKS=[
-  {at:0,name:'Без піджака'},
-  {at:30000,name:'Перший піджак'},
-  {at:90000,name:'Жовтий піджак',J:'#f5cb26',j:'#c88e12',Z:'#fff0a0',sh:8},
-  {at:180000,name:'Синій оксамит',J:'#2f5fd0',j:'#1b3a8a',Z:'#86a9ff',sh:7},
-  {at:300000,name:'Малиновий смокінг',J:'#b81f52',j:'#6e0d2b',Z:'#ff7aa4',sh:7},
-  {at:370000,name:'Клоун',id:'clown',body:CLOWN,cut:10,face:{chin:18,sink:.4,ax:15,cells:15},pal:{A:'#e22b2b',a:'#9e1212',B:'#2ea043',b:'#1a6b32',C:'#f5cb26',c:'#c88e12',S:'#fff8ee',s:'#e4d4b8',W:'#ffffff',F:'#f2c9a0'}},
-  {at:450000,name:'Смарагдовий костюм',J:'#18946a',j:'#0b553d',Z:'#7ff0c4',sh:7},
-  {at:530000,name:'Одіссей',id:'odyssey',body:ODYSSEY,cut:10,face:{chin:16,sink:.4,ax:14.5,cells:15},pal:{D:'#4a3a32',d:'#2e241e',U:'#6a6560',u:'#3e3a38',O:'#c4a35a',o:'#8a6a28',N:'#3a322c',E:'#c9b08a',F:'#f2c9a0',h:'#ff9a7a'}},
-  {at:650000,name:'Срібний костюм',J:'#c3c9d3',j:'#7d8695',Z:'#ffffff',sh:5,out:'#eef2f8'},
-  {at:900000,name:'Золотий костюм',id:'gold',J:'#e2a91c',j:'#8f5f08',Z:'#fff4b8',sh:4,gold:1,out:'#ffe08a'}
+  {at:0,cost:0,name:'Без піджака'},
+  {at:30000,cost:6,name:'Перший піджак'},
+  {at:90000,cost:10,name:'Жовтий піджак',J:'#f5cb26',j:'#c88e12',Z:'#fff0a0',sh:8},
+  {at:180000,cost:16,name:'Синій оксамит',J:'#2f5fd0',j:'#1b3a8a',Z:'#86a9ff',sh:7},
+  {at:300000,cost:24,name:'Малиновий смокінг',J:'#b81f52',j:'#6e0d2b',Z:'#ff7aa4',sh:7},
+  {at:370000,cost:36,name:'Клоун',id:'clown',body:CLOWN,cut:10,face:{chin:18,sink:.4,ax:15,cells:15},pal:{A:'#e22b2b',a:'#9e1212',B:'#2ea043',b:'#1a6b32',C:'#f5cb26',c:'#c88e12',S:'#fff8ee',s:'#e4d4b8',W:'#ffffff',F:'#f2c9a0'}},
+  {at:450000,cost:48,name:'Смарагдовий костюм',J:'#18946a',j:'#0b553d',Z:'#7ff0c4',sh:7},
+  {at:530000,cost:64,name:'Одіссей',id:'odyssey',body:ODYSSEY,cut:10,face:{chin:16,sink:.4,ax:14.5,cells:15},pal:{D:'#4a3a32',d:'#2e241e',U:'#6a6560',u:'#3e3a38',O:'#c4a35a',o:'#8a6a28',N:'#3a322c',E:'#c9b08a',F:'#f2c9a0',h:'#ff9a7a'}},
+  {at:650000,cost:80,name:'Срібний костюм',J:'#c3c9d3',j:'#7d8695',Z:'#ffffff',sh:5,out:'#eef2f8'},
+  {at:900000,cost:100,name:'Золотий костюм',id:'gold',J:'#e2a91c',j:'#8f5f08',Z:'#fff4b8',sh:4,gold:1,out:'#ffe08a'}
 ];
 function lookPal(L){
   const p=Object.assign({},BASEPAL,{R:'#e2452a',r:'#b0241c',W:'#fafafa',P:'#c8281e',T:'#8f1a1a',G:'#4ca038',g:'#1d6626',n:'#2a2230'});
@@ -468,13 +477,19 @@ function enemyChar(kind){
 const ROCKET_SPR=buildSprite(IGRID.ROCKET,IPAL,3,'#ffffff');
 const ENV_SPR=buildSprite(IGRID.ENV,IPAL,2,null);
 const THREAD_SPR=buildSprite(IGRID.THREAD,IPAL,2,'#ffffff');
+const TICKET=["KKKKKKKKKKKK","KYYYYYYYYYYK","KYRRRYYYYYYK","KYYYYYYYYYYK","KYKKKKKKKKYK","KYYYYYYYYYYK","KKKKKKKKKKKK"];
+const TICKET_SPR=buildSprite(TICKET,{K:'#1e1820',Y:'#fff3b0',R:'#d63434'},3,'#ffffff');
 function charThumb(ch){
   const pad=4,w=Math.ceil(ch.c.width*SSX/ch.k)+pad*2,h=Math.ceil(ch.c.height*SSC/ch.k)+pad*2;
   const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
   drawChar(g,ch,w/2,h-pad,SSX,SSC,'feet',0);return c;
 }
+function paintHero(){
+  let i=0;try{if(lookOwned(STATS.wear))i=STATS.wear}catch(e){}
+  const el=$('heroImg');if(el)el.src=charThumb(redkaChar(i,4)).toDataURL();
+}
 function paintIcons(){
-  $('heroImg').src=charThumb(redkaChar(2,4)).toDataURL();
+  paintHero();
   for(const [id,k] of [['icStuk','stuk'],['icKoms','koms'],['icThreads','threads'],['icLang','lang'],['icCancel','cancel']]){const el=$(id);if(el)el.src=enemyChar(k).c.toDataURL()}
   const r=$('icRocket');if(r)r.src=ROCKET_SPR.toDataURL();
 }
@@ -494,7 +509,8 @@ const ZONES=[
 // The labels that stick most often, so the end-of-run tally has a clear winner to brag about.
 const HOT=['МАЛОРОС','ЗРАДНИК','АГЕНТ КРЕМЛЯ','ІПСО','ХАЙПОЖЕР','ЖЕБРАК ІЗ СУМ'];
 const MINUS=[[],['МАСОВА ВІДПИСКА','КОНЦЕРТ МАЙЖЕ ЗІРВАЛИ'],['ЗАЛ ВІДМОВИВ','МАСОВА ВІДПИСКА'],['МАСОВА ВІДПИСКА','ВІДПИСАЛИСЬ ХОРОМ'],['РЕКЛАМУ РОЗІРВАНО','МАСОВА ВІДПИСКА'],['КВИТКИ ПОВЕРТАЮТЬ','РЕКЛАМУ РОЗІРВАНО'],['МАСОВА ВІДПИСКА','РЕКЛАМУ РОЗІРВАНО','КВИТКИ ПОВЕРТАЮТЬ']];
-const CITIES=['ЛЬВІВ СКАСОВАНО','ХМЕЛЬНИЦЬКИЙ СКАСОВАНО','ФРАНКІВСЬК СКАСОВАНО'];
+const CITIES=['ЛЬВІВ СКАСОВАНО','ХМЕЛЬНИЦЬКИЙ СКАСОВАНО','ФРАНКІВСЬК СКАСОВАНО','ТЕРНОПІЛЬ СКАСОВАНО','ВІННИЦЯ СКАСОВАНО','ОДЕСА СКАСОВАНО','ДНІПРО СКАСОВАНО','ХАРКІВ СКАСОВАНО','ПОЛТАВА СКАСОВАНО','ЧЕРНІГІВ СКАСОВАНО','ЗАПОРІЖЖЯ СКАСОВАНО','ЧЕРКАСИ СКАСОВАНО','СУМИ СКАСОВАНО','ЛУЦЬК СКАСОВАНО','РІВНЕ СКАСОВАНО'];
+const CITY_CAP=15,CITY_GOAL=12,CITY_FROM=40000;
 const FAKES=['ФЕЙК','ВИРВАНО З КОНТЕКСТУ','СКРІН БЕЗ ДЖЕРЕЛА','«ВСІ ЗНАЮТЬ»','ІНСАЙД ВІД ЗНАЙОМОГО','НЕПЕРЕВІРЕНЕ','ЗМОНТОВАНЕ ВІДЕО','КОЛАЖ ЗІ СТРІЛКАМИ'];
 const MOVERS=['ПЕРЕВЗУВСЯ','ТО ЗРАДА, ТО ПЕРЕМОГА','ЗМІНИВ ПОЗИЦІЮ','ТО ТАК, ТО СЯК','ТО ЛАЙК, ТО ХЕЙТ','ВЧОРА ЛАЙКАВ','СЬОГОДНІ ХЕЙТИТЬ','СПОЧАТКУ ХВАЛИВ','ТЕПЕР ПРОТИ','ТРЕД ПО КОЛУ'];
 const ENEMIES={
@@ -510,6 +526,7 @@ const STOMP_Q={stuk:['скаргу порвано','стукач у мюті'],k
 const FEET=22*PX;
 
 let items=[],waves=[],causeKind='fall',mode='start',player,plats,enemies,envs,floats,camY,topY,bonus,zoneIdx,lookIdx,banner,cities,stomps,hat,cause,best=0,input={l:false,r:false},pointers=new Map(),player0=0,tick=0,recent=[];
+let ticketsRun=0,citySpawned=[],lastTicketStep=-99;
 let gordonAudio=null,gordonBits=[],gordonDecided=false,gordonTitle=0,gordonLastEdge=-1,gordonDeck=[],gordonDeckI=0,gordonCaught=false,gordonDemo=false,gordonMissed=false,gordonOffered=false;
 let toasts=[],toastNow=null,stompKind={},expressN=0,malorosN=0,threadHits=0,idlePeak=0,newAchs=[];
 const GORDON_IMGS=[];
@@ -553,10 +570,20 @@ function bgCrop(g,i,x,y,w,h,wash){
 }
 
 /* ---------- achievements ---------- */
-function blankStats(){return {stomp:{stuk:0,koms:0,lang:0,cancel:0,threads:0},express:0,gordon:0,gordonMiss:0,labels:0,bestZone:0,looks:0,death:{fall:0,stuk:0,koms:0,lang:0,cancel:0,threads:0},runs:0,fakes:0,minus:0,threads:0}}
+function blankStats(){return {stomp:{stuk:0,koms:0,lang:0,cancel:0,threads:0},express:0,gordon:0,gordonMiss:0,labels:0,bestZone:0,looks:0,tickets:0,owned:[0],wear:0,death:{fall:0,stuk:0,koms:0,lang:0,cancel:0,threads:0},runs:0,fakes:0,minus:0,threads:0}}
 let STATS=blankStats(),ACH_HAVE={};
 try{const s=JSON.parse(localStorage.getItem('redkaStats')||'null');if(s)STATS=Object.assign(blankStats(),s,{stomp:Object.assign(blankStats().stomp,s.stomp||{}),death:Object.assign(blankStats().death,s.death||{})})}catch(e){}
 try{ACH_HAVE=JSON.parse(localStorage.getItem('redkaAch')||'{}')||{}}catch(e){}
+function lookOwned(i){return i===0||(STATS.owned||[]).indexOf(i)>=0}
+function migrateLooks(){
+  STATS.tickets=STATS.tickets|0;
+  if(!Array.isArray(STATS.owned))STATS.owned=[0];
+  if(STATS.owned.indexOf(0)<0)STATS.owned.push(0);
+  const n=Math.max(0,STATS.looks|0,lookAt(best));
+  for(let i=1;i<=n&&i<LOOKS.length;i++)if(STATS.owned.indexOf(i)<0)STATS.owned.push(i);
+  if(!lookOwned(STATS.wear))STATS.wear=0;
+}
+migrateLooks();
 const ACH=[
   {id:'joke',name:'Скасований з першого жарту',hint:'Впади, не набравши 1 000',test:(r)=>r.fromOver&&r.causeKind==='fall'&&r.score<1000},
   {id:'abyss',name:'Відкрий для себе прірву',hint:'Впади в прірву хоч раз',test:(r,S)=>r.fromOver&&(S.death.fall||0)>=1},
@@ -570,20 +597,26 @@ const ACH=[
   {id:'exp3',name:'Шакалячий пасажир',hint:'3 експреси за забіг',test:(r)=>r.expressN>=3},
   {id:'guest',name:'Був у гостях',hint:'Піймай Гордона — не DEMO',test:(r,S)=>(r.gordonCaught&&!r.gordonDemo)||(S.gordon||0)>=1},
   {id:'gmiss',name:'Гордон чекав, а ти не прийшов',hint:'Пропусти предмет Гордона',test:(r,S)=>r.gordonMissed||(S.gordonMiss||0)>=1},
-  {id:'hat',name:'Хет-трик туру',hint:'Три скасовані міста туру',test:(r)=>r.hat},
+  {id:'hat',name:'Хет-трик туру',hint:'3 скасовані міста туру за забіг',test:(r)=>r.citiesN>=3},
+  {id:'hat7',name:'Сім залів',hint:'7 скасованих міст туру за забіг',test:(r)=>r.citiesN>=7},
+  {id:'hat12',name:'Тур зірвано',hint:'12 скасованих міст туру за забіг',test:(r)=>r.citiesN>=12},
   {id:'minus5',name:'Мінус на мінусі',hint:'5 відписок за забіг',test:(r)=>r.minusCnt>=5},
   {id:'fake15',name:'Фактчекер',hint:'Порви 15 фейків',test:(r,S)=>(S.fakes||0)+(r.fromOver?0:r.fakeCnt)>=15},
   {id:'stoic',name:'Стоїк',hint:'Впади, простоявши понад 3 с',test:(r)=>r.fromOver&&r.causeKind==='fall'&&r.idlePeak>180},
   {id:'lviv',name:'Лев не вражений',hint:'Дострибай до Львова',test:(r,S)=>r.zoneIdx>=1||(S.bestZone||0)>=1},
   {id:'stad',name:'Стадіон зібрано',hint:'Дострибай до стадіону',test:(r,S)=>r.zoneIdx>=6||(S.bestZone||0)>=6},
-  {id:'gold',name:'Золотий хлопчик',hint:'Відкрий золотий піджак',test:(r,S)=>{const n=Math.max(r.lookIdx,S.looks||0);for(let i=0;i<=n&&i<LOOKS.length;i++)if(LOOKS[i].gold)return true;return false}},
-  {id:'ward',name:'Повний гардероб',hint:'Усі костюми',test:(r,S)=>Math.max(r.lookIdx,S.looks||0)>=LOOKS.length-1}
+  {id:'gold',name:'Золотий хлопчик',hint:'Купи золотий піджак',test:(r,S)=>(S.owned||[]).some(i=>LOOKS[i]&&LOOKS[i].gold)},
+  {id:'ward',name:'Повний гардероб',hint:'Купи всі костюми',test:(r,S)=>(S.owned||[]).length>=LOOKS.length}
 ];
-function runSnap(){return {score:Math.max(0,Math.floor(score())),causeKind,zoneIdx,lookIdx,hat,malorosN,expressN,minusCnt,fakeCnt,threadHits,idlePeak,stompKind,gordonCaught,gordonDemo,gordonMissed,fromOver:false}}
+function runSnap(){return {score:Math.max(0,Math.floor(score())),causeKind,zoneIdx,lookIdx,hat,citiesN:cities.size,malorosN,expressN,minusCnt,fakeCnt,threadHits,idlePeak,stompKind,gordonCaught,gordonDemo,gordonMissed,fromOver:false}}
 function saveAch(){try{localStorage.setItem('redkaAch',JSON.stringify(ACH_HAVE))}catch(e){}}
+(function grantShopAchs(){
+  let n=0;for(const a of ACH){if((a.id==='gold'||a.id==='ward')&&!ACH_HAVE[a.id]&&a.test({},STATS)){ACH_HAVE[a.id]=1;n++}}
+  if(n)saveAch();
+})();
 function saveStats(){try{localStorage.setItem('redkaStats',JSON.stringify(STATS))}catch(e){}}
 function saveRun(){
-  STATS.runs++;STATS.labels+=hateSum();STATS.bestZone=Math.max(STATS.bestZone,zoneIdx);STATS.looks=Math.max(STATS.looks,lookIdx);
+  STATS.runs++;STATS.labels+=hateSum();STATS.bestZone=Math.max(STATS.bestZone,zoneIdx);STATS.looks=Math.max(STATS.looks||0,...(STATS.owned||[0]));
   STATS.fakes+=fakeCnt;STATS.minus+=minusCnt;STATS.threads+=threadHits;STATS.express+=expressN;
   if(gordonCaught&&!gordonDemo)STATS.gordon++;if(gordonMissed)STATS.gordonMiss++;
   for(const k of Object.keys(stompKind))STATS.stomp[k]=(STATS.stomp[k]||0)+stompKind[k];
@@ -632,7 +665,13 @@ function loadAchs(){
     im.src='art/achs/'+a.id+'.png';
   });
 }
-function paintAchCount(){const el=$('achCount');if(el)el.textContent=Object.keys(ACH_HAVE).filter(k=>ACH[k]||ACH.some(a=>a.id===k)).length+'/20'}
+function paintAchCount(){const el=$('achCount');if(el)el.textContent=Object.keys(ACH_HAVE).filter(k=>ACH.some(a=>a.id===k)).length+'/'+ACH.length}
+function paintTickets(){
+  const n=STATS.tickets|0,run=ticketsRun|0;
+  const hud=$('hudTix');if(hud)hud.textContent='Квитки '+(run?run+' · '+n:n);
+  const st=$('tixStart');if(st)st.textContent=fmt(n);
+  const wt=$('wardTix');if(wt)wt.innerHTML='Квитки: <b>'+fmt(n)+'</b>';
+}
 function wardThumb(i,on){
   const key=i+':'+(on?1:0);
   if(WARD_TH[key])return WARD_TH[key];
@@ -642,7 +681,7 @@ function wardThumb(i,on){
   WARD_TH[key]=s.toDataURL();return WARD_TH[key];
 }
 function paintCol(){
-  paintAchCount();
+  paintAchCount();paintTickets();
   const grid=$('achGrid');grid.innerHTML='';
   for(const a of ACH){
     const on=!!ACH_HAVE[a.id],el=document.createElement('div');el.className='achcard'+(on?'':' locked');
@@ -652,12 +691,26 @@ function paintCol(){
   }
   const wg=$('wardGrid');wg.innerHTML='';
   LOOKS.forEach((L,i)=>{
-    const on=best>=L.at||(STATS.looks||0)>=i,el=document.createElement('div');el.className='wardcard'+(on?'':' locked');
-    const img=document.createElement('img');img.alt='';img.src=wardThumb(i,on);
+    const on=lookOwned(i),wear=on&&STATS.wear===i,el=document.createElement('div');
+    el.className='wardcard'+(on?'':' locked')+(wear?' wear':'');
+    const img=document.createElement('img');img.alt='';img.src=wardThumb(on?i:0,on);
     const n=document.createElement('div');n.className='an';n.textContent=on?L.name:'???';
-    const h=document.createElement('div');h.className='ah';h.textContent=(on?'від ':'з ')+fmt(L.at);
-    el.append(img,n,h);wg.append(el);
+    const h=document.createElement('div');h.className='ah'+(on?'':' price');
+    h.textContent=on?(wear?'На тобі':'Одягнути'):((L.cost||0)+' квитків');
+    el.append(img,n,h);
+    el.onclick=()=>tapLook(i);
+    wg.append(el);
   });
+}
+function tapLook(i){
+  if(lookOwned(i)){STATS.wear=i;lookIdx=i;saveStats();paintHero();paintCol();return}
+  const c=LOOKS[i].cost||0;
+  if((STATS.tickets|0)>=c){
+    STATS.tickets-=c;STATS.owned.push(i);STATS.wear=i;lookIdx=i;
+    STATS.looks=Math.max(STATS.looks||0,i);saveStats();audioOn();try{SFX.unlock()}catch(e){}
+    paintHero();paintCol();checkAch(false);return;
+  }
+  const wt=$('wardTix');if(!wt)return;wt.classList.add('tixflash');setTimeout(()=>wt.classList.remove('tixflash'),500);
 }
 function fillNewAchs(){
   const box=$('newAchs');if(!box)return;
@@ -735,10 +788,19 @@ function genStep(){
     if(Math.random()<GORDON_P){items.push({kind:'gordon',x:p.x+p.w/2,y:topY-30,t:0});lastItemStep=stepN;gordonOffered=true;gordonDecided=true}
   }else if(player.flyKind!=='gordon'&&!calm&&!p.vx&&type!=='minus'&&stepN-lastItemStep>20){const rr=Math.random();
     if(gs>250000&&gs-lastExpressGs>200000&&rr<.006+.01*ramp(gs,250000,800000)){items.push({kind:'express',x:p.x+p.w/2,y:topY-26,t:0});lastItemStep=stepN;lastExpressGs=gs}}
-  const bc=calm?0:z.cities?.34:gs<50000?0:.05+.15*ramp(gs,50000,700000);
+  if(gs>12000&&!calm&&type==='normal'&&!p.vx&&player.fly<=0&&stepN-lastTicketStep>=8&&Math.random()<(.10+.06*ramp(gs,20000,500000))){
+    items.push({kind:'ticket',x:p.x+p.w/2,y:topY-26,t:0});lastTicketStep=stepN;
+  }
+  if(!calm&&citySpawned.length<CITY_CAP&&gs>=CITY_FROM&&Math.random()<(.028+.03*ramp(gs,CITY_FROM,750000))){
+    const left=CITIES.filter(c=>citySpawned.indexOf(c)<0);
+    if(left.length){const lab=pick(left);citySpawned.push(lab);
+      const b=makePlat('breaking',topY+gap*rnd(.4,.6),lab,{city:true});
+      if(Math.abs((b.x+b.w/2)-(p.x+p.w/2))<110)b.x=((b.x+W/2)%Math.max(1,W-b.w-4))+2;
+      plats.push(b)}
+  }
+  const bc=calm?0:gs<50000?0:.05+.15*ramp(gs,50000,700000);
   if(Math.random()<bc){
-    const city=z.cities&&Math.random()<.7;
-    const b=makePlat('breaking',topY+gap*rnd(.4,.6),city?pick(CITIES):pick(FAKES),{city});
+    const b=makePlat('breaking',topY+gap*rnd(.4,.6),pick(FAKES),{city:false});
     if(Math.abs((b.x+b.w/2)-(p.x+p.w/2))<110)b.x=((b.x+W/2)%Math.max(1,W-b.w-4))+2;
     plats.push(b);
   }
@@ -804,7 +866,7 @@ function rankNow(){
 }
 function reset(){
   hateLog={};minusCnt=0;fakeCnt=0;
-  camY=0;bonus=0;zoneIdx=0;lookIdx=0;banner=null;cities=new Set();stomps=0;hat=false;cause='Впав у прірву скасування';causeKind='fall';recent=[];stepN=0;million=false;streak=0;mult=1;shownCnt={};lastItemStep=-99;lastExpressGs=-1e9;seenNew=new Set();
+  camY=0;bonus=0;zoneIdx=0;lookIdx=STATS.wear||0;banner=null;cities=new Set();citySpawned=[];stomps=0;hat=false;cause='Впав у прірву скасування';causeKind='fall';recent=[];stepN=0;million=false;streak=0;mult=1;shownCnt={};lastItemStep=-99;lastExpressGs=-1e9;lastTicketStep=-99;ticketsRun=0;seenNew=new Set();
   gordonDecided=false;gordonBits=[];gordonTitle=0;gordonLastEdge=-1;gordonDeck=[];gordonDeckI=0;gordonCaught=false;gordonDemo=false;gordonMissed=false;gordonOffered=false;stopGordonMusic();
   toasts=[];toastNow=null;stompKind={};expressN=0;malorosN=0;threadHits=0;idlePeak=0;newAchs=[];hideAchPop();
   floats=[];plats=[];enemies=[];envs=[];items=[];waves=[];
@@ -851,8 +913,10 @@ function update(dt){
       if(prevB<=pl.y+3&&bot>=pl.y&&p.x+18>pl.x&&p.x-18<pl.x+pl.w){
         if(pl.type==='breaking'){
           pl.broken=true;sfx('break');if(mode==='play')fakeCnt++;
-          if(mode==='play'&&pl.city){cities.add(pl.label);addFloat('скасовано '+cities.size+' з 3',pl.x+pl.w/2,pl.y-8,'#b02020');
-            if(cities.size===3&&!hat){hat=true;sfx('unlock');bonus+=18000;pushToast('Хет-трик туру','+18 000');checkAchLive('hat')}}
+          if(mode==='play'&&pl.city){cities.add(pl.label);const n=cities.size;addFloat(n<=CITY_GOAL?('скасовано '+n+' з '+CITY_GOAL):('скасовано '+n),pl.x+pl.w/2,pl.y-8,'#b02020');
+            if(n===3){sfx('unlock');bonus+=8000;pushToast('Хет-трик туру','+8 000');checkAchLive()}
+            else if(n===7){sfx('unlock');bonus+=15000;pushToast('Сім залів','+15 000');checkAchLive()}
+            else if(n===12){hat=true;sfx('unlock');bonus+=25000;pushToast('Тур зірвано','+25 000');checkAchLive()}}
           continue;
         }
         p.y=pl.y-FEET;p.vy=pl.type==='spring'?-16.5:-10.3;p.sq=1;
@@ -870,8 +934,6 @@ function update(dt){
     if(zi!==zoneIdx){zoneIdx=zi;sfx('stage');const rw=6000*zi;bonus+=rw;pushToast('Етап '+(zi+1)+' / '+ZONES.length,ZONES[zi].name);checkAchLive('zone')}
     if(!recordShown&&bestAtStart>0&&score()>bestAtStart){recordShown=true;sfx('unlock');pushToast('Новий рекорд',fmt(score()))}
     if(!million&&score()>=1000000){million=true;pushToast('Жебрак-мільйонер','1 000 000');sfx('express');checkAchLive('mil')}
-    const li=lookAt(score());
-    if(li>lookIdx){lookIdx=li;sfx('unlock');pushToast('Новий образ',LOOKS[li].name);checkAchLive('look')}
   }
   if(clothZone!==zoneIdx)makeCloth(zoneIdx);
   for(const pl of plats){
@@ -908,10 +970,11 @@ function update(dt){
   for(const e of envs){e.vy=Math.min(3,e.vy+.03*dt);e.x+=e.vx*dt;e.y+=e.vy*dt;e.rot+=.04*dt;
     if(mode==='play'&&p.fly<=0&&!e.hit&&Math.abs(e.x-p.x)<24&&Math.abs(e.y-(p.y+22))<38){e.hit=true;sfx('hit');breakCombo(p);if(e.kind==='thread'){const pen=2000+zoneIdx*1000;bonus-=pen;threadHits++;addFloat('−'+fmt(pen),p.x,p.y-30,'#3c434e',14)}else{p.vy=Math.max(p.vy,4);addFloat('−стрибок',p.x,p.y-30,'#b02020',14)}}}
   envs=envs.filter(e=>!e.hit&&e.y-camY<H+40);
-  for(const it of items){it.t+=.07*dt;if(mode==='play'&&!seenNew.has(it.kind)&&it.y-camY>30&&it.y-camY<H-40){seenNew.add(it.kind);pushToast('Новий бонус',it.kind==='gordon'?'В гостях у Гордона':'Шакалячий експрес')}
+  for(const it of items){it.t+=.07*dt;if(mode==='play'&&!seenNew.has(it.kind)&&it.y-camY>30&&it.y-camY<H-40){seenNew.add(it.kind);pushToast('Новий бонус',it.kind==='gordon'?'В гостях у Гордона':it.kind==='ticket'?'Квиток на концерт':'Шакалячий експрес')}
     const reach=it.kind==='gordon'?90:30,yreach=it.kind==='gordon'?52:44;
     if(mode==='play'&&!it.got&&Math.abs(it.x-p.x)<reach&&Math.abs(it.y-(p.y+22))<yreach){it.got=1;
     if(it.kind==='gordon'){gordonCaught=true;sfx('gordonGet');beginGordon(p);checkAchLive('gordon')}
+    else if(it.kind==='ticket'){STATS.tickets=(STATS.tickets|0)+1;ticketsRun++;saveStats();sfx('ticket');addFloat('+квиток',it.x,it.y-12,'#8f5f08',13);paintTickets()}
     else if(p.flyKind!=='gordon'){p.fly=EXPRESS_FLY;p.flyMax=EXPRESS_FLY;p.flyKind='express';sfx('express');sfx('whoosh');bonus+=12000;expressN++;pushToast('Шакалячий експрес','+12 000');checkAchLive('express')}}}
   items=items.filter(it=>{if(it.kind==='gordon'&&!it.got&&it.y-camY>=H+40){gordonMissed=true;checkAchLive('gmiss')}return !it.got&&it.y-camY<H+40});
   for(const w of waves){w.r+=4*dt;w.life-=.03*dt}waves=waves.filter(w=>w.life>0);
@@ -1123,7 +1186,7 @@ function drawItem(it){
     if(gimg){ctx.save();ctx.imageSmoothingEnabled=true;ctx.beginPath();ctx.arc(it.x,y,16,0,7);ctx.clip();ctx.drawImage(gimg,it.x-18,y-18,36,36);ctx.restore()}
     return;
   }
-  const s=ROCKET_SPR;
+  const s=it.kind==='ticket'?TICKET_SPR:ROCKET_SPR;
   ctx.drawImage(s,Math.round(it.x-s.width/2),Math.round(y-s.height/2));
 }
 function drawGordonBits(){
@@ -1286,6 +1349,7 @@ function gameOver(){
   const L=LOOKS[lookIdx];$('look').textContent=L.name;$('look').className='look'+(L.gold?' gold':'');
   runRank=rankNow();$('rankMini').textContent=runRank;
   saveRun();checkAch(true);fillNewAchs();
+  const ot=$('overTix');if(ot)ot.textContent=ticketsRun?'Квитки цього забігу +'+ticketsRun+' · усього '+fmt(STATS.tickets):'Квитки: '+fmt(STATS.tickets);
   fillHatePanel();
   const sc=scene(causeKind,lookIdx);$('endImg').src=sc.toDataURL();shareCard=makeCard(sc,s);$('shareImg').hidden=true;
   $('zoneReached').textContent='Етап '+(zoneIdx+1)+' / '+ZONES.length+' · '+ZONES[zoneIdx].name;
@@ -1310,7 +1374,7 @@ function fillHatePanel(){
   $('hateExtra').innerHTML='<span>Розібрано хейтерів: <b>'+stomps+'</b></span><span>Відписок: <b>'+minusCnt+'</b></span><span>Фейків: <b>'+fakeCnt+'</b></span>';
 }
 let bestAtStart=0,recordShown=false;
-function start(){reset();bestAtStart=best;recordShown=false;mode='play';$('startScr').hidden=true;$('colScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=true;showPlayHud(true);$('score').textContent='0';$('best').textContent=fmt(best);pushToast('Етап 1 / '+ZONES.length,ZONES[0].name);syncBgm()}
+function start(){reset();bestAtStart=best;recordShown=false;mode='play';$('startScr').hidden=true;$('colScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=true;showPlayHud(true);$('score').textContent='0';$('best').textContent=fmt(best);paintTickets();pushToast('Етап 1 / '+ZONES.length,ZONES[0].name);syncBgm()}
 let yellT=null;
 function showYell(){
   $('startScr').hidden=true;$('colScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=false;
@@ -1325,7 +1389,7 @@ document.querySelectorAll('.tabs').forEach(t=>t.addEventListener('click',e=>{
   card.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
   card.querySelectorAll('[data-panel]').forEach(p=>{p.hidden=p.dataset.panel!==b.dataset.tab});
 }));
-function showBestStart(){$('bestStart').textContent=fmt(best);$('bestLine').hidden=!(best>0)}
+function showBestStart(){$('bestStart').textContent=fmt(best);$('bestLine').hidden=!(best>0);paintTickets()}
 showBestStart();
 $('demoBtn').onclick=function(e){
   e.stopPropagation();this.blur();
@@ -1384,17 +1448,6 @@ $('shareBtn').onclick=async function(){
   }catch(e){if(e&&e.name==='AbortError')return}
   shareHint('Текст скопійовано');
 };
-$('saveBtn').onclick=async function(){
-  if(!shareCard)return;
-  const blob=await cardBlob();
-  if(!blob){showImgFallback();return}
-  if(DL){try{await DL.save({filename:'redka-jump.png',data:blob});shareHint('Картинку збережено');return}catch(e){if(e&&e.code==='declined')return}}
-  try{
-    const a=document.createElement('a'),url=URL.createObjectURL(blob);
-    a.href=url;a.download='redka-jump.png';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),2000);shareHint('Картинку збережено');
-  }catch(e){showImgFallback()}
-};
 $('muteBtn').onclick=function(e){
   e.stopPropagation();muted=!muted;try{localStorage.setItem('redkaMute',muted?'1':'0')}catch(err){}
   paintMute();
@@ -1441,14 +1494,14 @@ document.addEventListener('visibilitychange',()=>{
 });
 
 loadFaces();loadEnds();loadAchs();loadBackgrounds();
-resize();reset();$('best').textContent=fmt(best);paintAchCount();
+resize();reset();$('best').textContent=fmt(best);paintAchCount();paintTickets();paintHero();showBestStart();
 function jumpTo(gs){
   const y=player0-gs/SC;player.y=y;camY=y-H*.45;
   plats=[];items=[];enemies=[];envs=[];
   const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
   topY=player.y+FEET+2;while(topY>camY-280)genStep();
 }
-window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r}};
+window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,tapLook,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get cities(){return cities},get citySpawned(){return citySpawned},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r}};
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode!=='over')update(dt);draw();requestAnimationFrame(loop)}
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});
