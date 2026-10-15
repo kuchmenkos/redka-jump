@@ -211,7 +211,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
           <span class="ic"><span class="badge">×5</span></span><span><b>Комбо</b> — нові ярлики без пауз</span>
           <span class="ic"><span class="badge red">3 / 7 / 12</span></span><span><b>Скасовані міста туру</b> — три, сім або дванадцять залів</span>
           <span class="ic"><span class="badge gold">???</span></span><span>Після <b>300 000</b> інколи заходить гість</span>
-          <span class="ic"><span class="badge gold">КВИТОК</span></span><span><b>Квитки</b> — збирай і купуй луки в гардеробі</span>
+          <span class="ic"><img id="icTicket" alt=""></span><span><b>Квитки</b> — збирай і купуй луки в гардеробі</span>
         </div>
       </div>
     </div>
@@ -492,6 +492,7 @@ function paintIcons(){
   paintHero();
   for(const [id,k] of [['icStuk','stuk'],['icKoms','koms'],['icThreads','threads'],['icLang','lang'],['icCancel','cancel']]){const el=$(id);if(el)el.src=enemyChar(k).c.toDataURL()}
   const r=$('icRocket');if(r)r.src=ROCKET_SPR.toDataURL();
+  const t=$('icTicket');if(t)t.src=TICKET_SPR.toDataURL();
 }
 paintIcons();
 
