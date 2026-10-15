@@ -66,10 +66,6 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .cta:active{transform:translateY(3px);box-shadow:0 1px 0 #1a6b32}
 .bestline{margin:-2px 0 0;font-size:12px;font-weight:700;color:var(--muted)}
 .bestline b{color:var(--ink)}
-.hoprow{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;margin:2px 0 0;font-size:12px;font-weight:800;color:var(--muted)}
-.hoprow button{flex:none;min-width:0;width:32px;height:32px;padding:0;font-size:13px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line)}
-.hoprow button[aria-pressed="true"]{background:var(--ink);color:var(--card);box-shadow:none}
-.hophint{margin:-2px 0 0}
 .achbtn{width:100%;flex:none;min-width:0;padding:10px;font-size:14px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line)}
 .achbtn b{font-family:var(--pixel);font-size:11px;font-weight:400}
 .achgrid,.wardgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left;max-height:min(52vh,380px);overflow-y:auto}
@@ -146,14 +142,6 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
       <p class="sub">Що більше наїжджають — то вище стрибає.</p>
       <button id="playBtn" class="cta">Стрибати</button>
       <p class="bestline" id="bestLine" hidden>Рекорд: <b id="bestStart">0</b></p>
-      <p class="hoprow" id="hopRow">Стрибок «ОП»
-        <button type="button" class="hop" data-hop="1" aria-pressed="true" aria-label="ОП бадьорий">1</button>
-        <button type="button" class="hop" data-hop="2" aria-pressed="false" aria-label="ОП писклявий">2</button>
-        <button type="button" class="hop" data-hop="3" aria-pressed="false" aria-label="ОП басовитий">3</button>
-        <button type="button" class="hop" data-hop="4" aria-pressed="false" aria-label="Але-оп театральний">4</button>
-        <button type="button" class="hop" data-hop="5" aria-pressed="false" aria-label="Оп-оп цирковий">5</button>
-      </p>
-      <p class="fine hophint">1 бадьорий · 2 писклявий · 3 басовитий · 4 але-оп · 5 оп-оп</p>
       <button id="colBtn" class="achbtn" type="button">Досягнення <b id="achCount">0/20</b></button>
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" data-tab="how" aria-selected="true">Як грати</button>
@@ -171,10 +159,10 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
           <span class="ic"><span class="patch worn" style="background:#2ea043"></span></span><span>Ярлик відклеюється після двох стрибків</span>
         </div>
         <div class="legend" role="tabpanel" data-panel="haters" hidden>
-          <span class="ic"><img id="icStuk" alt=""></span><span><b>Стукач</b> — скарги збивають стрибок</span>
-          <span class="ic"><img id="icThreads" alt=""></span><span><b>Тредс-блогер</b> — треди мінусують рахунок</span>
-          <span class="ic"><img id="icLang" alt=""></span><span><b>Мовна інспекторка</b> — криком штовхає вбік</span>
-          <span class="ic"><img id="icCancel" alt=""></span><span><b>Скасовувач</b> — штампує «СКАСОВАНО»</span>
+          <span class="ic"><img id="icStuk" alt=""></span><span><b>Стукач</b> — скарги збивають стрибок; топчи зверху</span>
+          <span class="ic"><img id="icThreads" alt=""></span><span><b>Тредс-блогер</b> — треди мінусують рахунок; топчи зверху</span>
+          <span class="ic"><img id="icLang" alt=""></span><span><b>Мовна інспекторка</b> — криком штовхає вбік; топчи зверху</span>
+          <span class="ic"><img id="icCancel" alt=""></span><span><b>Скасовувач</b> — штампує «СКАСОВАНО»; топчи зверху</span>
           <span class="ic"><img id="icKoms" alt=""></span><span><b>Комсомол</b> — цькує; топчи зверху</span>
         </div>
         <div class="legend" role="tabpanel" data-panel="bonus" hidden>
@@ -249,10 +237,8 @@ const PX=3;
 
 /* ---------- sound ---------- */
 let AC=null,muted=false,bgmOn=true,bgmAudio=null,bgmPrimed=false;try{muted=localStorage.getItem('redkaMute')==='1'}catch(e){}try{bgmOn=localStorage.getItem('redkaBgm')!=='0'}catch(e){}
-let hopChoice=1;try{const h=+localStorage.getItem('redkaHop');if(h>=1&&h<=5)hopChoice=h}catch(e){}
-const BGM_VOL=.7,DEMO=true,HOP_N=5,HOP_VOL=.5;
-const hopBufs=Array(HOP_N+1).fill(null);let hopLoading=false,hopSrc=null;
-function audioOn(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();loadGordonBuf();loadHopBufs()}catch(e){}}
+const BGM_VOL=.7,DEMO=true;
+function audioOn(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();loadGordonBuf()}catch(e){}}
 function tone(type,f0,f1,dur,vol,delay){
   if(!AC||muted)return;const t=AC.currentTime+(delay||0),o=AC.createOscillator(),g=AC.createGain();
   o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(30,f1),t+dur);
@@ -264,49 +250,27 @@ function noise(dur,vol,cut){
   const src=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();src.buffer=b;f.type='lowpass';f.frequency.value=cut;g.gain.value=vol;
   src.connect(f);f.connect(g);g.connect(AC.destination);src.start();
 }
-function playBuf(buf,rate,vol){
-  if(!AC||muted||!buf)return null;
-  const g=AC.createGain();g.gain.value=vol;
-  const src=AC.createBufferSource();src.buffer=buf;src.playbackRate.value=rate||1;
-  src.connect(g);g.connect(AC.destination);src.start(0);return src;
-}
-function loadSfxBuf(url,assign){
-  if(!AC)return;
-  fetch(url).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>AC.decodeAudioData(b.slice(0))).then(assign).catch(()=>{});
-}
-function loadHopBufs(){
-  if(!AC||hopLoading)return;hopLoading=true;
-  for(let i=1;i<=HOP_N;i++){if(!hopBufs[i])loadSfxBuf('art/sfx/hop-'+i+'.mp3',buf=>{hopBufs[i]=buf})}
-}
-function stopHop(){if(hopSrc){try{hopSrc.stop()}catch(e){}hopSrc=null}}
-function playHop(n){
-  if(!AC||muted)return;
-  const i=n||hopChoice,buf=hopBufs[i];
-  stopHop();
-  if(buf){const src=playBuf(buf,1,HOP_VOL);hopSrc=src;if(src)src.onended=()=>{if(hopSrc===src)hopSrc=null};return}
-  tone('sine',320,720,.13,.12);
-}
 const SFX={
-  jump:()=>playHop(hopChoice),
-  spring:()=>{tone('sine',220,1300,.38,.14);tone('triangle',440,1800,.3,.05,.04)},
-  minus:()=>{tone('sawtooth',420,330,.22,.07);tone('sawtooth',330,180,.38,.07,.22)},
-  break:()=>{noise(.18,.25,1800);tone('square',300,90,.12,.04)},
-  peel:()=>{noise(.12,.14,2400);tone('triangle',620,180,.16,.05);tone('square',190,70,.1,.035,.04)},
-  stomp:()=>{tone('square',220,60,.16,.12);noise(.08,.15,900)},
-  hit:()=>{tone('triangle',700,180,.28,.12);noise(.1,.08,3000)},
-  unlock:()=>[523,659,784,1046].forEach((f,i)=>tone('square',f,f,.1,.06,i*.08)),
-  stage:()=>{tone('triangle',784,784,.16,.1);tone('triangle',1175,1175,.3,.1,.14)},
-  combo:()=>{tone('triangle',659,784,.1,.055);tone('sine',988,1175,.16,.045,.06)},
-  breakCombo:()=>{tone('sine',420,180,.28,.06);tone('triangle',330,110,.32,.045,.08)},
-  whoosh:()=>{noise(.32,.12,900);tone('sawtooth',180,60,.28,.035)},
-  gordonGet:()=>{[784,988,1175,1568].forEach((f,i)=>tone('sine',f,f,.09,.045,i*.05));tone('triangle',2093,2093,.2,.05,.2)},
-  spawn:()=>{tone('square',880,660,.06,.035);tone('triangle',1320,990,.08,.025,.04)},
-  fall:()=>tone('sine',900,70,1.1,.14),
-  rocket:()=>{noise(.6,.18,1200);tone('sawtooth',120,900,.6,.06)},
-  express:()=>{[392,523,659,784,1046,1318].forEach((f,i)=>tone('square',f,f,.14,.07,i*.09));tone('triangle',1568,1568,.6,.08,.55)},
-  shout:()=>{tone('square',180,140,.25,.09);tone('square',240,190,.2,.06,.05)},
-  stamp:()=>{tone('square',150,60,.12,.12);noise(.06,.2,600)},
-  lose:()=>{tone('square',330,110,.5,.1);noise(.3,.12,700)}
+  jump:()=>{const j=Math.random()*40-20;tone('sine',400+j,680+j,.09,.055);tone('triangle',560+j,840+j,.07,.025,.015)},
+  spring:()=>{tone('sine',240,980,.26,.08);tone('triangle',480,1400,.2,.03,.03)},
+  minus:()=>{tone('sine',380,280,.18,.05);tone('triangle',300,160,.28,.04,.16)},
+  break:()=>{noise(.14,.16,1600);tone('sine',240,80,.1,.03)},
+  peel:()=>{noise(.08,.08,2000);tone('triangle',520,160,.12,.035)},
+  stomp:()=>{tone('sine',190,70,.11,.07);noise(.05,.08,650)},
+  hit:()=>{tone('triangle',480,150,.16,.05);noise(.05,.04,1800)},
+  unlock:()=>[523,659,784].forEach((f,i)=>tone('sine',f,f,.08,.04,i*.07)),
+  stage:()=>{tone('triangle',784,784,.12,.06);tone('triangle',1175,1175,.2,.055,.1)},
+  combo:()=>{tone('triangle',659,784,.08,.04);tone('sine',988,1175,.12,.03,.05)},
+  breakCombo:()=>{tone('sine',380,160,.22,.045);tone('triangle',280,110,.24,.03,.06)},
+  whoosh:()=>{noise(.22,.08,800);tone('sine',160,70,.2,.025)},
+  gordonGet:()=>{[784,988,1175].forEach((f,i)=>tone('sine',f,f,.08,.035,i*.05));tone('triangle',1568,1568,.16,.04,.16)},
+  spawn:()=>tone('sine',760,620,.05,.022),
+  fall:()=>tone('sine',720,70,.85,.1),
+  rocket:()=>{noise(.4,.1,1000);tone('sine',140,520,.4,.04)},
+  express:()=>{[392,523,659,784,1046].forEach((f,i)=>tone('triangle',f,f,.1,.045,i*.08));tone('sine',1318,1318,.4,.05,.42)},
+  shout:()=>{tone('triangle',260,140,.14,.045);tone('sine',220,130,.12,.03,.03)},
+  stamp:()=>{tone('sine',150,70,.09,.06);noise(.04,.1,500)},
+  lose:()=>{tone('sine',280,110,.4,.07);noise(.2,.08,600)}
 };
 const sfx=k=>{if(mode==='play'||k==='fall'||k==='lose')try{SFX[k]()}catch(e){}};
 
@@ -788,6 +752,15 @@ function addFloat(text,x,y,color,size){const t=floats.filter(f=>!f.puff);if(t.le
 function pushToast(top,text){if(toasts.length+(toastNow?1:0)>=5)toasts.shift();toasts.push({top,text})}
 function tickToast(dt){if(!toastNow&&toasts.length)toastNow=Object.assign({life:2.2,max:2.2},toasts.shift());if(toastNow){toastNow.life-=.012*dt;if(toastNow.life<=0)toastNow=null}}
 function breakCombo(p){if(mult>1){addFloat('комбо збито',p.x,p.y-10,'#6f5a52',13);sfx('breakCombo')}streak=0;mult=1}
+function stompHater(en,bounce){
+  const p=player,ey=en.y+Math.sin(en.t)*5;
+  en.dead=true;sfx('stomp');
+  if(bounce){p.vy=-12;p.sq=1}
+  bonus+=2500;stomps++;stompKind[en.kind]=(stompKind[en.kind]||0)+1;
+  addFloat('+2500',en.x,ey-40,'#1a7a32');
+  const q=STOMP_Q[en.kind];if(q)addFloat(pick(q),en.x,ey-58,'#1a7a32',13);
+  checkAchLive();
+}
 
 function update(dt){
   tick+=dt;
@@ -858,10 +831,11 @@ function update(dt){
         else if(en.kind==='threads'){sayHate(en);envs.push({x:en.x,y:ey+10,vx:(p.x-en.x)*.003,vy:1,rot:0,kind:'thread'});en.cool=rnd(161,210)-en.d*70}
         else en.cool=999;
       }}
-    if(mode==='play'&&p.fly>0&&Math.abs(en.x-p.x)<36&&Math.abs(ey-(p.y+22))<46){en.dead=true;sfx('stomp');bonus+=2500;stomps++;stompKind[en.kind]=(stompKind[en.kind]||0)+1;addFloat('+2500',en.x,ey-40,'#1a7a32');continue}
-    if(mode==='play'&&Math.abs(en.x-p.x)<32&&Math.abs(ey-(p.y+22))<42){
-      if(p.vy>0&&p.y+FEET<ey+2){en.dead=true;sfx('stomp');p.vy=-12;p.sq=1;bonus+=2500;stomps++;stompKind[en.kind]=(stompKind[en.kind]||0)+1;addFloat('+2500',en.x,ey-40,'#1a7a32')}
-      else{cause=ENEMIES[en.kind].cause;causeKind=en.kind;gameOver();return}
+    const ch=enemyChar(en.kind),etop=ey-ch.cy/ch.k;
+    if(mode==='play'&&p.fly>0&&Math.abs(en.x-p.x)<36&&Math.abs(ey-(p.y+22))<46){stompHater(en,false);continue}
+    if(mode==='play'&&Math.abs(en.x-p.x)<34){
+      if(p.vy>0&&prevB<=etop+10&&bot>=etop-2){stompHater(en,true);continue}
+      if(Math.abs(ey-(p.y+22))<42){cause=ENEMIES[en.kind].cause;causeKind=en.kind;gameOver();return}
     }
   }
   for(const e of envs){e.vy=Math.min(3,e.vy+.03*dt);e.x+=e.vx*dt;e.y+=e.vy*dt;e.rot+=.04*dt;
@@ -1263,13 +1237,6 @@ document.querySelectorAll('.tabs').forEach(t=>t.addEventListener('click',e=>{
 }));
 function showBestStart(){$('bestStart').textContent=fmt(best);$('bestLine').hidden=!(best>0)}
 showBestStart();
-function paintHop(){document.querySelectorAll('[data-hop]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.hop===hopChoice)))}
-paintHop();
-$('hopRow').addEventListener('click',e=>{
-  const b=e.target.closest('[data-hop]');if(!b)return;
-  hopChoice=+b.dataset.hop;try{localStorage.setItem('redkaHop',String(hopChoice))}catch(err){}
-  paintHop();audioOn();playHop(hopChoice);
-});
 $('demoBtn').onclick=function(e){
   e.stopPropagation();this.blur();
   if(mode!=='play'||player.flyKind==='gordon')return;
@@ -1325,7 +1292,7 @@ $('shareBtn').onclick=function(){
 $('muteBtn').onclick=function(e){
   e.stopPropagation();muted=!muted;try{localStorage.setItem('redkaMute',muted?'1':'0')}catch(err){}
   paintMute();
-  if(muted){stopHop();if(gordonGain)gordonGain.gain.value=0;if(gordonAudio)gordonAudio.pause();if(bgmAudio)bgmAudio.pause();return}
+  if(muted){if(gordonGain)gordonGain.gain.value=0;if(gordonAudio)gordonAudio.pause();if(bgmAudio)bgmAudio.pause();return}
   audioOn();SFX.jump();
   if(gordonGain)gordonGain.gain.value=GORDON_VOL;
   if(player&&player.flyKind==='gordon'&&player.fly>0&&!gordonSrc){
@@ -1375,7 +1342,7 @@ function jumpTo(gs){
   const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
   topY=player.y+FEET+2;while(topY>camY-280)genStep();
 }
-window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},get hop(){return hopChoice},get hopReady(){return hopBufs.slice(1).every(Boolean)},playHop,SFX,setHop(n){if(n>=1&&n<=HOP_N){hopChoice=n;paintHop()}},setInput(l,r){input.l=!!l;input.r=!!r}};
+window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},SFX,setInput(l,r){input.l=!!l;input.r=!!r}};
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode!=='over')update(dt);draw();requestAnimationFrame(loop)}
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});
