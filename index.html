@@ -132,8 +132,9 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .about{display:flex;flex-direction:column;gap:8px;text-align:left;font-size:12.5px;font-weight:600;line-height:1.4;color:var(--muted)}
 .about p{margin:0}
 .about p b{color:var(--ink);font-weight:800}
-.threads{pointer-events:auto;touch-action:manipulation;-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto;cursor:pointer;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--ink);font-weight:800;font-size:15px;padding:10px 12px;min-height:44px;background:var(--well);box-shadow:inset 0 0 0 2px var(--card-line);border-radius:10px}
-.threads svg{width:22px;height:22px;flex:none;pointer-events:none}
+.extchip{pointer-events:auto;touch-action:manipulation;-webkit-touch-callout:default;user-select:auto;-webkit-user-select:auto;cursor:pointer;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--ink);font-weight:800;font-size:15px;padding:10px 12px;min-height:44px;background:var(--well);box-shadow:inset 0 0 0 2px var(--card-line);border-radius:10px;width:100%;flex:none;box-sizing:border-box}
+.extchip svg{width:22px;height:22px;flex:none;pointer-events:none}
+button.extchip{font-family:var(--body)}
 .about .fine{margin:0}
 .patch.fake{background:rgba(255,248,240,.9);outline:1.5px dashed #e53935;outline-offset:-2px}
 .patch.worn{opacity:.7;outline-color:rgba(255,255,255,.35)}
@@ -251,8 +252,12 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
         </div>
         <div class="about" role="tabpanel" data-panel="about" hidden>
           <p><b>Фанатська пародія-стрибалка.</b> Редька лізе хронологією кенселів. Рахунок — підписники з хейту. Тицяй половину екрана, ярлик тримає два стрибки, хейтерів топчеш зверху, квитки — в гардероб.</p>
+          <button type="button" class="extchip" id="gameLinkBtn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3.9 12a5 5 0 0 1 5-5h4v2h-4a3 3 0 1 0 0 6h4v2h-4a5 5 0 0 1-5-5m7.1 1h4v-2h-4zm5.1-6h4a5 5 0 0 1 0 10h-4v-2h4a3 3 0 1 0 0-6h-4z"/></svg>
+            <span id="gameLinkLbl">Посилання на гру</span>
+          </button>
           <p>Я люблю розказувати історії в Тредс і готую нові кльові релізи. Якщо гра зайшла — підпишись, там буде першим.</p>
-          <a class="threads" href="https://www.threads.com/@saintfame23/" target="_blank" rel="noopener noreferrer">
+          <a class="extchip threads" href="https://www.threads.com/@saintfame23/" target="_blank" rel="noopener noreferrer">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32L7.734 7.847c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221z"/></svg>
             @saintfame23
           </a>
@@ -1562,7 +1567,18 @@ function makeCard(sc,s){
   g.fillStyle='#d63434';g.font='800 34px Manrope, sans-serif';g.fillText('Побий мій рекорд!',540,1280);
   return c;
 }
-const gameUrl=()=>/^https?:/.test(location.protocol)?' '+location.origin+location.pathname:'';
+const GAME_LINK='https://kuchmenkos.github.io/redka-jump/';
+function liveGameUrl(){
+  if(/^https?:/.test(location.protocol)&&!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){
+    return location.origin+location.pathname.replace(/index\.html$/,'');
+  }
+  return GAME_LINK;
+}
+const gameUrl=()=>' '+liveGameUrl();
+function copyText(txt){
+  try{if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(txt)}catch(e){}
+  return new Promise((res,rej)=>{try{const t=document.createElement('textarea');t.value=txt;t.setAttribute('readonly','');t.style.cssText='position:fixed;left:-9999px';document.body.appendChild(t);t.select();const ok=document.execCommand('copy');t.remove();ok?res():rej()}catch(e){rej(e)}});
+}
 function shareText(){
   const top=hateTop()[0],s=$('finalScore').textContent;
   const hook=top?'Редьку назвали «'+top[0].toLowerCase()+'» '+top[1]+' '+plural(top[1],'раз','рази','разів')+', а він все одно набрав '+s+' підписників.':'Редька набрав '+s+' підписників на хейті.';
@@ -1607,12 +1623,18 @@ document.addEventListener('click',e=>{
 paintMute();paintBgm();
 
 function setPtr(){input.l=false;input.r=false;const r=wrap.getBoundingClientRect();for(const x of pointers.values()){if(x-r.left<r.width/2)input.l=true;else input.r=true}if(mode==='play')noteSteer()}
-wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.card,.menu,.soundchip,.demo,.achbtn,.threads,#menuBtn,#yellScr,#pauseScr'))return;audioOn();pointers.set(e.pointerId,e.clientX);setPtr()});
+wrap.addEventListener('pointerdown',e=>{if(e.target.closest('.card,.menu,.soundchip,.demo,.achbtn,.extchip,.threads,#menuBtn,#yellScr,#pauseScr'))return;audioOn();pointers.set(e.pointerId,e.clientX);setPtr()});
 document.querySelectorAll('a.threads').forEach(a=>a.addEventListener('click',e=>{
   e.preventDefault();e.stopPropagation();
   const url=a.href;const w=window.open(url,'_blank','noopener,noreferrer');
   if(!w)location.assign(url);
 }));
+$('gameLinkBtn').addEventListener('click',e=>{
+  e.preventDefault();e.stopPropagation();
+  const url=liveGameUrl(),lbl=$('gameLinkLbl');
+  const done=ok=>{if(lbl)lbl.textContent=ok?'Скопійовано':'kuchmenkos.github.io/redka-jump';setTimeout(()=>{if(lbl)lbl.textContent='Посилання на гру'},1600)};
+  Promise.resolve(copyText(url)).then(()=>done(true)).catch(()=>done(false));
+});
 wrap.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('touchmove',e=>{if(!e.target.closest('.card'))e.preventDefault()},{passive:false});
 document.addEventListener('gesturestart',e=>e.preventDefault());
