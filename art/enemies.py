@@ -148,13 +148,25 @@ def cancel():
 
 
 def lang():
-    """Teal blazer + clipboard only. Head is art/faces/lang.png."""
+    """Teal blazer, clipboard, generic pixel head (no photo)."""
     g = G()
+    head(g)
+    # short dark hair, not a portrait
+    g.ell(10, 3.6, 6.4, 3.0, 'H', 'h', .4)
+    g.rect(4, 3, 15, 5, 'H')
+    g.rect(3, 6, 4, 9, 'H')
+    g.rect(15, 6, 16, 9, 'H')
+    face(g, mouth='shout', brows='angry')
+    # glasses
+    g.rect(5, 7, 8, 9, 'K')
+    g.rect(11, 7, 14, 9, 'K')
+    g.px(9, 8, 'K'); g.px(10, 8, 'K')
+    g.px(6, 8, 'W'); g.px(7, 8, 'K')
+    g.px(12, 8, 'W'); g.px(13, 8, 'K')
     neck(g, 13)
     g.ell(10, 19.5, 6.4, 5.0, 'X', 'x', .42)
     g.rect(8, 15, 12, 16, 'S')
     g.rect(9, 16, 11, 17, 'S')
-    # clipboard
     g.rect(2, 16, 5, 21, 'U')
     g.rect(3, 17, 5, 20, 'P')
     g.px(4, 16, 'Z')

@@ -10,11 +10,11 @@
 ## Структура
 
 - `index.html` — уся гра: звук, спрайти, рівні, фізика, рендер, стартовий, колекція і фінальний екрани.
-- `art/faces/` — піксельні обличчя персонажів (`felix`, `felix-fail` на фейлі, `felix-fly` у польоті, `stuk`, `koms`, `threads`, `lang`, `cancel`).
+- `art/faces/` — піксельні обличчя персонажів (`felix`, `felix-fail` на фейлі, `felix-fly` у польоті, `stuk`, `koms`, `threads`, `cancel`). Мовний патруль — лише піксельний спрайт.
 - `art/bg/` — ілюстровані фони семи етапів.
 - `art/achs/` — іконки досягнень (`art/achs/<id>.png`).
 - `art/gordon/` і `gordon-intro.mp3` — режим Гордона.
-- `art/ends/` — фінальні ілюстрації (`fall`, `stuk`, `threads`, `koms`, `cancel`, `lang`; без обличчя Фаріон).
+- `art/ends/` — фінальні ілюстрації (`fall`, `stuk`, `threads`, `koms`, `cancel`, `lang`).
 - `art/springy-lead.mp3` — фонова тема, цикл, гучність 0.7.
 - `art/looks.py` — сітки костюмів (`REDKA`, клоун, Одіссей). Унікальні луки мають `body` + `cut`; обличчя завжди `felix*.png`.
 - `art/enemies.py` — тіла хейтерів без піксельних голів (піксельна голова Скасовувача — лише fallback, якщо немає `cancel.png`).
