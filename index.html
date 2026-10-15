@@ -31,19 +31,21 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 .hud .val{font-family:var(--pixel);font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.2;padding-bottom:8px}
 .hud .combo{display:inline-block;margin:-2px 0 8px;padding:3px 7px;font-size:11px;font-weight:800;color:#fff;background:#1a7a32;border-radius:4px;transform:rotate(-4deg);box-shadow:0 2px 0 #0f4d1e}
 .hud .best{align-self:stretch;margin:0 -12px;padding:5px 10px 7px;font-size:10px;font-weight:800;color:var(--ink);background:linear-gradient(#ffe48a,#e2a91c);text-align:center}
-.hud .tixchip{position:absolute;left:50%;top:0;transform:translateX(-50%);pointer-events:none;display:flex;align-items:center;gap:5px;background:linear-gradient(#fff8e4,#f0d48a);color:#8f5f08;padding:5px 10px 5px 6px;border-radius:8px;box-shadow:0 3px 0 rgba(43,30,25,.28);outline:1.5px dashed rgba(143,95,8,.4);outline-offset:-4px;font-weight:800}
+.hud .tixchip{position:absolute;left:50%;top:0;transform:translateX(-50%);pointer-events:none;display:flex;align-items:center;gap:5px;background:var(--card);color:#8f5f08;padding:6px 12px 6px 8px;border-radius:10px;box-shadow:0 3px 0 rgba(43,30,25,.28);outline:2px dashed var(--card-line);outline-offset:-5px;font-weight:800}
 .hud .tixchip img{image-rendering:pixelated;height:22px;width:auto}
 .hud .tixchip .run{font-family:var(--pixel);font-size:12px;line-height:1}
 .hud .tixchip .wallet{font-size:10px;font-weight:700;opacity:.78}
 .hud .right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:auto;pointer-events:none}
-.menu{pointer-events:auto;flex:none;height:44px;min-width:44px;padding:0 12px;font-size:13px;font-weight:800;border-radius:10px;background:rgba(248,241,227,.92);color:var(--ink);box-shadow:0 3px 0 rgba(43,30,25,.28)}
-.steerhint{position:absolute;inset:0;z-index:3;pointer-events:none;display:flex;align-items:center;justify-content:space-between;padding:0 5%;opacity:0;transition:opacity .4s}
+.menu{pointer-events:auto;flex:none;height:44px;min-width:44px;padding:0 12px;font-size:13px;font-weight:800;border-radius:10px;background:var(--card);color:var(--ink);outline:2px dashed var(--card-line);outline-offset:-5px;box-shadow:0 3px 0 rgba(43,30,25,.28)}
+.steerhint{position:absolute;inset:0;z-index:3;pointer-events:none;display:flex;align-items:center;justify-content:space-between;padding:0 6%;opacity:0;transition:opacity .4s}
 .steerhint.on{opacity:1}
-.steerhint .arr{display:flex;flex-direction:column;align-items:center;gap:2px;width:28%;color:var(--ink);opacity:.28}
-.steerhint .arr b{font-size:64px;line-height:.9;font-weight:800}
-.steerhint .arr span{font-family:var(--body);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.demo{pointer-events:auto;flex:none;width:100%;min-width:0;padding:10px 12px;min-height:44px;font-size:13px;font-weight:800;border-radius:8px;background:linear-gradient(#ffe48a,#e2a91c);color:#2a1722;box-shadow:inset 0 0 0 1.5px #2a1722,0 2px 0 rgba(43,30,25,.35);letter-spacing:.04em}
-.demo:disabled{opacity:.45}
+.steerhint .arr{display:flex;flex-direction:column;align-items:center;gap:8px;width:28%;opacity:.72}
+.steerhint .arr i{display:block;width:76px;height:76px;border-radius:50%;background:rgba(248,241,227,.78);box-shadow:0 3px 0 rgba(43,30,25,.28);position:relative}
+.steerhint .arr i::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-style:solid;filter:drop-shadow(0 2px 0 #2a1722)}
+.steerhint .arr.l i::after{margin:-16px 0 0 -16px;border-width:16px 28px 16px 0;border-color:transparent #f8f1e3 transparent transparent}
+.steerhint .arr.r i::after{margin:-16px 0 0 -12px;border-width:16px 0 16px 28px;border-color:transparent transparent transparent #f8f1e3}
+.steerhint .arr span{font-family:var(--body);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#f8f1e3;text-shadow:0 1px 0 #2a1722,0 0 6px rgba(42,23,34,.85)}
+.achbtn.demo{color:#8f5f08;letter-spacing:.06em}
 .soundrow{display:flex;gap:8px}
 .soundchip{flex:1;min-width:0;min-height:48px;padding:10px 8px;font-size:14px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line)}
 .soundchip b{font-size:16px;margin-left:4px}
@@ -162,6 +164,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 #yellScr{z-index:7;background:rgba(43,30,25,.72)}
 .card.pause{gap:10px}
 .card.pause>button{flex:none;width:100%}
+.card.pause .eyebrow{margin-bottom:-4px}
 .card.yell{gap:12px;padding:28px 18px 24px;outline-color:var(--stamp);transform:rotate(-2deg);animation:yellIn .35s cubic-bezier(.2,1.4,.4,1),yellShake .4s .35s ease-in-out 4}
 .card.yell h2{font-family:var(--body);font-size:22px;line-height:1.3;color:var(--stamp);margin:0;font-weight:800;text-wrap:balance;letter-spacing:.04em}
 @keyframes yellIn{from{transform:scale(.55) rotate(-10deg);opacity:0}to{transform:scale(1) rotate(-2deg);opacity:1}}
@@ -187,8 +190,8 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
     </div>
   </div>
   <div class="steerhint" id="steerHint" hidden aria-hidden="true">
-    <div class="arr"><b>◀</b><span>тримай</span></div>
-    <div class="arr"><b>▶</b><span>тримай</span></div>
+    <div class="arr l"><i></i><span>тримай</span></div>
+    <div class="arr r"><i></i><span>тримай</span></div>
   </div>
   <div id="achPop" class="achpop" hidden>
     <img id="achPopImg" class="achpop-ico" alt="">
@@ -253,6 +256,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 
   <div class="overlay" id="pauseScr" hidden>
     <div class="card pause" role="dialog" aria-label="Пауза">
+      <p class="eyebrow">Пауза</p>
       <h1>Пауза</h1>
       <button id="resumeBtn" class="cta" type="button">Продовжити</button>
       <button id="pauseWardBtn" class="achbtn" type="button">Гардероб</button>
@@ -260,8 +264,8 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
         <button type="button" class="soundchip" data-mute aria-label="Вимкнути звук">Звук <b>♪</b></button>
         <button type="button" class="soundchip" data-bgm aria-label="Вимкнути музику">Музика <b>♫</b></button>
       </div>
-      <button id="pauseDemoBtn" class="demo" type="button" hidden aria-label="Демо: увімкнути режим Гордона">DEMO</button>
-      <button id="quitBtn" class="ghost" type="button">На старт</button>
+      <button id="pauseDemoBtn" class="achbtn demo" type="button" hidden aria-label="Демо: увімкнути режим Гордона">DEMO</button>
+      <button id="quitBtn" class="achbtn" type="button">На старт</button>
     </div>
   </div>
 
@@ -568,7 +572,7 @@ function bgCrop(g,i,x,y,w,h,wash){
 }
 
 /* ---------- achievements ---------- */
-function blankStats(){return {stomp:{stuk:0,koms:0,lang:0,cancel:0,threads:0},express:0,gordon:0,gordonMiss:0,labels:0,bestZone:0,looks:0,tickets:0,owned:[0],wear:0,death:{fall:0,stuk:0,koms:0,lang:0,cancel:0,threads:0},runs:0,fakes:0,minus:0,threads:0}}
+function blankStats(){return {stomp:{stuk:0,koms:0,lang:0,cancel:0,threads:0},express:0,gordon:0,gordonMiss:0,labels:0,bestZone:0,looks:0,tickets:0,owned:[0],wear:0,death:{fall:0,stuk:0,koms:0,lang:0,cancel:0,threads:0},runs:0,steerN:0,fakes:0,minus:0,threads:0}}
 let STATS=blankStats(),ACH_HAVE={};
 try{const s=JSON.parse(localStorage.getItem('redkaStats')||'null');if(s)STATS=Object.assign(blankStats(),s,{stomp:Object.assign(blankStats().stomp,s.stomp||{}),death:Object.assign(blankStats().death,s.death||{})})}catch(e){}
 try{ACH_HAVE=JSON.parse(localStorage.getItem('redkaAch')||'{}')||{}}catch(e){}
@@ -741,7 +745,7 @@ function showPlayHud(on){
   if(on){paintBestHud();paintTickets()}
   else hideSteer(false);
 }
-let steerDone=false,steerT=null;
+let steerDone=false,steerT=null,steerArmT=null,steerArmed=false;
 function hideSteer(fade){
   const el=$('steerHint');if(!el)return;
   clearTimeout(steerT);steerT=null;
@@ -753,14 +757,23 @@ function hideSteer(fade){
 function showSteer(){
   const el=$('steerHint');if(!el)return;
   clearTimeout(steerT);steerT=null;
-  if(steerDone||(STATS.runs|0)>=3){el.hidden=true;el.classList.remove('on');return}
+  if(steerDone||(STATS.steerN|0)>=3){el.hidden=true;el.classList.remove('on');return}
   el.hidden=false;
   requestAnimationFrame(()=>el.classList.add('on'));
   steerT=setTimeout(()=>{steerDone=true;hideSteer(true)},4000);
 }
+function armSteer(){
+  steerArmed=false;
+  clearTimeout(steerArmT);
+  steerArmT=setTimeout(()=>{steerArmed=true},500);
+}
 function noteSteer(){
-  if(steerDone||(STATS.runs|0)>=3)return;
-  if(input.l||input.r){steerDone=true;hideSteer(true)}
+  if(!steerArmed||steerDone||(STATS.steerN|0)>=3)return;
+  if(input.l||input.r){
+    steerDone=true;
+    STATS.steerN=(STATS.steerN|0)+1;saveStats();
+    hideSteer(true);
+  }
 }
 function ensureBgm(){
   if(bgmAudio)return bgmAudio;
@@ -1447,7 +1460,7 @@ function fillHatePanel(){
   $('hateExtra').innerHTML='<span>Розібрано хейтерів: <b>'+stomps+'</b></span><span>Відписок: <b>'+minusCnt+'</b></span><span>Фейків: <b>'+fakeCnt+'</b></span>';
 }
 let bestAtStart=0,recordShown=false,colBack='start';
-function start(){reset();bestAtStart=best;recordShown=false;mode='play';colBack='start';$('startScr').hidden=true;$('colScr').hidden=true;$('pauseScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=true;showPlayHud(true);$('score').textContent='0';$('combo').hidden=true;$('combo').textContent='';paintBestHud();paintTickets();steerDone=false;showSteer();pushToast('Етап 1 / '+ZONES.length,ZONES[0].name);syncBgm()}
+function start(){reset();bestAtStart=best;recordShown=false;mode='play';colBack='start';input.l=input.r=false;pointers.clear();$('startScr').hidden=true;$('colScr').hidden=true;$('pauseScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=true;showPlayHud(true);$('score').textContent='0';$('combo').hidden=true;$('combo').textContent='';paintBestHud();paintTickets();steerDone=false;armSteer();showSteer();pushToast('Етап 1 / '+ZONES.length,ZONES[0].name);syncBgm()}
 let yellT=null;
 function showYell(){
   $('startScr').hidden=true;$('colScr').hidden=true;$('pauseScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=false;
@@ -1468,7 +1481,7 @@ function openPause(){
 function resumePlay(){
   if(mode!=='pause')return;
   $('pauseScr').hidden=true;$('colScr').hidden=true;
-  mode='play';showPlayHud(true);showSteer();resumeGordonAudio();syncBgm();
+  mode='play';showPlayHud(true);showSteer();if(!steerDone)steerArmed=true;resumeGordonAudio();syncBgm();
 }
 function quitToStart(){
   hideAchPop();stopGordonMusic();gordonBits=[];
@@ -1622,7 +1635,7 @@ function jumpTo(gs){
   const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
   topY=player.y+FEET+2;while(topY>camY-280)genStep();
 }
-window.__g={get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,tapLook,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get cities(){return cities},get citySpawned(){return citySpawned},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get runs(){return STATS.runs},set runs(v){STATS.runs=v|0},get steerOn(){const el=$('steerHint');return !!(el&&!el.hidden&&el.classList.contains('on'))},hideSteer,showSteer,get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r;if(mode==='play')noteSteer()}};
+window.__g={get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,tapLook,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get cities(){return cities},get citySpawned(){return citySpawned},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get runs(){return STATS.runs},set runs(v){STATS.runs=v|0},get steerN(){return STATS.steerN|0},set steerN(v){STATS.steerN=v|0;saveStats()},get steerOn(){const el=$('steerHint');return !!(el&&!el.hidden&&el.classList.contains('on'))},get steerArmed(){return steerArmed},hideSteer,showSteer,armSteer,get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r;if(mode==='play')noteSteer()}};
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode==='play'){update(dt);draw()}requestAnimationFrame(loop)}
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});
