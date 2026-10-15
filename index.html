@@ -66,6 +66,10 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
 .cta:active{transform:translateY(3px);box-shadow:0 1px 0 #1a6b32}
 .bestline{margin:-2px 0 0;font-size:12px;font-weight:700;color:var(--muted)}
 .bestline b{color:var(--ink)}
+.hoprow{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;margin:2px 0 0;font-size:12px;font-weight:800;color:var(--muted)}
+.hoprow button{flex:none;min-width:0;width:32px;height:32px;padding:0;font-size:13px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line)}
+.hoprow button[aria-pressed="true"]{background:var(--ink);color:var(--card);box-shadow:none}
+.hophint{margin:-2px 0 0}
 .achbtn{width:100%;flex:none;min-width:0;padding:10px;font-size:14px;background:var(--well);color:var(--ink);box-shadow:inset 0 0 0 2px var(--card-line)}
 .achbtn b{font-family:var(--pixel);font-size:11px;font-weight:400}
 .achgrid,.wardgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left;max-height:min(52vh,380px);overflow-y:auto}
@@ -142,6 +146,14 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
       <p class="sub">Що більше наїжджають — то вище стрибає.</p>
       <button id="playBtn" class="cta">Стрибати</button>
       <p class="bestline" id="bestLine" hidden>Рекорд: <b id="bestStart">0</b></p>
+      <p class="hoprow" id="hopRow">Стрибок «ОП»
+        <button type="button" class="hop" data-hop="1" aria-pressed="true" aria-label="ОП бадьорий">1</button>
+        <button type="button" class="hop" data-hop="2" aria-pressed="false" aria-label="ОП писклявий">2</button>
+        <button type="button" class="hop" data-hop="3" aria-pressed="false" aria-label="ОП басовитий">3</button>
+        <button type="button" class="hop" data-hop="4" aria-pressed="false" aria-label="Але-оп театральний">4</button>
+        <button type="button" class="hop" data-hop="5" aria-pressed="false" aria-label="Оп-оп цирковий">5</button>
+      </p>
+      <p class="fine hophint">1 бадьорий · 2 писклявий · 3 басовитий · 4 але-оп · 5 оп-оп</p>
       <button id="colBtn" class="achbtn" type="button">Досягнення <b id="achCount">0/20</b></button>
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" data-tab="how" aria-selected="true">Як грати</button>
@@ -237,8 +249,10 @@ const PX=3;
 
 /* ---------- sound ---------- */
 let AC=null,muted=false,bgmOn=true,bgmAudio=null,bgmPrimed=false;try{muted=localStorage.getItem('redkaMute')==='1'}catch(e){}try{bgmOn=localStorage.getItem('redkaBgm')!=='0'}catch(e){}
-const BGM_VOL=.7,DEMO=true;
-function audioOn(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();loadGordonBuf()}catch(e){}}
+let hopChoice=1;try{const h=+localStorage.getItem('redkaHop');if(h>=1&&h<=5)hopChoice=h}catch(e){}
+const BGM_VOL=.7,DEMO=true,HOP_N=5,HOP_VOL=.5;
+const hopBufs=Array(HOP_N+1).fill(null);let hopLoading=false,hopSrc=null;
+function audioOn(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();loadGordonBuf();loadHopBufs()}catch(e){}}
 function tone(type,f0,f1,dur,vol,delay){
   if(!AC||muted)return;const t=AC.currentTime+(delay||0),o=AC.createOscillator(),g=AC.createGain();
   o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(30,f1),t+dur);
@@ -250,15 +264,43 @@ function noise(dur,vol,cut){
   const src=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();src.buffer=b;f.type='lowpass';f.frequency.value=cut;g.gain.value=vol;
   src.connect(f);f.connect(g);g.connect(AC.destination);src.start();
 }
+function playBuf(buf,rate,vol){
+  if(!AC||muted||!buf)return null;
+  const g=AC.createGain();g.gain.value=vol;
+  const src=AC.createBufferSource();src.buffer=buf;src.playbackRate.value=rate||1;
+  src.connect(g);g.connect(AC.destination);src.start(0);return src;
+}
+function loadSfxBuf(url,assign){
+  if(!AC)return;
+  fetch(url).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>AC.decodeAudioData(b.slice(0))).then(assign).catch(()=>{});
+}
+function loadHopBufs(){
+  if(!AC||hopLoading)return;hopLoading=true;
+  for(let i=1;i<=HOP_N;i++){if(!hopBufs[i])loadSfxBuf('art/sfx/hop-'+i+'.mp3',buf=>{hopBufs[i]=buf})}
+}
+function stopHop(){if(hopSrc){try{hopSrc.stop()}catch(e){}hopSrc=null}}
+function playHop(n){
+  if(!AC||muted)return;
+  const i=n||hopChoice,buf=hopBufs[i];
+  stopHop();
+  if(buf){const src=playBuf(buf,1,HOP_VOL);hopSrc=src;if(src)src.onended=()=>{if(hopSrc===src)hopSrc=null};return}
+  tone('sine',320,720,.13,.12);
+}
 const SFX={
-  jump:()=>tone('sine',320,720,.13,.12),
+  jump:()=>playHop(hopChoice),
   spring:()=>{tone('sine',220,1300,.38,.14);tone('triangle',440,1800,.3,.05,.04)},
   minus:()=>{tone('sawtooth',420,330,.22,.07);tone('sawtooth',330,180,.38,.07,.22)},
   break:()=>{noise(.18,.25,1800);tone('square',300,90,.12,.04)},
+  peel:()=>{noise(.12,.14,2400);tone('triangle',620,180,.16,.05);tone('square',190,70,.1,.035,.04)},
   stomp:()=>{tone('square',220,60,.16,.12);noise(.08,.15,900)},
   hit:()=>{tone('triangle',700,180,.28,.12);noise(.1,.08,3000)},
   unlock:()=>[523,659,784,1046].forEach((f,i)=>tone('square',f,f,.1,.06,i*.08)),
   stage:()=>{tone('triangle',784,784,.16,.1);tone('triangle',1175,1175,.3,.1,.14)},
+  combo:()=>{tone('triangle',659,784,.1,.055);tone('sine',988,1175,.16,.045,.06)},
+  breakCombo:()=>{tone('sine',420,180,.28,.06);tone('triangle',330,110,.32,.045,.08)},
+  whoosh:()=>{noise(.32,.12,900);tone('sawtooth',180,60,.28,.035)},
+  gordonGet:()=>{[784,988,1175,1568].forEach((f,i)=>tone('sine',f,f,.09,.045,i*.05));tone('triangle',2093,2093,.2,.05,.2)},
+  spawn:()=>{tone('square',880,660,.06,.035);tone('triangle',1320,990,.08,.025,.04)},
   fall:()=>tone('sine',900,70,1.1,.14),
   rocket:()=>{noise(.6,.18,1200);tone('sawtooth',120,900,.6,.06)},
   express:()=>{[392,523,659,784,1046,1318].forEach((f,i)=>tone('square',f,f,.14,.07,i*.09));tone('triangle',1568,1568,.6,.08,.55)},
@@ -732,7 +774,7 @@ function reset(){
 function addFloat(text,x,y,color,size){const t=floats.filter(f=>!f.puff);if(t.length>=3){const o=t[0];floats.splice(floats.indexOf(o),1)}floats.push({text,x,y,life:1,color:color||'#2a1722',size:size||14})}
 function pushToast(top,text){if(toasts.length+(toastNow?1:0)>=5)toasts.shift();toasts.push({top,text})}
 function tickToast(dt){if(!toastNow&&toasts.length)toastNow=Object.assign({life:2.2,max:2.2},toasts.shift());if(toastNow){toastNow.life-=.012*dt;if(toastNow.life<=0)toastNow=null}}
-function breakCombo(p){if(mult>1)addFloat('комбо збито',p.x,p.y-10,'#6f5a52',13);streak=0;mult=1}
+function breakCombo(p){if(mult>1){addFloat('комбо збито',p.x,p.y-10,'#6f5a52',13);sfx('breakCombo')}streak=0;mult=1}
 
 function update(dt){
   tick+=dt;
@@ -763,8 +805,8 @@ function update(dt){
         }
         p.y=pl.y-FEET;p.vy=pl.type==='spring'?-16.5:-10.3;p.sq=1;
         sfx(pl.type==='spring'?'spring':pl.type==='minus'&&!pl.visited?'minus':'jump');
-        pl.hits++;if(pl.hits>=pl.life){pl.broken=true;pl.peeled=true;sfx('break')}
-        if(!pl.visited&&mode==='play'){pl.visited=true;logHate(pl);if(/МАЛОРОС/.test(pl.label))malorosN++;if(pl.type!=='minus'){streak++;const nm=Math.min(5,1+Math.floor(streak/12));if(nm>mult){mult=nm;addFloat('КОМБО ×'+mult,p.x,pl.y-60,'#1a7a32',16);sfx('stage')}bonus+=100*mult}else breakCombo(p);if(pl.type==='spring'){bonus+=1800;addFloat(pick(SPRING_Q),p.x,pl.y-40,'#3d8a18')}
+        pl.hits++;if(pl.hits>=pl.life){pl.broken=true;pl.peeled=true;sfx('peel')}
+        if(!pl.visited&&mode==='play'){pl.visited=true;logHate(pl);if(/МАЛОРОС/.test(pl.label))malorosN++;if(pl.type!=='minus'){streak++;const nm=Math.min(5,1+Math.floor(streak/12));if(nm>mult){mult=nm;addFloat('КОМБО ×'+mult,p.x,pl.y-60,'#1a7a32',16);sfx('combo')}bonus+=100*mult}else breakCombo(p);if(pl.type==='spring'){bonus+=1800;addFloat(pick(SPRING_Q),p.x,pl.y-40,'#3d8a18')}
           if(pl.type==='minus'){bonus-=pl.pen;addFloat('−'+fmt(pl.pen),p.x,pl.y-40,'#3c434e',15);pl.dim=1}}
         break;
       }
@@ -794,7 +836,7 @@ function update(dt){
       if(en.cool<=0&&sy>40&&sy<H-60){sayHate(en);en.cool=rnd(147,189)-en.d*77;envs.push({x:en.x,y:ey+10,vx:(p.x-en.x)*.004,vy:1.2,rot:0})}
     }
     const esy=ey-camY,onScr=esy>30&&esy<H-40;
-    if(mode==='play'&&onScr&&!seenNew.has(en.kind)){seenNew.add(en.kind);pushToast('Новий хейтер',ENEMIES[en.kind].name);sfx('stage')}
+    if(mode==='play'&&onScr&&!seenNew.has(en.kind)){seenNew.add(en.kind);pushToast('Новий хейтер',ENEMIES[en.kind].name);sfx('spawn')}
     if(mode==='play'&&onScr&&en.kind!=='stuk'){en.cool-=dt;
       if(en.cool<=0){
         if(en.kind==='cancel'){let best=null,bd=1e9;for(const pl of plats){if(pl.broken||pl.type==='breaking'||pl.type==='spring'||pl.label==='ПЕРШИЙ ЖАРТ')continue;const dy=pl.y-ey;if(dy<-40||dy>200)continue;if(Math.abs(pl.y-(p.y+FEET))<50&&Math.abs(pl.x+pl.w/2-p.x)<pl.w/2+20)continue;const dd=Math.abs(pl.x+pl.w/2-en.x)+dy;if(dd<bd){bd=dd;best=pl}}
@@ -815,8 +857,8 @@ function update(dt){
   for(const it of items){it.t+=.07*dt;if(mode==='play'&&!seenNew.has(it.kind)&&it.y-camY>30&&it.y-camY<H-40){seenNew.add(it.kind);pushToast('Новий бонус',it.kind==='gordon'?'В гостях у Гордона':'Шакалячий експрес')}
     const reach=it.kind==='gordon'?90:30,yreach=it.kind==='gordon'?52:44;
     if(mode==='play'&&!it.got&&Math.abs(it.x-p.x)<reach&&Math.abs(it.y-(p.y+22))<yreach){it.got=1;
-    if(it.kind==='gordon'){gordonCaught=true;beginGordon(p);checkAchLive('gordon')}
-    else if(p.flyKind!=='gordon'){p.fly=EXPRESS_FLY;p.flyMax=EXPRESS_FLY;p.flyKind='express';sfx('express');bonus+=12000;expressN++;pushToast('Шакалячий експрес','+12 000');checkAchLive('express')}}}
+    if(it.kind==='gordon'){gordonCaught=true;sfx('gordonGet');beginGordon(p);checkAchLive('gordon')}
+    else if(p.flyKind!=='gordon'){p.fly=EXPRESS_FLY;p.flyMax=EXPRESS_FLY;p.flyKind='express';sfx('express');sfx('whoosh');bonus+=12000;expressN++;pushToast('Шакалячий експрес','+12 000');checkAchLive('express')}}}
   items=items.filter(it=>{if(it.kind==='gordon'&&!it.got&&it.y-camY>=H+40){gordonMissed=true;checkAchLive('gmiss')}return !it.got&&it.y-camY<H+40});
   for(const w of waves){w.r+=4*dt;w.life-=.03*dt}waves=waves.filter(w=>w.life>0);
   plats=plats.filter(pl=>pl.y-camY<H+80&&pl.alpha>0);enemies=enemies.filter(e=>e.y-camY<H+90);
@@ -1208,6 +1250,13 @@ document.querySelectorAll('.tabs').forEach(t=>t.addEventListener('click',e=>{
 }));
 function showBestStart(){$('bestStart').textContent=fmt(best);$('bestLine').hidden=!(best>0)}
 showBestStart();
+function paintHop(){document.querySelectorAll('[data-hop]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.hop===hopChoice)))}
+paintHop();
+$('hopRow').addEventListener('click',e=>{
+  const b=e.target.closest('[data-hop]');if(!b)return;
+  hopChoice=+b.dataset.hop;try{localStorage.setItem('redkaHop',String(hopChoice))}catch(err){}
+  paintHop();audioOn();playHop(hopChoice);
+});
 $('demoBtn').onclick=function(e){
   e.stopPropagation();this.blur();
   if(mode!=='play'||player.flyKind==='gordon')return;
@@ -1263,7 +1312,7 @@ $('shareBtn').onclick=function(){
 $('muteBtn').onclick=function(e){
   e.stopPropagation();muted=!muted;try{localStorage.setItem('redkaMute',muted?'1':'0')}catch(err){}
   paintMute();
-  if(muted){if(gordonGain)gordonGain.gain.value=0;if(gordonAudio)gordonAudio.pause();if(bgmAudio)bgmAudio.pause();return}
+  if(muted){stopHop();if(gordonGain)gordonGain.gain.value=0;if(gordonAudio)gordonAudio.pause();if(bgmAudio)bgmAudio.pause();return}
   audioOn();SFX.jump();
   if(gordonGain)gordonGain.gain.value=GORDON_VOL;
   if(player&&player.flyKind==='gordon'&&player.fly>0&&!gordonSrc){
@@ -1313,7 +1362,7 @@ function jumpTo(gs){
   const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
   topY=player.y+FEET+2;while(topY>camY-280)genStep();
 }
-window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},setInput(l,r){input.l=!!l;input.r=!!r}};
+window.__g={get mode(){return mode},get player(){return player},score,start,reset,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get bgmOn(){return bgmOn},get bgm(){return bgmAudio},get muted(){return muted},get hop(){return hopChoice},get hopReady(){return hopBufs.slice(1).every(Boolean)},playHop,SFX,setHop(n){if(n>=1&&n<=HOP_N){hopChoice=n;paintHop()}},setInput(l,r){input.l=!!l;input.r=!!r}};
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode!=='over')update(dt);draw();requestAnimationFrame(loop)}
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{plats.forEach(pl=>{pl.fs=fontFor(pl.label,pl.w-12)})});

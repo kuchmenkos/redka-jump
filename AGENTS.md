@@ -15,6 +15,7 @@
 - `art/achs/` — іконки досягнень (`art/achs/<id>.png`).
 - `art/gordon/` і `gordon-intro.mp3` — режим Гордона.
 - `art/springy-lead.mp3` — фонова тема, цикл, гучність 0.7.
+- `art/sfx/hop-1.mp3` … `hop-5.mp3` — голос «ОП» на стрибок; вибір у `localStorage` `redkaHop` (1–5, дефолт 1).
 - `*.py` — генератори піксельних сіток тіл і предметів.
 - `README.md` — баланс, пороги і де що лежить.
 
@@ -24,5 +25,6 @@
 - Інтро Гордона грає через WebAudio (`decodeAudioData`) після `audioOn()` на «Стрибати», гучність 0.7, швидкість 1.2. HTMLAudio лишається запасним і після прайму не ставиться на паузу (інакше iOS блокує пізній `play()`).
 - `DEMO=true` показує кнопку примусового режиму Гордона в HUD. DEMO не рахується в ачивку «Був у гостях».
 - Повідомлення про етапи, образи, хейтерів і ачивки йдуть чергою тостів під HUD. Плавальний текст лишається лише для «+2500» і комбо.
-- `localStorage`: `redkaBest`, `redkaMute`, `redkaBgm`, `redkaStats`, `redkaAch`.
+- `localStorage`: `redkaBest`, `redkaMute`, `redkaBgm`, `redkaHop`, `redkaStats`, `redkaAch`.
+- Стрибок грає `art/sfx/hop-N.mp3` через WebAudio buffer (як Гордон). Нові синтезовані ключі: `combo`, `breakCombo`, `whoosh`, `gordonGet`, `peel`, `spawn`. Mute ♪ глушить усе, крім опційно BGM.
 - Фонова музика (`art/springy-lead.mp3`) має окрему кнопку ♫ і не залежить від mute звуків. На iPhone її теж треба праймити в тапі (`primeBgm()`). Під час Гордона фон ставиться на паузу.
