@@ -30,7 +30,7 @@ body{box-sizing:border-box;background:var(--frame);color:var(--ink);font-family:
 #wrap{position:relative;height:100vh;height:100dvh;max-width:460px;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow:hidden}
 canvas{display:block;width:100%;height:100%;touch-action:none}
 .hud{position:absolute;top:max(6px,env(safe-area-inset-top,0px));left:8px;right:8px;z-index:4;display:flex;justify-content:space-between;align-items:flex-start;gap:6px;pointer-events:none}
-.hud .scorebox{display:flex;flex-direction:column;align-items:flex-start;flex:1 1 0;min-width:0;background:var(--card);padding:8px 10px 0;border-radius:10px;outline:2px dashed var(--card-line);outline-offset:-5px;box-shadow:0 3px 0 rgba(43,30,25,.28);overflow:hidden}
+.hud .scorebox{display:flex;flex-direction:column;align-items:flex-start;flex:0 1 auto;min-width:0;background:var(--card);padding:8px 10px 0;border-radius:10px;outline:2px dashed var(--card-line);outline-offset:-5px;box-shadow:0 3px 0 rgba(43,30,25,.28);overflow:hidden}
 .hud .scorebox .eyebrow{font-size:9px;letter-spacing:.12em;margin:0 0 4px}
 .hud .val{font-family:var(--pixel);font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.2;padding-bottom:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .hud .combo{display:inline-block;margin:-2px 0 8px;padding:3px 7px;font-size:11px;font-weight:800;color:#fff;background:#1a7a32;border-radius:4px;transform:rotate(-4deg);box-shadow:0 2px 0 #0f4d1e}
