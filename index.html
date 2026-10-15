@@ -1613,7 +1613,7 @@ $('shareBtn').onclick=async function(){
   shareHint('Текст скопійовано');
 };
 let chipTapAt=0;
-function chipOnce(){const t=performance.now();if(t-chipTapAt<280)return false;chipTapAt=t;return true}
+function chipOnce(){const t=performance.now();if(t-chipTapAt<80)return false;chipTapAt=t;return true}
 function toggleMute(e){
   if(e){e.preventDefault();e.stopPropagation()}
   if(!chipOnce())return;
