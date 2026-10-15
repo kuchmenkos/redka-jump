@@ -40,6 +40,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none}
 .soundchip b{font-size:16px;margin-left:4px}
 .soundchip.off{color:var(--muted);text-decoration:line-through}
 .overlay{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;background:rgba(43,30,25,.45);padding:12px max(16px,env(safe-area-inset-left,0px));overflow-y:auto;box-sizing:border-box}
+#startScr,#pauseScr,#colScr,#overScr{z-index:6}
 .card{position:relative;background:var(--card);color:var(--ink);border-radius:10px;padding:22px 20px 18px;width:100%;max-width:350px;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;text-align:center;margin:auto;
   outline:2px dashed var(--card-line);outline-offset:-8px}
 .eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--stamp);margin:0}
@@ -1458,12 +1459,13 @@ function openPause(){
   $('pauseDemoBtn').hidden=!DEMO||!(player&&player.flyKind!=='gordon');
   paintMute();paintBgm();
   pauseGordonAudio();
+  showPlayHud(false);
   $('colScr').hidden=true;$('pauseScr').hidden=false;
 }
 function resumePlay(){
   if(mode!=='pause')return;
   $('pauseScr').hidden=true;$('colScr').hidden=true;
-  mode='play';resumeGordonAudio();syncBgm();
+  mode='play';showPlayHud(true);resumeGordonAudio();syncBgm();
 }
 function quitToStart(){
   hideAchPop();stopGordonMusic();gordonBits=[];
