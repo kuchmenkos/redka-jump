@@ -6,7 +6,7 @@
 
 Онлайн: [https://redkajump.fun/](https://redkajump.fun/). Живий хост — **Cloudflare Pages** (проєкт `redkajump`). Push у `main` деплоїть через Actions job `cloudflare-pages` (`wrangler pages deploy`). «Поділитись» додає `https://redkajump.fun/` (або поточний origin, якщо відкрито не з localhost).
 
-Аналітика — PostHog (`posthog-js` у `index.html`, autocapture вимкнений). Project API key — константа `POSTHOG_KEY` (для статичної гри ключ і так публічний). Порожній ключ — гра працює без мережевих викликів. Події: `pageview`, `play_start`, `game_over` (`cause`, `score`, `zone`), `share`. Хост за замовчуванням `https://us.i.posthog.com`.
+Аналітика — PostHog (`posthog-js` у `index.html`, autocapture вимкнений). Project API key — константа `POSTHOG_KEY` (для статичної гри ключ і так публічний). Порожній ключ — гра працює без мережевих викликів. Події: `pageview`, `play_start`, `game_over` (`cause`, `score`, `zone`), `share`. Хост — `https://eu.i.posthog.com` (EU).
 
 ### Деплой Cloudflare Pages
 
