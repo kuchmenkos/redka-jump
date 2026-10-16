@@ -701,15 +701,15 @@ function buildSprite(rows,pal,px,outline){
 }
 const LOOKS=[
   {at:0,cost:0,name:'Без піджака'},
-  {at:30000,cost:12,name:'Перший піджак'},
-  {at:90000,cost:20,name:'Жовтий піджак'},
-  {at:180000,cost:32,name:'Синій оксамит'},
-  {at:300000,cost:48,name:'Малиновий смокінг'},
-  {at:370000,cost:72,name:'Клоун',id:'clown'},
-  {at:450000,cost:96,name:'Смарагдовий костюм'},
-  {at:530000,cost:128,name:'Одіссей',id:'odyssey'},
-  {at:650000,cost:160,name:'Срібний костюм',out:'#eef2f8'},
-  {at:900000,cost:200,name:'Золотий костюм',id:'gold',gold:1,out:'#ffe08a'}
+  {at:30000,cost:6,name:'Перший піджак'},
+  {at:90000,cost:12,name:'Жовтий піджак'},
+  {at:180000,cost:20,name:'Синій оксамит'},
+  {at:300000,cost:30,name:'Малиновий смокінг'},
+  {at:370000,cost:45,name:'Клоун',id:'clown'},
+  {at:450000,cost:65,name:'Смарагдовий костюм'},
+  {at:530000,cost:90,name:'Одіссей',id:'odyssey'},
+  {at:650000,cost:125,name:'Срібний костюм',out:'#eef2f8'},
+  {at:900000,cost:170,name:'Золотий костюм',id:'gold',gold:1,out:'#ffe08a'}
 ];
 LOOKS.forEach((L,i)=>{L.body=LOOKGRID[i];L.pal=LOOKPAL[i]});
 function lookPal(L){return Object.assign({},BASEPAL,{K:'#1a141a',R:'#d63434'},L.pal)}
