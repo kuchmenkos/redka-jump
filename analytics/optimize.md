@@ -33,6 +33,8 @@ MCP у Cloud Agent не логіниться. SQL нижче — якщо тре
 | `share` | чи є чим хвалитись |
 | `threads_click` | чіп у «Про гру» |
 
+Примітка: назви етапів (`zone`) без років з 2026-10-16 («Суми», не «Суми · 2022»); старі події мають роки — групуй за `zone_idx`.
+
 `game_over` / `run_abandon` поля: `cause`, `score`, `zone`, `zone_idx`, `duration_s` (без паузи), `wall_s`, `look`, `tickets`, `express`, `gordon` (caught/missed/none), `stomps`, `stomp_*`, `combo_max`, `minus`, `fakes`, `threads`, `labels`, `idle_s`, `record`, `million`, `pauses`.
 
 ## Пороги в коді (орієнтири)
