@@ -41,3 +41,5 @@
 - Стрибок і хейтери — короткі `tone()`/`noise()` з `SFX_VOL`, чути над BGM. Mute ♪ глушить SFX і ставить BGM на паузу.
 - Усіх хейтерів топчуть зверху через `stompHater` (`+2500`, `STOMP_Q`); боковий удар — смерть.
 - Фонова музика (`art/springy-lead.mp3`) має окрему кнопку ♫ і не залежить від mute звуків. На iPhone її теж треба праймити в тапі (`primeBgm()` / `unlockAudio()`). Під час Гордона фон ставиться на паузу. Unmute ♪ знову кличе `syncBgm()`.
+
+- Хейтери й Гордон: `tryShield()` (Блок), `chainN/chainT` (ланцюг у `stompHater`), `raid`/`raidReward()` (рейд у `genStep`), Гордон через «директор» `heat`/`gordonNextGs`/`gordonPendStep` (`scheduleNextGordon()`, `gordonMode`: interview/live/exclusive). Подій: `shield_get`, `shield_save`, `chain`, `raid`, `gordon{result,mode,heat,nth}`.
