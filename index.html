@@ -749,15 +749,17 @@ function drawChar(g,ch,x,y,sx,sy,anchor,rot){
   g.drawImage(ch.c,-ch.cx,anchor==='feet'?-ch.fy:-ch.cy);g.restore();
 }
 const REDKA_FACE={
-  felix:{ax:15,chin:18,sink:.4,cells:15},
-  'felix-fail':{ax:15,chin:18.4,sink:.4,cells:15},
-  'felix-fly':{ax:15,chin:18,sink:.5,cells:19}
+  felix:{ax:15,chin:18,sink:1.9,cells:15},
+  'felix-fail':{ax:15,chin:18.4,sink:1.9,cells:15},
+  'felix-fly':{ax:15,chin:18,sink:2,cells:19},
+  // бронювання: той самий felix-fly.png, але масштаб 4 (як у звичайного обличчя), щоб Редька не «меншав»
+  'felix-armor':{ax:15,chin:18,sink:2,cells:23}
 };
 const REDKA_CH={};
 function redkaChar(li,px,faceKey,pose,outline){
-  const fk=faceKey&&FACES[faceKey]?faceKey:'felix';
+  const fk=faceKey&&(faceKey==='felix-armor'?FACES['felix-fly']:FACES[faceKey])?faceKey:'felix';
   const key=li+':'+px+':'+fk+(pose?':'+pose:'')+(outline?':'+outline:'');if(REDKA_CH[key])return REDKA_CH[key];
-  const L=LOOKS[li],f=FACES[fk]||FACES.felix,bg=pose==='up'&&L.bodyUp?L.bodyUp:pose==='side'&&L.bodySide?L.bodySide:lookGrid(L),grid=f?bg:withHead(bg);
+  const L=LOOKS[li],f=(fk==='felix-armor'?FACES['felix-fly']:FACES[fk])||FACES.felix,bg=pose==='up'&&L.bodyUp?L.bodyUp:pose==='side'&&L.bodySide?L.bodySide:lookGrid(L),grid=f?bg:withHead(bg);
   const ch=makeChar(grid,Object.assign(lookPal(L),{h:'#ff9a7a'}),px,outline||L.out||'#ffffff',f,REDKA_FACE[fk]||REDKA_FACE.felix);
   if(f)REDKA_CH[key]=ch;return ch;
 }
@@ -1886,7 +1888,7 @@ function drawRedka(){
   const flying=p.flyKind==='express'||p.flyKind==='gordon',gordon=p.flyKind==='gordon';
   const jp=jumpPose(p.sq,p.vy,flying),sx=jp.sx,sy=jp.sy;
   const armor=shield>0||shieldGrace>0;
-  const ch=redkaChar(lookIdx,SPX,flying||armor?'felix-fly':null,jp.pose,shield>0&&shieldGrace<=0?'#3d8bff':undefined);
+  const ch=redkaChar(lookIdx,SPX,flying?'felix-fly':armor?'felix-armor':null,jp.pose,shield>0&&shieldGrace<=0?'#3d8bff':undefined);
   const lean=flying?(gordon?0.22:0.12)*p.face+Math.sin(tick*(gordon?0.28:0.18))*(gordon?0.12:0.05):0;
   if(flying){
     const n=gordon?4:3;
@@ -2165,7 +2167,7 @@ function fillHatePanel(){
 let bestAtStart=0,recordShown=false,colBack='start';
 let runTok='';
 function runTokFetch(){runTok='';try{fetch('/api/run?pid='+encodeURIComponent(lbPid()),{method:'POST'}).then(r=>r.json()).then(j=>{runTok=(j&&j.tok)||''}).catch(()=>{})}catch(e){}}
-function start(){runTokFetch();try{redkaChar(STATS.wear||0,SPX,null,'side');redkaChar(STATS.wear||0,SPX,'felix-fly','up');redkaChar(STATS.wear||0,SPX,'felix-fly','side','#3d8bff');redkaChar(STATS.wear||0,SPX,'felix-fly',undefined,'#3d8bff');redkaChar(STATS.wear||0,SPX,'felix-fly','side')}catch(e){}
+function start(){runTokFetch();try{redkaChar(STATS.wear||0,SPX,null,'side');redkaChar(STATS.wear||0,SPX,'felix-fly','up');redkaChar(STATS.wear||0,SPX,'felix-armor','side','#3d8bff');redkaChar(STATS.wear||0,SPX,'felix-armor',undefined,'#3d8bff');redkaChar(STATS.wear||0,SPX,'felix-armor','side');redkaChar(STATS.wear||0,SPX,'felix-armor')}catch(e){}
   $('helpScr').hidden=true;
   reset();bestAtStart=best;recordShown=false;isRecord=false;comboMax=1;pauseN=0;
   runT0=performance.now();playAcc=0;playMark=runT0;
