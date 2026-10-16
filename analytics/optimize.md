@@ -20,7 +20,10 @@ MCP у Cloud Agent не логіниться. SQL нижче — якщо тре
 |---|---|
 | `play_start` | `from` cta/again, `look`, `returning` |
 | `game_over` | знімок катки: `duration_s`, `score`, `zone`, `cause`, механіки |
-| `run_abandon` | вихід з паузи; якщо багато vs смерті — здаються, не вмирають |
+| `run_abandon` | вихід з паузи (`cause=quit`) або закрита вкладка посеред забігу (`cause=closed`); багато vs смерті — здаються, не вмирають |
+| `hater_met` | вперше зустрінутий хейтер | 
+| `lb_open` / `lb_submit` | відкрито лідерборд / відправлено імʼя |
+| `dock` | кнопки дока на інтро (`btn`: achs, ward, help) |
 | `zone_enter` | де відвалюються |
 | `express` / `gordon` / `ticket` / `stomp` | чи бонуси взагалі трапляються |
 | `look_buy` / `look_wear` / `ach` | чи гардероб живе |

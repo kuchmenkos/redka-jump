@@ -46,6 +46,20 @@ async function readTop(kv) {
 const view = (top, pid) => top.slice(0, SHOW).map(e => ({ n: e.n, s: e.s, z: e.z | 0, l: e.l | 0, me: !!pid && e.p === pid }));
 const rankOf = (top, pid) => { const i = top.findIndex(e => e.p === pid); return i < 0 ? 0 : i + 1; };
 
+async function hmac(secret, msg) {
+  const k = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', k, new TextEncoder().encode(msg));
+  return [...new Uint8Array(sig)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+// токен забігу «ts.sig» видає /api/run на старті; сервер сам міряє тривалість і не вірить dur клієнта
+async function runElapsed(secret, tok, pid) {
+  const [ts, sig] = String(tok || '').split('.');
+  const t = Number(ts);
+  if (!t || !sig || (await hmac(secret, ts + ':' + pid)) !== sig) return -1;
+  const el = (Date.now() - t) / 1000;
+  return el >= 0 && el < 7200 ? el : -1;
+}
+
 export async function onRequestGet({ request, env }) {
   if (!env || !env.LEADERBOARD) return json({ ok: false, error: 'no_kv' }, 503);
   const pid = new URL(request.url).searchParams.get('pid') || '';
@@ -55,15 +69,21 @@ export async function onRequestGet({ request, env }) {
 
 export async function onRequestPost({ request, env }) {
   if (!env || !env.LEADERBOARD) return json({ ok: false, error: 'no_kv' }, 503);
+  if (Number(request.headers.get('content-length')) > 2048) return json({ ok: false, error: 'too_big' }, 413);
   let body;
   try { body = await request.json(); } catch (e) { return json({ ok: false, error: 'bad_json' }, 400); }
   const pid = String(body.pid || '');
   const name = cleanName(body.name);
   const score = Number(body.score);
-  const dur = Math.max(0, Number(body.dur) || 0);
+  let dur = Math.max(0, Number(body.dur) || 0);
   if (!PID_RE.test(pid)) return json({ ok: false, error: 'bad_pid' }, 400);
   if (!name) return json({ ok: false, error: 'bad_name' }, 422);
   if (!Number.isInteger(score) || score <= 0 || score > MAX_SCORE) return json({ ok: false, error: 'bad_score' }, 422);
+  if (env.LB_SECRET) {
+    const el = PID_RE.test(pid) ? await runElapsed(env.LB_SECRET, body.tok, pid) : -1;
+    if (el < 0) return json({ ok: false, error: 'no_token' }, 422);
+    dur = Math.min(dur, el + 5);
+  }
   if (score > 3000 + dur * MAX_RATE) return json({ ok: false, error: 'implausible' }, 422);
 
   const kv = env.LEADERBOARD;

@@ -20,9 +20,9 @@ window.POSTHOG_KEY='phc_ywzdLNtXzxU3RtrDnFVtxRcUMa2qa6rpyHxiKPoXsZzH';
 window.POSTHOG_HOST='https://eu.i.posthog.com';
 (function(){
   var k=window.POSTHOG_KEY;
-  if(!k){window.posthog={capture:function(){}};return}
+  if(!k||/[?&]qa=1/.test(location.search)){window.posthog={capture:function(){}};return}
   !function(t,e){var o,n,p,r;e.__SV||window.posthog&&window.posthog.__loaded||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once identify reset get_distinct_id set_config".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-  posthog.init(k,{api_host:window.POSTHOG_HOST,autocapture:!1,capture_pageview:!0,persistence:'localStorage+'});
+  posthog.init(k,{api_host:/^https?:/.test(location.protocol)&&location.hostname==='redkajump.fun'?'/ingest':window.POSTHOG_HOST,ui_host:'https://eu.posthog.com',autocapture:!1,capture_pageview:!0,persistence:'localStorage+',person_profiles:'identified_only'});
 })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -701,15 +701,15 @@ function buildSprite(rows,pal,px,outline){
 }
 const LOOKS=[
   {at:0,cost:0,name:'Без піджака'},
-  {at:30000,cost:12,name:'Перший піджак'},
-  {at:90000,cost:20,name:'Жовтий піджак'},
-  {at:180000,cost:32,name:'Синій оксамит'},
-  {at:300000,cost:48,name:'Малиновий смокінг'},
-  {at:370000,cost:72,name:'Клоун',id:'clown'},
-  {at:450000,cost:96,name:'Смарагдовий костюм'},
-  {at:530000,cost:128,name:'Одіссей',id:'odyssey'},
-  {at:650000,cost:160,name:'Срібний костюм',out:'#eef2f8'},
-  {at:900000,cost:200,name:'Золотий костюм',id:'gold',gold:1,out:'#ffe08a'}
+  {at:30000,cost:6,name:'Перший піджак'},
+  {at:90000,cost:12,name:'Жовтий піджак'},
+  {at:180000,cost:20,name:'Синій оксамит'},
+  {at:300000,cost:30,name:'Малиновий смокінг'},
+  {at:370000,cost:45,name:'Клоун',id:'clown'},
+  {at:450000,cost:65,name:'Смарагдовий костюм'},
+  {at:530000,cost:90,name:'Одіссей',id:'odyssey'},
+  {at:650000,cost:125,name:'Срібний костюм',out:'#eef2f8'},
+  {at:900000,cost:170,name:'Золотий костюм',id:'gold',gold:1,out:'#ffe08a'}
 ];
 LOOKS.forEach((L,i)=>{L.body=LOOKGRID[i];L.pal=LOOKPAL[i]});
 function lookPal(L){return Object.assign({},BASEPAL,{K:'#1a141a',R:'#d63434'},L.pal)}
@@ -1462,8 +1462,9 @@ function update(dt){
     if(p.flyKind==='gordon')spinGordon(dt);
     if(p.fly<=0){const was=p.flyKind;p.flyKind=null;p.vy=-8;if(was==='express')stopDogs();stopGordonMusic();gordonBits=[]}
   }
-  else p.vy+=.3*dt;
-  p.y+=p.vy*dt;const bot=p.y+FEET,falling=p.vy>0;
+  if(p.fly>0)p.y+=p.vy*dt;
+  else{p.y+=p.vy*dt+.15*dt*dt;p.vy+=.3*dt}
+  const bot=p.y+FEET,falling=p.vy>0;
   if(p.vy>0){
     for(const pl of plats){
       if(pl.broken)continue;
@@ -1472,7 +1473,7 @@ function update(dt){
           pl.broken=true;sfx('break');if(mode==='play')fakeCnt++;burst(pl.x+pl.w/2,pl.y+8,['#d63434','#fff8f0','#e53935'],10,3,1);
           continue;
         }
-        p.y=pl.y-FEET;p.vy=pl.type==='spring'?-16.5:-10.3;p.sq=1;if(pl.type==='spring')pl.pulse=1;
+        p.y=pl.y-FEET;p.vy=pl.type==='spring'?-16.35:-10.15;p.sq=1;if(pl.type==='spring')pl.pulse=1;
         if(mode==='play'){const sp=pl.type==='spring';burst(p.x,pl.y,sp?['#b78bff','#ffd23a','#ffffff']:['#fff8f0','#e8dcc4'],sp?16:4,sp?3.8:1.6,.5);if(sp)shake=Math.max(shake,3)}
         sfx(pl.type==='spring'?'spring':pl.type==='minus'&&!pl.visited?'minus':'jump');
         pl.hits++;if(pl.hits>=pl.life){pl.broken=true;pl.peeled=true;sfx('peel');burst(pl.x+pl.w/2,pl.y+8,['#2ea043','#ffffff','#9ed99a'],12,3.2,1)}
@@ -2083,7 +2084,9 @@ function fillHatePanel(){
   $('hateExtra').innerHTML='<span>Розібрано хейтерів: <b>'+stomps+'</b></span><span>Відписок: <b>'+minusCnt+'</b></span><span>Фейків: <b>'+fakeCnt+'</b></span>';
 }
 let bestAtStart=0,recordShown=false,colBack='start';
-function start(){
+let runTok='';
+function runTokFetch(){runTok='';try{fetch('/api/run?pid='+encodeURIComponent(lbPid()),{method:'POST'}).then(r=>r.json()).then(j=>{runTok=(j&&j.tok)||''}).catch(()=>{})}catch(e){}}
+function start(){runTokFetch();
   $('helpScr').hidden=true;
   reset();bestAtStart=best;recordShown=false;isRecord=false;comboMax=1;pauseN=0;
   runT0=performance.now();playAcc=0;playMark=runT0;
@@ -2095,7 +2098,8 @@ let yellT=null;
 function showYell(){
   $('startScr').hidden=true;$('colScr').hidden=true;$('pauseScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=false;
   try{SFX.stamp()}catch(e){}
-  clearTimeout(yellT);yellT=setTimeout(finishYell,1800);
+  let seen=0;try{seen=+sessionStorage.getItem('redkaYell')||0;sessionStorage.setItem('redkaYell','1')}catch(e){}
+  clearTimeout(yellT);yellT=setTimeout(finishYell,seen?600:1800);
 }
 function finishYell(){if($('yellScr').hidden)return;clearTimeout(yellT);yellT=null;$('yellScr').hidden=true;start()}
 function goPlay(){
@@ -2182,11 +2186,11 @@ if(window.ResizeObserver){
 }
 function showBestStart(){$('bestStart').textContent=fmt(best);const rec=$('bestRec');if(rec)rec.hidden=!(best>0);const rk=$('rankLine');if(rk)rk.textContent=STATS.rank||rankFor(null);paintTickets()}
 showBestStart();
-$('colBtn').onclick=()=>openCol('achs','start');
-$('helpBtn').onclick=()=>{$('helpScr').hidden=false;const c=$('helpScr').querySelector('.card');c.style.animation='none';void c.offsetWidth;c.style.animation='';try{SFX.spawn()}catch(e){}};
+$('colBtn').onclick=()=>{ph('dock',{btn:'achs'});openCol('achs','start')};
+$('helpBtn').onclick=()=>{ph('dock',{btn:'help'});$('helpScr').hidden=false;const c=$('helpScr').querySelector('.card');c.style.animation='none';void c.offsetWidth;c.style.animation='';try{SFX.spawn()}catch(e){}};
 $('helpClose').onclick=()=>{$('helpScr').hidden=true};
 $('helpScr').addEventListener('pointerdown',e=>{if(e.target===$('helpScr'))$('helpScr').hidden=true});
-$('wardBtn').onclick=()=>openCol('ward','start');
+$('wardBtn').onclick=()=>{ph('dock',{btn:'ward'});openCol('ward','start')};
 $('wardPrev').onclick=()=>wardGo(-1);$('wardNext').onclick=()=>wardGo(1);$('wardAct').onclick=wardAct;
 (function(){const m=$('mannequin');let x0=null;m.addEventListener('pointerdown',e=>{x0=e.clientX});m.addEventListener('pointerup',e=>{if(x0===null)return;const dx=e.clientX-x0;x0=null;if(Math.abs(dx)>36)wardGo(dx<0?1:-1)});m.addEventListener('pointercancel',()=>{x0=null})})();
 $('colClose').onclick=closeCol;
@@ -2252,7 +2256,7 @@ async function lbSubmit(){
   if(!name){st.textContent='Введи імʼя (хоча б одну літеру)';inp.focus();popEl($('lbSend'),'shake');return}
   $('lbSend').disabled=true;st.textContent='Записую…';
   try{localStorage.setItem('redkaName',name)}catch(e){}
-  const {status,j}=await lbFetch({method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:lbPid(),name,score:lastScore,dur:Math.round(playAcc/1000)||1,zone:zoneIdx,look:lookIdx})});
+  const {status,j}=await lbFetch({method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:lbPid(),name,score:lastScore,tok:runTok,dur:Math.round(playAcc/1000)||1,zone:zoneIdx,look:lookIdx})});
   if(status===200&&j.ok){
     lbOk=true;lbTop=j.top||[];lbMyRank=j.rank|0;lbRankLast=lbMyRank;ph('lb_submit',{rank:lbMyRank,score:lastScore});
     if(lastScene)shareCard=makeCard(lastScene,lastScore);
@@ -2260,7 +2264,7 @@ async function lbSubmit(){
     lbPage=Math.floor((Math.max(1,lbMyRank)-1)/lbPer());$('lbScr').hidden=false;lbPaint();
   }else{
     $('lbSend').disabled=false;
-    st.textContent=status===429?'Зачекай хвилину й спробуй ще раз':status===422&&j.error==='name_too_long'?'Рекорд уже перебили: імʼя до 12 символів':status===422?'Це імʼя не підходить. Спробуй інше':'Не вийшло записати. Спробуй ще раз';
+    st.textContent=status===429?'Зачекай хвилину й спробуй ще раз':status===422&&j.error==='name_too_long'?'Рекорд уже перебили: імʼя до 12 символів':status===422&&(j.error==='implausible'||j.error==='no_token')?'Цей рахунок не прийняли. Зіграй ще раз':status===422?'Це імʼя не підходить. Спробуй інше':'Не вийшло записати. Спробуй ще раз';
     popEl($('lbSend'),'shake');
   }
 }
@@ -2407,6 +2411,7 @@ addEventListener('keyup',e=>{if(KL.includes(e.key))input.l=false;if(KR.includes(
 addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,250));
 if(window.visualViewport)visualViewport.addEventListener('resize',resize);
 addEventListener('blur',()=>{input.l=input.r=false;pointers.clear()});
+addEventListener('pagehide',()=>{if(mode==='play'||mode==='pause'){try{accPlay();posthog.capture('run_abandon',runPhProps({cause:'closed'}),{transport:'sendBeacon'})}catch(e){}}});
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){
     if(mode==='play')openPause();

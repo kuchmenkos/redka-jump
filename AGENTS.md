@@ -37,7 +37,7 @@
 - ♪/♫ на старті й у паузі (`[data-mute]` / `[data-bgm]`, `touch-action:manipulation`, JS click/pointerup). Перший жест на `#wrap` — `unlockAudio()` (`audioOn` + `primeBgm` + `syncBgm`). Якщо ♫ увімкнена, але трек ще не грає, тап лише стартує, не вимикає. Оверлеї `z-index:6`, HUD `4`.
 - Повідомлення про етапи, образи, хейтерів і ачивки йдуть чергою тостів під HUD. Плавальний текст лишається лише для «+2500» і комбо.
 - `localStorage`: `redkaBest`, `redkaMute`, `redkaBgm`, `redkaStats` (`tickets`, `owned`, `wear`), `redkaAch`. Квитки пишуться одразу при підборі.
-- Тур-плашок міст немає. `achCount` = `ACH.length` (19). Експрес: `EXPRESS_FROM=60000`, `EXPRESS_CD=50000`, окремий рол ~5–9%.
+- Тур-плашок міст немає. `achCount` = `ACH.length` (19). Експрес: `EXPRESS_FROM=60000`, `EXPRESS_CD=70000`, окремий рол ~5–9%.
 - Стрибок і хейтери — короткі `tone()`/`noise()` з `SFX_VOL`, чути над BGM. Mute ♪ глушить SFX і ставить BGM на паузу.
 - Усіх хейтерів топчуть зверху через `stompHater` (`+2500`, `STOMP_Q`); боковий удар — смерть.
 - Фонова музика (`art/springy-lead.mp3`) має окрему кнопку ♫ і не залежить від mute звуків. На iPhone її теж треба праймити в тапі (`primeBgm()` / `unlockAudio()`). Під час Гордона фон ставиться на паузу. Unmute ♪ знову кличе `syncBgm()`.
