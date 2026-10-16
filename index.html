@@ -878,7 +878,7 @@ const FEET=22*PX;
 let items=[],waves=[],causeKind='fall',mode='start',player,plats,enemies,envs,floats,camY,topY,bonus,zoneIdx,lookIdx,banner,stomps,cause,best=0,input={l:false,r:false},pointers=new Map(),player0=0,tick=0,recent=[];
 let ticketsRun=0,lastTicketStep=-99;
 let lastGap=100,lastHaterStep=-99;
-let shield=0,shieldGrace=0,shieldN=0,shieldSaved=0,lastShieldStep=-99,chainN=0,chainT=0,chainMax=0,heat=0,gordonNextGs=0,gordonNeed=30,gordonPendStep=-1,gordonCount=0,gordonMode='',gordonLive=0,gordonLiveT=0,raidLastGs=-1e9,raidNext=1e12,raid=null,raidWins=0;
+let shield=0,shieldGrace=0,shieldN=0,shieldSaved=0,lastShieldStep=-99,chainN=0,chainT=0,chainMax=0,heat=0,gordonNextGs=0,gordonNeed=30,gordonPendStep=-1,gordonCount=0,gordonMode='',gordonLive=0,gordonLiveT=0;
 let runT0=0,playAcc=0,playMark=0,pauseN=0,playFrom='cta',comboMax=1;
 function ph(n,p){try{window.posthog&&posthog.capture&&posthog.capture(n,p||{})}catch(e){}}
 function accPlay(){if(playMark){playAcc+=performance.now()-playMark;playMark=0}}
@@ -893,7 +893,7 @@ function runPhProps(extra){
   return Object.assign({
     cause:causeKind,score:phScore(),zone:phZone(),zone_idx:zoneIdx|0,
     duration_s:Math.round(playMs()/100)/10,wall_s:Math.round(wallMs()/100)/10,
-    look:L.name,tickets:ticketsRun|0,express:expressN|0,gordon:gordonState(),gordon_mode:gordonMode,diff:Math.round((curD||0)*100)/100,shield_got:shieldN|0,shield_saved:shieldSaved|0,chain_max:chainMax|0,raid_wins:raidWins|0,
+    look:L.name,tickets:ticketsRun|0,express:expressN|0,gordon:gordonState(),gordon_mode:gordonMode,diff:Math.round((curD||0)*100)/100,shield_got:shieldN|0,shield_saved:shieldSaved|0,chain_max:chainMax|0,
     stomps:stomps|0,stomp_stuk:sk.stuk|0,stomp_lang:sk.lang|0,stomp_threads:sk.threads|0,stomp_cancel:sk.cancel|0,stomp_koms:sk.koms|0,
     combo_max:comboMax|0,minus:minusCnt|0,fakes:fakeCnt|0,threads:threadHits|0,labels:hateSum(),
     idle_s:Math.round((idlePeak/60)*10)/10,record:!!isRecord,million:!!million,pauses:pauseN|0
@@ -1373,13 +1373,6 @@ function genStep(){
   if(calm&&stepN%56===51&&!shield&&player.fly<=0&&!p.vx&&type==='normal'){items.push({kind:'shield',x:p.x+p.w/2,y:topY-26,t:0});lastShieldStep=stepN}
   const ep=EPOOL[zi]||[],ecap=gs<60000?0:gs<140000?1:gs<280000?2:3,live=enemies.filter(e=>!e.dead).length;
   if(!calm&&ep.length&&live<ecap&&stepN-lastHaterStep>=4&&Math.random()<.08+.14*ramp(gs,60000,700000)){lastHaterStep=stepN;spawnHater(pick(ep),topY-gap*rnd(.22,.78),d,p.x+p.w/2,p)}
-  // Рейд: рідкісна хвиля з трьох хейтерів; усіх потоптав = +15 000 і Блок
-  if(!calm&&!raid&&gs>=raidNext&&gs>100000&&live===0&&ep.length>=2&&player.fly<=0){
-    const id=stepN;raid={id,n:3,dead:0};raidLastGs=gs;raidNext=gs+rnd(150000,250000);
-    for(let k=0;k<3;k++){const before=enemies.length;spawnHater(pick(ep.filter(x=>x!=='koms')),topY-gap*(.25+.25*k),d,p.x+p.w/2+(k-1)*60,p);if(enemies.length>before)enemies[enemies.length-1].raid=id}
-    raid.n=enemies.filter(e=>e.raid===id).length;if(raid.n<2)raid=null;
-    else{pushToast('РЕЙД!','Потопчи всіх трьох');sfx('spawn');ph('raid',{result:'started',score:Math.max(0,Math.floor(gs))})}
-  }
 }
 function sayHate(en){
   const b=ENEMIES[en.kind].bubbles;if(!b||!b.length)return;
@@ -1451,7 +1444,7 @@ function reset(){
   hateLog={};minusCnt=0;fakeCnt=0;
   camY=0;bonus=0;zoneIdx=0;lookIdx=STATS.wear||0;banner=null;stomps=0;cause='Впав у прірву скасування';causeKind='fall';recent=[];stepN=0;million=false;streak=0;mult=1;shownCnt={};lastItemStep=-99;lastExpressGs=-1e9;lastTicketStep=-99;ticketsRun=0;seenNew=new Set();
   gordonDecided=false;gordonBits=[];gordonTitle=0;gordonLastEdge=-1;gordonDeck=[];gordonDeckI=0;gordonCaught=false;gordonDemo=false;gordonMissed=false;gordonOffered=false;stopGordonMusic();
-  lastGap=100;lastHaterStep=-99;shield=0;shieldGrace=0;shieldN=0;shieldSaved=0;lastShieldStep=-99;chainN=0;chainT=0;chainMax=0;heat=0;gordonCount=0;gordonMode='';gordonPendStep=-1;gordonLive=0;gordonLiveT=0;gordonNextGs=rnd(150000,450000);gordonNeed=rnd(18,42);raid=null;raidWins=0;raidLastGs=-1e9;raidNext=rnd(110000,200000);
+  lastGap=100;lastHaterStep=-99;shield=0;shieldGrace=0;shieldN=0;shieldSaved=0;lastShieldStep=-99;chainN=0;chainT=0;chainMax=0;heat=0;gordonCount=0;gordonMode='';gordonPendStep=-1;gordonLive=0;gordonLiveT=0;gordonNextGs=rnd(150000,450000);gordonNeed=rnd(18,42);
   toasts=[];toastNow=null;stompKind={};expressN=0;malorosN=0;threadHits=0;idlePeak=0;newAchs=[];hideAchPop();
   floats=[];plats=[];enemies=[];envs=[];items=[];waves=[];sparks=[];shake=0;flashA=0;lastMult=1;lastSc=0;
   const sy=H*.8;player0=sy;
@@ -1480,13 +1473,6 @@ function tryShield(x,y){
   ph('shield_save',{score:phScore(),n:shieldSaved});
   return true;
 }
-function raidReward(){
-  const p=player;raidWins++;bonus+=15000;raid=null;
-  pushToast('Рейд відбито','+15 000 і Бронювання');sfx('gordonGet');
-  if(!shield){shield=1;shieldN++}
-  addFloat('+15 000',p.x,p.y-60,'#1a7a32',16);
-  ph('raid',{result:'won',score:phScore()});
-}
 function stompHater(en,bounce){
   const p=player,ey=en.y+Math.sin(en.t)*5;
   en.dead=true;sfx('stomp');burst(en.x,ey,['#ffd23a','#ffffff','#d63434'],18,4.4,1.6);shake=Math.max(shake,5);buzz(16);
@@ -1497,7 +1483,6 @@ function stompHater(en,bounce){
   addFloat('+'+pts,en.x,ey-40,'#1a7a32');
   if(cm>=2){addFloat('ЛАНЦЮГ ×'+cm,en.x,ey-76,'#b02020',15);sfx('combo');if(cm===2||cm===5)ph('chain',{n:cm,score:phScore()})}
   if(Math.random()<(en.kind==='cancel'||en.kind==='koms'?.2:.13)){items.push({kind:'ticket',x:en.x,y:ey,t:0})}
-  if(en.raid&&raid&&en.raid===raid.id){raid.dead++;if(raid.dead>=raid.n)raidReward()}
   const q=STOMP_Q[en.kind];if(q)addFloat(pick(q),en.x,ey-58,'#1a7a32',13);
   ph('stomp',{kind:en.kind,score:phScore()});
   checkAchLive();
@@ -1595,7 +1580,7 @@ function update(dt){
     else{lastExpressGs=hs();if(p.flyKind!=='gordon'){p.fly=EXPRESS_FLY;p.flyMax=EXPRESS_FLY;p.flyKind='express';chase=[];startDogs();shake=Math.max(shake,5);flashA=.35;sfx('express');sfx('whoosh');bonus+=12000;expressN++;pushToast('Шакалячий експрес','+12 000');ph('express',{score:phScore(),zone:phZone()});checkAchLive('express')}}}}
   items=items.filter(it=>{if(it.kind==='gordon'&&!it.got&&it.y-camY>=H+40){gordonMissed=true;scheduleNextGordon();ph('gordon',{result:'missed',score:phScore()});checkAchLive('gmiss')}return !it.got&&it.y-camY<H+40});
   for(const w of waves){w.r+=4*dt;w.life-=.03*dt}waves=waves.filter(w=>w.life>0);
-  plats=plats.filter(pl=>pl.y-camY<H+80&&pl.alpha>0);enemies=enemies.filter(e=>e.y-camY<H+90);if(raid&&!enemies.some(e=>e.raid===raid.id)){ph('raid',{result:'failed',score:phScore()});raid=null}
+  plats=plats.filter(pl=>pl.y-camY<H+80&&pl.alpha>0);enemies=enemies.filter(e=>e.y-camY<H+90);
   while(topY>camY-160)genStep();
   for(const f of floats){if(f.puff){f.y+=1.4*dt;f.life-=.05*dt}else{f.y-=.55*dt;f.life-=.011*dt}}floats=floats.filter(f=>f.life>0);
   for(const s of sparks){s.x+=s.vx*dt;s.y+=s.vy*dt;s.vy+=.18*dt;s.life-=.032*dt}sparks=sparks.filter(s=>s.life>0);
