@@ -802,7 +802,7 @@ const BARK_AT=[.10,.34,.60,.84,1.10,1.36,1.66],BARK_LEN=.2; // початки г
 let chase=[],chaseT0=0,barkSeen=-1;
 function chaseInit(p){
   // три шакали стопкою просто під Редькою: на місці, віялом, найближчий майже під ногами
-  chase=[{k:'gold',dy:98,off:-14,sc:.9,ph:0},{k:'grey',dy:148,off:-74,sc:.78,ph:1.7},{k:'dark',dy:148,off:62,sc:.78,ph:3.1}]
+  chase=[{k:'gold',dy:150,off:-6,sc:.9,ph:0},{k:'grey',dy:196,off:-72,sc:.78,ph:1.7},{k:'dark',dy:196,off:64,sc:.78,ph:3.1}]
     .map(d=>Object.assign(d,{x:p.x+d.off,lt:tick,bub:0,call:''}));
   chaseT0=performance.now();barkSeen=-1;
 }
@@ -821,16 +821,17 @@ function drawChaseDogs(p,py){
     const k=1-Math.pow(.9,Math.max(0,tick-d.lt));d.lt=tick;
     d.x+=(p.x+d.off-d.x)*k;
     const run=Math.floor(tick/2.6+d.ph*2)%4,y=py+FEET+d.dy+Math.sin(tick*.5+d.ph)*3,x=Math.max(30,Math.min(W-30,d.x));
-    const spr=JACKAL_SPR[d.k][bark?1:0][run],dir=p.face||1;
-    ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(-.06*dir);ctx.scale(dir*d.sc,d.sc);
+    const spr=JACKAL_SPR[d.k][bark?1:0][run];
+    // шакали біжать вертикально, мордою вгору за автобусом
+    ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.rotate(-Math.PI/2+Math.sin(tick*.12+d.ph)*.06);ctx.scale(d.sc,d.sc);
     ctx.fillStyle='rgba(255,243,200,.5)';
     for(let j=0;j<4;j++){const ox=-spr.width*.45-4-((tick*6+j*11)%26);ctx.fillRect(Math.round(ox),-6+j*8,10,2)}
     ctx.drawImage(spr,-spr.width/2,-spr.height/2);ctx.restore();
     ctx.fillStyle='rgba(120,90,60,.35)';
-    for(let j=0;j<3;j++){const r=2+((tick*.4+j*3+d.ph)%5);ctx.fillRect(Math.round(x-dir*(26+j*9)-r/2),Math.round(y+22*d.sc-r/2+(j%2)*3),r,r)}
+    for(let j=0;j<3;j++){const r=2+((tick*.4+j*3+d.ph)%5);ctx.fillRect(Math.round(x+(j-1)*8-r/2),Math.round(y+spr.width*.5*d.sc+6+j*9-r/2),r,r)}
     if(tick<d.bub){
       const life=(d.bub-tick)/30,pop=Math.min(1,(1-life)*6),txt=d.call;
-      ctx.save();ctx.globalAlpha=Math.min(1,life*3);ctx.font='800 12px Manrope, system-ui, sans-serif';const tw=ctx.measureText(txt).width+14,bx=Math.max(tw/2+6,Math.min(W-tw/2-6,x+(d.off<0?-1:1)*(34+tw*.35)));ctx.translate(Math.round(bx),Math.round(y-26));ctx.scale(pop,pop);
+      ctx.save();ctx.globalAlpha=Math.min(1,life*3);ctx.font='800 12px Manrope, system-ui, sans-serif';const tw=ctx.measureText(txt).width+14,bx=Math.max(tw/2+6,Math.min(W-tw/2-6,x+(d.off<0?-1:1)*(30+tw*.45)));ctx.translate(Math.round(bx),Math.round(y-8));ctx.scale(pop,pop);
       ctx.fillStyle='#1a141a';ctx.fillRect(Math.round(-tw/2-2),-11,Math.round(tw+4),24);ctx.fillRect(Math.round(-tw/2),-13,Math.round(tw),28);
       ctx.fillStyle='#fff';ctx.fillRect(Math.round(-tw/2),-11,Math.round(tw),24);
       ctx.fillStyle='#b02020';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,0,1);ctx.restore();
