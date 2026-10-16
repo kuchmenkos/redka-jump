@@ -2,7 +2,7 @@
 hands out, pants, shoes) and differs by palette and torso pattern. Look 0 is the same body shirtless.
 Headless: the face is felix*.png laid on top by makeChar() in index.html.
 
-Writes looks.json {grids, pals, head} and looks.png (preview). Paste grids/pals/head into index.html
+Writes looks.json {grids, grids_up (hands raised, shown while jumping up), pals, head} and looks.png (preview). Paste grids/pals/head into index.html
 (LOOKGRID, LOOKPAL, HEADPH)."""
 from PIL import Image
 import json, os
@@ -127,7 +127,21 @@ def pat_bare(g):
     g.rect(9, 29, 21, 29, 'K')                                 # belt
 
 
-def arms(g, left, right, skin=False):
+def arms(g, left, right, skin=False, up=False):
+    if up:
+        # hands raised: arms go diagonally up and out beside the face (face spans x 7.5..22.5)
+        cl, cr = ('F', 'F') if skin else (left, right)
+        sl, sr = ('f', 'f') if skin else (left.lower(), right.lower())
+        for y in range(9, 20):
+            xl = 7 - round((19 - y) * 5 / 10)
+            xr = 29 - xl
+            g.rect(xl - 1, y, xl + 1, y, cl)
+            g.px(xl + 1, y, sl)
+            g.rect(xr - 1, y, xr + 1, y, cr)
+            g.px(xr - 1, y, sr)
+        g.rect(1, 5, 4, 8, 'F'); g.rect(25, 5, 28, 8, 'F')
+        g.rect(1, 8, 4, 8, 'f'); g.rect(25, 8, 28, 8, 'f')
+        return
     if skin:
         g.rect(6, 18, 8, 26, 'F'); g.rect(22, 18, 24, 26, 'F')
         g.rect(8, 18, 8, 26, 'f'); g.rect(22, 18, 22, 26, 'f')
@@ -150,12 +164,18 @@ def lower(g, shoe_l='A', shoe_r='B', skirt=False):
     g.px(11, 33, shoe_l); g.px(19, 33, shoe_r)
 
 
-def suit(pat, arm=('A', 'A'), dressed=True, skin_arms=False, skirt=False, shoes=('A', 'B')):
+def suit(pat, arm=('A', 'A'), dressed=True, skin_arms=False, skirt=False, shoes=('A', 'B'), up=False):
     g = G()
     if dressed:
         ruff(g)
+    if up and pat is pat_diamond:  # the diamond pattern leaves ragged edges that only the lowered arms used to hide
+        torso_base(g, 'A', 'a')
     pat(g)
-    arms(g, arm[0], arm[1], skin_arms)
+    if up:  # pattern cells that poked out under the lowered arms must not show when the arms are raised
+        for y in range(17, 30):
+            for x in list(range(0, 9)) + list(range(22, 30)):
+                g.g[y][x] = '.'
+    arms(g, arm[0], arm[1], skin_arms, up)
     lower(g, shoes[0], shoes[1], skirt)
     g.outline()
     return g
@@ -164,7 +184,7 @@ def suit(pat, arm=('A', 'A'), dressed=True, skin_arms=False, skirt=False, shoes=
 # name, pattern, extra kwargs, palette (letters used above), outline override, gold flag
 SKIN = {'F': '#f2c9a0', 'f': '#d99c72', 'q': '#c97a62'}
 LOOKS = [
-    dict(name='Без піджака', pat=pat_bare, kw=dict(dressed=False, skin_arms=True),
+    dict(name='Жебрак', pat=pat_bare, kw=dict(dressed=False, skin_arms=True),
          pal=dict(SKIN, P='#4a68a8', p='#324a80', A='#c8281e', B='#c8281e')),
     dict(name='Перший піджак', pat=pat_plain, kw=dict(arm=('A', 'A'), shoes=('M', 'M')),
          pal=dict(SKIN, A='#2b2b38', a='#17171f', S='#ffffff', s='#d9dcea', W='#fafafa', R='#d63434', M='#e2b33a', P='#3a3a46', p='#25252e')),
@@ -180,8 +200,8 @@ LOOKS = [
          pal=dict(SKIN, A='#18946a', a='#0b553d', C='#7ff0c4', c='#3fc79a', S='#e8fff6', s='#a9e4cc', W='#ffffff', M='#e2b33a', P='#0b553d', p='#073a29')),
     dict(name='Одіссей', pat=pat_tunic, kw=dict(arm=('A', 'A'), skin_arms=True, skirt=True, shoes=('O', 'O')),
          pal=dict(SKIN, A='#4a3a32', a='#2e241e', O='#c4a35a', o='#8a6a28', S='#a8a39e', s='#6f6a66', W='#c9c4be', P='#3a322c', p='#2e241e')),
-    dict(name='Срібний костюм', pat=pat_diamond, kw=dict(arm=('A', 'B'), shoes=('A', 'B')), out='#eef2f8',
-         pal=dict(SKIN, A='#9aa3b2', a='#667082', B='#d9dee8', b='#a9b2c0', C='#ffffff', c='#c9ced8', S='#ffffff', s='#d5dae4', W='#ffffff', M='#ffffff', P='#aab2c0', p='#7d8695')),
+    dict(name='Біле пальто', pat=pat_plain, kw=dict(arm=('A', 'A'), shoes=('M', 'M')),
+         pal=dict(SKIN, A='#f4f4f0', a='#c4c9d6', S='#d6e4f7', s='#9fb6d6', W='#ffffff', R='#b81f52', M='#e2b33a', P='#8a93a6', p='#646c7e')),
     dict(name='Золотий костюм', pat=pat_diamond, kw=dict(arm=('A', 'B'), shoes=('A', 'B')), out='#ffe08a', gold=1,
          pal=dict(SKIN, A='#c8860e', a='#8f5f08', B='#ffd75a', b='#d9a52a', C='#fff4b8', c='#f0cf66', S='#fff4b8', s='#e2c36a', W='#ffffff', M='#fff4b8', P='#c88e12', p='#8f5f08')),
 ]
@@ -195,13 +215,14 @@ HEAD.outline()
 BASE_PAL = {'K': '#1a141a'}
 SC = 10
 grids = [suit(L['pat'], **L['kw']) for L in LOOKS]
-json.dump({'grids': [g.rows() for g in grids], 'pals': [L['pal'] for L in LOOKS], 'head': HEAD.rows()[:12]},
+grids_up = [suit(L['pat'], up=True, **L['kw']) for L in LOOKS]
+json.dump({'grids': [g.rows() for g in grids], 'grids_up': [g.rows() for g in grids_up], 'pals': [L['pal'] for L in LOOKS], 'head': HEAD.rows()[:12]},
           open(os.path.join(DIR, 'looks.json'), 'w'))
 
 cols = 5
 cell = W * SC + 24
-img = Image.new('RGB', (cols * cell + 24, 2 * (H * SC + 36) + 12), (239, 230, 211))
-for i, (L, g) in enumerate(zip(LOOKS, grids)):
+img = Image.new('RGB', (cols * cell + 24, 4 * (H * SC + 36) + 12), (239, 230, 211))
+for i, (L, g) in enumerate(zip(LOOKS * 2, grids + grids_up)):
     pal = dict(BASE_PAL, **L['pal'])
     ox, oy = 16 + (i % cols) * cell, 12 + (i // cols) * (H * SC + 36)
     for y, r in enumerate(g.rows()):

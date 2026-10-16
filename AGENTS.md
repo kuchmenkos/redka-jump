@@ -16,7 +16,7 @@
 - `art/gordon/` і `gordon-intro.mp3` — режим Гордона.
 - `art/ends/` — фінальні ілюстрації (`fall`, `stuk`, `threads`, `koms`, `cancel`, `lang`).
 - `art/springy-lead.mp3` — фонова тема, цикл, гучність 0.63. `SFX_VOL=5`.
-- `art/looks.py` — сітки всіх 10 костюмів на одному силуеті клоуна + палітри (`looks.json` → `LOOKGRID`/`LOOKPAL`/`HEADPH` в `index.html`). Лук 0 — голий торс. Обличчя завжди `felix*.png`, геометрія в `REDKA_FACE`.
+- `art/looks.py` — сітки всіх 10 костюмів на одному силуеті клоуна + палітри (`looks.json` → `LOOKGRID`/`LOOKPAL`/`HEADPH` в `index.html`). Лук 0 — «Жебрак» (голий торс). `grids_up` — друга сітка «руки вгору» на кожен лук (`LOOKGRIDUP`, `redkaChar(...,up)`); `jumpPose()` у `index.html` дає позу й стискання: руки вгору при підйомі (`vy<-1.5`), стискання `.24`. Обличчя завжди `felix*.png`, геометрія в `REDKA_FACE`.
 - `art/jackals.py` — сітки шакалів (`jackals.json` → `JACKAL`): 4 кадри галопу × закрита/відкрита паща, палітри gold/grey/dark.
 - `art/enemies.py` — тіла хейтерів без піксельних голів (піксельна голова Скасовувача — лише fallback, якщо немає `cancel.png`).
 - `*.py` — генератори піксельних сіток тіл і предметів.
