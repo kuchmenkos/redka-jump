@@ -4,7 +4,7 @@
 
 Живі дашборди (PostHog EU, проєкт redkajump, період 30 днів):
 
-- [Як грають](https://eu.posthog.com/project/307751/dashboard/1027950) — KPI, медіани, воронки, Threads
+- [Як грають](https://eu.posthog.com/project/307751/dashboard/1027950) — KPI з порівнянням, тренд, нові/повернулись, утримання, пристрої й країни, воронки, інтро
 - [Баланс](https://eu.posthog.com/project/307751/dashboard/1027951) — секції: наскільки важко → чим кінчають → етапи → бонуси → прогрес
 
 MCP у Cloud Agent не логіниться. SQL нижче — якщо треба свіжий знімок у чат Cursor.
