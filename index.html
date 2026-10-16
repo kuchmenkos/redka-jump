@@ -2084,7 +2084,9 @@ function fillHatePanel(){
   $('hateExtra').innerHTML='<span>Розібрано хейтерів: <b>'+stomps+'</b></span><span>Відписок: <b>'+minusCnt+'</b></span><span>Фейків: <b>'+fakeCnt+'</b></span>';
 }
 let bestAtStart=0,recordShown=false,colBack='start';
-function start(){
+let runTok='';
+function runTokFetch(){runTok='';try{fetch('/api/run?pid='+encodeURIComponent(lbPid()),{method:'POST'}).then(r=>r.json()).then(j=>{runTok=(j&&j.tok)||''}).catch(()=>{})}catch(e){}}
+function start(){runTokFetch();
   $('helpScr').hidden=true;
   reset();bestAtStart=best;recordShown=false;isRecord=false;comboMax=1;pauseN=0;
   runT0=performance.now();playAcc=0;playMark=runT0;
@@ -2253,7 +2255,7 @@ async function lbSubmit(){
   if(!name){st.textContent='Введи імʼя (хоча б одну літеру)';inp.focus();popEl($('lbSend'),'shake');return}
   $('lbSend').disabled=true;st.textContent='Записую…';
   try{localStorage.setItem('redkaName',name)}catch(e){}
-  const {status,j}=await lbFetch({method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:lbPid(),name,score:lastScore,dur:Math.round(playAcc/1000)||1,zone:zoneIdx,look:lookIdx})});
+  const {status,j}=await lbFetch({method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({pid:lbPid(),name,score:lastScore,tok:runTok,dur:Math.round(playAcc/1000)||1,zone:zoneIdx,look:lookIdx})});
   if(status===200&&j.ok){
     lbOk=true;lbTop=j.top||[];lbMyRank=j.rank|0;lbRankLast=lbMyRank;ph('lb_submit',{rank:lbMyRank,score:lastScore});
     if(lastScene)shareCard=makeCard(lastScene,lastScore);
@@ -2261,7 +2263,7 @@ async function lbSubmit(){
     lbPage=Math.floor((Math.max(1,lbMyRank)-1)/lbPer());$('lbScr').hidden=false;lbPaint();
   }else{
     $('lbSend').disabled=false;
-    st.textContent=status===429?'Зачекай хвилину й спробуй ще раз':status===422&&j.error==='name_too_long'?'Рекорд уже перебили: імʼя до 12 символів':status===422?'Це імʼя не підходить. Спробуй інше':'Не вийшло записати. Спробуй ще раз';
+    st.textContent=status===429?'Зачекай хвилину й спробуй ще раз':status===422&&j.error==='name_too_long'?'Рекорд уже перебили: імʼя до 12 символів':status===422&&(j.error==='implausible'||j.error==='no_token')?'Цей рахунок не прийняли. Зіграй ще раз':status===422?'Це імʼя не підходить. Спробуй інше':'Не вийшло записати. Спробуй ще раз';
     popEl($('lbSend'),'shake');
   }
 }
