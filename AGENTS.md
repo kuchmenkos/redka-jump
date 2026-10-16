@@ -43,4 +43,4 @@
 - Фонова музика (`art/springy-lead.mp3`) має окрему кнопку ♫ і не залежить від mute звуків. На iPhone її теж треба праймити в тапі (`primeBgm()` / `unlockAudio()`). Під час Гордона фон ставиться на паузу. Unmute ♪ знову кличе `syncBgm()`.
 
 - Хейтери й Гордон: `tryShield()` (Бронювання), `chainN/chainT` (ланцюг у `stompHater`), Гордон через «директор» `heat`/`gordonNextGs`/`gordonPendStep` (`scheduleNextGordon()`, `gordonMode`: interview/live/exclusive). Подій: `shield_get`, `shield_save`, `chain`, `gordon{result,mode,heat,nth}`.
-- Бронювання: поки `shield>0||shieldGrace>0` Редька малюється з обличчям `felix-fly` (`redkaChar(...,'felix-fly',pose,outline)`), обводка синя `#3d8bff`, під час невразливості блимає. Складність: `breath`/`lastGap`/`lastHaterStep` у `genStep`.
+- Бронювання: поки `shield>0||shieldGrace>0` Редька малюється з обличчям `felix-armor` (той самий `felix-fly.png`, але масштаб 4 як у звичайного, `redkaChar(...,'felix-armor',pose,outline)`), обводка синя `#3d8bff`, під час невразливості блимає. Складність: `breath`/`lastGap`/`lastHaterStep` у `genStep`.
