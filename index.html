@@ -2098,7 +2098,8 @@ let yellT=null;
 function showYell(){
   $('startScr').hidden=true;$('colScr').hidden=true;$('pauseScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=false;
   try{SFX.stamp()}catch(e){}
-  clearTimeout(yellT);yellT=setTimeout(finishYell,1800);
+  let seen=0;try{seen=+sessionStorage.getItem('redkaYell')||0;sessionStorage.setItem('redkaYell','1')}catch(e){}
+  clearTimeout(yellT);yellT=setTimeout(finishYell,seen?600:1800);
 }
 function finishYell(){if($('yellScr').hidden)return;clearTimeout(yellT);yellT=null;$('yellScr').hidden=true;start()}
 function goPlay(){
