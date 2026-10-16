@@ -2,7 +2,7 @@
 hands out, pants, shoes) and differs by palette and torso pattern. Look 0 is the same body shirtless.
 Headless: the face is felix*.png laid on top by makeChar() in index.html.
 
-Writes looks.json {grids, grids_up (hands raised, shown while jumping up), pals, head} and looks.png (preview). Paste grids/pals/head into index.html
+Writes looks.json {grids, grids_side (hands slightly out, while jumping), grids_up (hands raised, while flying on the rocket), pals, head} and looks.png (preview). Paste grids/pals/head into index.html
 (LOOKGRID, LOOKPAL, HEADPH)."""
 from PIL import Image
 import json, os
@@ -127,7 +127,21 @@ def pat_bare(g):
     g.rect(9, 29, 21, 29, 'K')                                 # belt
 
 
-def arms(g, left, right, skin=False, up=False):
+def arms(g, left, right, skin=False, up=False, side=False):
+    if side:
+        # micro-gesture while jumping: arms swing a little outward and the hands lift to waist height
+        cl, cr = ('F', 'F') if skin else (left, right)
+        sl, sr = ('f', 'f') if skin else (left.lower(), right.lower())
+        for y in range(18, 26):
+            xl = 7 - round((y - 18) * 3 / 7)
+            xr = 29 - xl
+            g.rect(xl - 1, y, xl + 1, y, cl)
+            g.px(xl + 1, y, sl)
+            g.rect(xr - 1, y, xr + 1, y, cr)
+            g.px(xr - 1, y, sr)
+        g.rect(1, 24, 4, 26, 'F'); g.rect(25, 24, 28, 26, 'F')
+        g.rect(1, 26, 4, 26, 'f'); g.rect(25, 26, 28, 26, 'f')
+        return
     if up:
         # hands raised: arms go diagonally up and out beside the face (face spans x 7.5..22.5)
         cl, cr = ('F', 'F') if skin else (left, right)
@@ -164,18 +178,18 @@ def lower(g, shoe_l='A', shoe_r='B', skirt=False):
     g.px(11, 33, shoe_l); g.px(19, 33, shoe_r)
 
 
-def suit(pat, arm=('A', 'A'), dressed=True, skin_arms=False, skirt=False, shoes=('A', 'B'), up=False):
+def suit(pat, arm=('A', 'A'), dressed=True, skin_arms=False, skirt=False, shoes=('A', 'B'), up=False, side=False):
     g = G()
     if dressed:
         ruff(g)
-    if up and pat is pat_diamond:  # the diamond pattern leaves ragged edges that only the lowered arms used to hide
+    if (up or side) and pat is pat_diamond:  # the diamond pattern leaves ragged edges that only the lowered arms used to hide
         torso_base(g, 'A', 'a')
     pat(g)
-    if up:  # pattern cells that poked out under the lowered arms must not show when the arms are raised
+    if up or side:  # pattern cells that poked out under the lowered arms must not show when the arms are raised
         for y in range(17, 30):
             for x in list(range(0, 9)) + list(range(22, 30)):
                 g.g[y][x] = '.'
-    arms(g, arm[0], arm[1], skin_arms, up)
+    arms(g, arm[0], arm[1], skin_arms, up, side)
     lower(g, shoes[0], shoes[1], skirt)
     g.outline()
     return g
@@ -216,13 +230,14 @@ BASE_PAL = {'K': '#1a141a'}
 SC = 10
 grids = [suit(L['pat'], **L['kw']) for L in LOOKS]
 grids_up = [suit(L['pat'], up=True, **L['kw']) for L in LOOKS]
-json.dump({'grids': [g.rows() for g in grids], 'grids_up': [g.rows() for g in grids_up], 'pals': [L['pal'] for L in LOOKS], 'head': HEAD.rows()[:12]},
+grids_side = [suit(L['pat'], side=True, **L['kw']) for L in LOOKS]
+json.dump({'grids': [g.rows() for g in grids], 'grids_up': [g.rows() for g in grids_up], 'grids_side': [g.rows() for g in grids_side], 'pals': [L['pal'] for L in LOOKS], 'head': HEAD.rows()[:12]},
           open(os.path.join(DIR, 'looks.json'), 'w'))
 
 cols = 5
 cell = W * SC + 24
-img = Image.new('RGB', (cols * cell + 24, 4 * (H * SC + 36) + 12), (239, 230, 211))
-for i, (L, g) in enumerate(zip(LOOKS * 2, grids + grids_up)):
+img = Image.new('RGB', (cols * cell + 24, 6 * (H * SC + 36) + 12), (239, 230, 211))
+for i, (L, g) in enumerate(zip(LOOKS * 3, grids + grids_side + grids_up)):
     pal = dict(BASE_PAL, **L['pal'])
     ox, oy = 16 + (i % cols) * cell, 12 + (i // cols) * (H * SC + 36)
     for y, r in enumerate(g.rows()):
