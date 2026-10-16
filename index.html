@@ -67,6 +67,7 @@ button:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
       <p class="sub">Що більше на нього наїжджають, то вище він піднімається.</p>
       <div class="legend">
         <span class="ic"><span class="patch" style="background:#d63434"></span></span><span>Що про нього пишуть — стрибай</span>
+        <span class="ic"><span class="patch" style="background:#e7b1a4;outline-color:#6e2a2a"></span></span><span>Потерта — два стрибки, потім розпорюється</span>
         <span class="ic"><span class="patch" style="background:#6b4fd8"></span></span><span>Скандал — підкидає вище</span>
         <span class="ic"><span class="patch" style="background:#4f5866"></span></span><span>Відписка — мінус підписники</span>
         <span class="ic"><span class="patch" style="background:#e0473a"></span></span><span>Перевзувалки — повзають туди-сюди</span>
@@ -339,7 +340,8 @@ function genStep(){
   if(calm)type=Math.random()<.12?'spring':'normal';
   if(!calm&&type==='normal'&&gs>100000&&Math.random()<.015+.08*ramp(gs,100000,850000))type='minus';
   const label=calmStart?'АНТРАКТ':type==='spring'?pick(z.springs):type==='minus'?'− '+pick(MINUS[Math.max(1,zi)]):type==='moving'?pickFresh(MOVERS):pickFresh((z.labels.length&&Math.random()<.75)?z.labels:COMMON);
-  const p=makePlat(type,topY,label,type==='minus'?{pen:Math.round((2500+gs*.01)/500)*500}:null);plats.push(p);
+  if(!calm&&type==='normal'&&label!=='АНТРАКТ'&&gs>=60000&&Math.random()<.08+.32*ramp(gs,60000,650000))type='worn';
+  const p=makePlat(type,topY,label,type==='minus'?{pen:Math.round((2500+gs*.01)/500)*500}:type==='worn'?{hits:0}:null);plats.push(p);
   if(!calm&&!p.vx&&type!=='minus'&&stepN-lastItemStep>36){const rr=Math.random();
     if(gs>250000&&gs-lastExpressGs>200000&&rr<.006+.01*ramp(gs,250000,800000)){items.push({kind:'express',x:p.x+p.w/2,y:topY-26,t:0});lastItemStep=stepN;lastExpressGs=gs}
     else if(gs>40000&&gs-lastRocketGs>70000&&player.flyKind!=='rocket'&&!items.some(it=>it.kind==='rocket')&&rr<.012+.014*ramp(gs,40000,600000)){items.push({kind:'rocket',x:p.x+p.w/2,y:topY-24,t:0});lastItemStep=stepN}}
@@ -397,7 +399,9 @@ function update(dt){
           continue;
         }
         p.y=pl.y-FEET;p.vy=pl.type==='spring'?-16.5:-10.3;p.sq=1;
+        if(pl.type==='worn'){pl.hits=(pl.hits||0)+1;if(pl.hits>=2)pl.broken=true}
         sfx(pl.type==='spring'?'spring':pl.type==='minus'&&!pl.visited?'minus':'jump');
+        if(pl.type==='worn'&&pl.broken)sfx('break');
         if(!pl.visited&&mode==='play'){pl.visited=true;if(pl.type!=='minus'){streak++;const nm=Math.min(5,1+Math.floor(streak/12));if(nm>mult){mult=nm;addFloat('КОМБО ×'+mult,p.x,pl.y-60,'#1c7a4a',16);sfx('stage')}bonus+=100*mult;if(pl.label==='АНТРАКТ')addFloat('антракт: видихни',p.x,pl.y-40,'#6f5a52',14)}else breakCombo(p);if(pl.type==='spring'){bonus+=1800;addFloat(pick(SPRING_Q),p.x,pl.y-40,'#4a2fb0')}
           if(pl.type==='minus'){bonus-=pl.pen;addFloat('−'+fmt(pl.pen)+' відписались',p.x,pl.y-40,'#3c434e',15);pl.dim=1}}
         break;
@@ -416,6 +420,7 @@ function update(dt){
   for(const pl of plats){
     if(pl.vx){pl.x+=pl.vx*dt;if(pl.x<2){pl.x=2;pl.vx*=-1}if(pl.x+pl.w>W-2){pl.x=W-2-pl.w;pl.vx*=-1}}
     if(pl.broken){pl.fy+=.5*dt;pl.y+=pl.fy*dt;pl.alpha=Math.max(0,pl.alpha-.03*dt)}
+    if(mode==='play'&&pl.type==='worn'&&!pl.broken&&!seenNew.has('worn')){const sy=pl.y-camY;if(sy>30&&sy<H-40){seenNew.add('worn');banner={top:'Нова латка',text:'Потерта',life:1};sfx('stage')}}
   }
   for(const en of enemies){
     en.t+=.05*dt;if(en.bi===undefined){en.bi=Math.floor(Math.random()*9);en.bt=0}en.bt+=dt;if(en.bt>300){en.bt=0;en.bi++}
@@ -465,23 +470,24 @@ function patch(w,h,bg,dk){
   ctx.fillStyle=dk;ctx.fillRect(2,3,w-4,h);ctx.fillRect(0,5,w,h-4);
   ctx.fillStyle=bg;ctx.fillRect(2,0,w-4,h);ctx.fillRect(0,2,w,h-4);
 }
-function stitches(w,h,col){ctx.fillStyle=col;for(let x=6;x<w-6;x+=7){ctx.fillRect(x,3,4,2);ctx.fillRect(x,h-5,4,2)}for(let y=8;y<h-7;y+=7){ctx.fillRect(3,y,2,4);ctx.fillRect(w-5,y,2,4)}}
+function stitches(w,h,col,gap){ctx.fillStyle=col;for(let x=6;x<w-6;x+=7){if(!(gap&&x>w/2-14&&x<w/2+8)){ctx.fillRect(x,3,4,2);ctx.fillRect(x,h-5,4,2)}}for(let y=8;y<h-7;y+=7){ctx.fillRect(3,y,2,4);ctx.fillRect(w-5,y,2,4)}}
 function drawPlat(pl){
   const sy=Math.round(pl.y-camY),w=Math.round(pl.w),h=pl.h;
   ctx.save();ctx.globalAlpha=pl.alpha;ctx.translate(Math.round(pl.x),sy);
-  if(pl.type==='breaking'){
+  if(pl.type==='breaking'||(pl.type==='worn'&&pl.broken)){
     if(pl.broken)ctx.rotate(pl.fy*.02);
-    stitches(w,h,pl.city?'#b02020':'#d63434');ctx.fillStyle='rgba(214,52,52,.08)';ctx.fillRect(3,3,w-6,h-6);
-    ctx.fillStyle=pl.city?'#9a1818':'#c23030';
+    if(pl.type==='worn'){patch(w,h,'#f3d2c8','#c4a094');stitches(w,h,'#6e2a2a',true)}
+    else{stitches(w,h,pl.city?'#b02020':'#d63434');ctx.fillStyle='rgba(214,52,52,.08)';ctx.fillRect(3,3,w-6,h-6);ctx.fillStyle=pl.city?'#9a1818':'#c23030'}
   }else{
-    const C={spring:['#6b4fd8','#3e2a99'],minus:[pl.dim?'#8a919c':'#4f5866','#2a3038'],normal:['#d63434','#8c1a1e'],moving:['#e0473a','#8c1a1e']}[pl.type]||['#d63434','#8c1a1e'];
+    const worn=pl.type==='worn',cracked=worn&&pl.hits>=1;
+    const C={spring:['#6b4fd8','#3e2a99'],minus:[pl.dim?'#8a919c':'#4f5866','#2a3038'],normal:['#d63434','#8c1a1e'],moving:['#e0473a','#8c1a1e'],worn:[cracked?'#f3d2c8':'#e7b1a4',cracked?'#c4a094':'#a85a52']}[pl.type]||['#d63434','#8c1a1e'];
     patch(w,h,C[0],C[1]);
-    ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(2,2,w-4,2);
-    stitches(w,h,'rgba(255,255,255,.85)');
+    if(!worn){ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(2,2,w-4,2)}
+    stitches(w,h,worn?'#6e2a2a':'rgba(255,255,255,.85)',cracked);
     if(pl.type==='spring'){ctx.fillStyle='#3e2a99';const cx=Math.round(w/2);for(let i=0;i<4;i++){ctx.fillRect(cx-8+(i%2)*8,-4-i*4,8,3)}}
     if(pl.type==='moving'){ctx.fillStyle='#ffffff';for(const [x,d] of [[8,1],[w-8,-1]]){ctx.fillRect(x,h/2-1,2*d,2);ctx.fillRect(x+2*d,h/2-3,2*d,6)}}
     if(pl.type==='minus'){ctx.fillStyle='#ffffff';ctx.fillRect(9,h/2-1,8,3)}
-    ctx.fillStyle='#ffffff';
+    ctx.fillStyle=worn?'#6e2a2a':'#ffffff';
   }
   const lab=pl.type==='minus'?pl.label.replace(/^− /,''):pl.label,ox=pl.type==='minus'?8:0;
   ctx.font='800 '+pl.fs+'px Manrope, system-ui, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lab,w/2+ox,h/2+1);
