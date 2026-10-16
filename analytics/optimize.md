@@ -30,7 +30,8 @@ MCP у Cloud Agent не логіниться. SQL нижче — якщо тре
 | `zone_enter` | де відвалюються |
 | `express` / `gordon` / `ticket` / `stomp` | чи бонуси взагалі трапляються |
 | `look_buy` / `look_wear` / `ach` | чи гардероб живе |
-| `share` | чи є чим хвалитись |
+| `share` | дія в листі-превʼю картки: `method` (native/download/copy), `format`, `card_v`, `rank`, `score`, `zone`, `cause` |
+| `share_open` | відкрито лист-превʼю картки |
 | `threads_click` | чіп у «Про гру» |
 
 Примітка: назви етапів (`zone`) без років з 2026-10-16 («Суми», не «Суми · 2022»); старі події мають роки — групуй за `zone_idx`.
