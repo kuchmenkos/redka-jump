@@ -10,8 +10,8 @@
 
 Два дашборди в PostHog EU (проєкт redkajump, період 30 днів):
 
-- [Як грають](https://eu.posthog.com/project/307751/dashboard/1027950) — KPI, медіани, воронки, Threads
-- [Баланс](https://eu.posthog.com/project/307751/dashboard/1027951) — легко vs складно: смерті, етапи, бонуси, гардероб
+- [Як грають](https://eu.posthog.com/project/307751/dashboard/1027950) — KPI з порівнянням, тренд, нові/повернулись, утримання, пристрої й країни, воронки, інтро
+- [Баланс](https://eu.posthog.com/project/307751/dashboard/1027951) — легко vs складно: гістограма рахунків, смерті, етапи, механіки на забіг, економіка гардероба, лідерборд
 
 Для Cursor: [`analytics/optimize.md`](analytics/optimize.md) (`@analytics/optimize.md` + SQL-знімок). MCP у Cloud Agent не логіниться; дашборди зібрані через personal API.
 

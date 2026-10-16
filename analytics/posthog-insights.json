@@ -1,49 +1,61 @@
 {
-  "host": "https://eu.posthog.com",
-  "project_id": 307751,
-  "dashboards_live": {
-    "play": "https://eu.posthog.com/project/307751/dashboard/1027950",
-    "balance": "https://eu.posthog.com/project/307751/dashboard/1027951"
+ "host": "https://eu.posthog.com",
+ "project_id": 307751,
+ "dashboards_live": {
+  "play": "https://eu.posthog.com/project/307751/dashboard/1027950",
+  "balance": "https://eu.posthog.com/project/307751/dashboard/1027951"
+ },
+ "note": "Dashboards laid out via personal API (12-col sm grid, markdown section tiles). Project token only captures events. Default date_from: -30d. Оновлено 2026-10-16: через PostHog MCP; бекап попередніх дашбордів у analytics/backup-2026-10-16/.",
+ "dashboards": [
+  {
+   "id": 1027950,
+   "name": "Редька Джамп — як грають",
+   "purpose": "audience, retention, funnels",
+   "layout": "огляд (KPI з порівнянням) → тренд + нові/повернулись → утримання → аудиторія (пристрої, країни) → воронки + інтро + забігів на гравця",
+   "insights": [
+    "Забіги",
+    "Унікальні гравці",
+    "Забіги по днях",
+    "Нові й ті, що повернулись",
+    "Утримання: хто повертається грати",
+    "Пристрої гравців",
+    "Країни гравців",
+    "Старт → фінал → шеринг",
+    "Відкрив гру → Threads",
+    "Що тиснуть на інтро та далі",
+    "Скільки забігів на гравця"
+   ]
   },
-  "note": "Dashboards laid out via personal API (12-col sm grid, markdown section tiles). Project token only captures events. Default date_from: -30d.",
-  "dashboards": [
-    {
-      "id": 1027950,
-      "name": "Редька Джамп — як грають",
-      "purpose": "traffic and engagement",
-      "layout": "intro → KPI row → Threads + medians → trend/funnels",
-      "insights": [
-        "Забіги",
-        "Унікальні гравці",
-        "Фінали",
-        "Поділитись",
-        "Кліки Threads",
-        "Медіана тривалості й рахунку",
-        "Забіги по днях",
-        "Старт → фінал → шеринг",
-        "Відкрив гру → Threads",
-        "Звідки старт (кнопка / ще раз)"
-      ]
-    },
-    {
-      "id": 1027951,
-      "name": "Редька Джамп — баланс",
-      "purpose": "difficulty and mechanic tuning",
-      "layout": "how hard → deaths/zones → stage funnel → bonuses → progress",
-      "insights": [
-        "Рахунок і тривалість (p50 / p90)",
-        "Короткі смерті (до 40k)",
-        "Смерті за причиною",
-        "Де відвалюються",
-        "Чим кінчають",
-        "Воронка етапів",
-        "Гордон",
-        "Експреси",
-        "Квитки",
-        "Топти",
-        "Покупки луків",
-        "Ачивки"
-      ]
-    }
-  ]
+  {
+   "id": 1027951,
+   "name": "Редька Джамп — баланс",
+   "purpose": "difficulty, deaths, stages, bonuses, economy",
+   "layout": "складність (p50/p90, короткі смерті, гістограма, пристрої) → смерті (пиріг + етапи) → воронка етапів → бонуси (механіки на забіг, Гордон) → прогрес (луки, ачивки, лідерборд)",
+   "insights": [
+    "Рахунок і тривалість (p50 / p90)",
+    "Короткі смерті (до 40k)",
+    "Розподіл рахунків",
+    "Рахунок на телефоні й комп’ютері",
+    "Смерті за причиною",
+    "Де відвалюються",
+    "Воронка етапів",
+    "Механіки на один забіг (середнє)",
+    "Гордон",
+    "Покупки луків",
+    "Ачивки",
+    "Лідерборд: відкрив → записався"
+   ]
+  }
+ ],
+ "removed_from_dashboards": [
+  "Фінали",
+  "Поділитись",
+  "Кліки Threads",
+  "Медіана тривалості й рахунку",
+  "Звідки старт (кнопка / ще раз)",
+  "Чим кінчають",
+  "Експреси",
+  "Квитки",
+  "Топти"
+ ]
 }

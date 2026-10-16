@@ -1,0 +1,1588 @@
+{
+ "id": 1027951,
+ "name": "Редька Джамп — баланс",
+ "description": "Легко vs складно: медіани, смерті, етапи, бонуси. Для крутіння механік, не vanity metrics. Період — 30 днів.",
+ "tags": [
+  "redka",
+  "balance"
+ ],
+ "filters": {
+  "date_from": "-30d"
+ },
+ "tiles": [
+  {
+   "id": 7513534,
+   "layouts": {
+    "sm": {
+     "h": 2,
+     "w": 12,
+     "x": 0,
+     "y": 0
+    }
+   },
+   "text": {
+    "id": 664367,
+    "created_by": {
+     "id": 193815,
+     "uuid": "019d000f-0b12-0000-c72a-3495d76d8476",
+     "distinct_id": "bPReS0mr8tu6hXo25i3K7Ul5xCnGV2lzPMPRKZCRS7i",
+     "first_name": "Sviatoslav",
+     "last_name": "Kuchmenko",
+     "email": "skuchmenko23@gmail.com",
+     "is_email_verified": true,
+     "hedgehog_config": null,
+     "role_at_organization": "marketing"
+    },
+    "last_modified_by": null,
+    "body": "## Наскільки важко\nДивись **медіану**, не середнє. p50 рахунок **< 40k** — заскладно; **> 250k** — залегко.",
+    "agent_context": null,
+    "dashboard_tiles": [
+     {
+      "id": 7513534,
+      "dashboard_id": 1027951,
+      "deleted": null
+     }
+    ],
+    "last_modified_at": "2026-10-15T22:22:14.236171Z",
+    "team": 307751
+   },
+   "insight": null
+  },
+  {
+   "id": 7512934,
+   "layouts": {
+    "sm": {
+     "h": 2,
+     "w": 6,
+     "x": 0,
+     "y": 2
+    }
+   },
+   "text": null,
+   "insight": {
+    "id": 6604448,
+    "short_id": "zcfD9f06",
+    "name": "Рахунок і тривалість (p50 / p90)",
+    "description": "Дивись медіану. p50 рахунок < 40k — заскладно; > 250k — залегко.",
+    "query": {
+     "kind": "DataTableNode",
+     "source": {
+      "connectionId": null,
+      "executionTarget": null,
+      "explain": null,
+      "filters": {
+       "breakdownFilter": null,
+       "compareFilter": null,
+       "dateRange": {
+        "date_from": "-30d",
+        "date_to": null,
+        "daysOfWeek": null,
+        "excludeIncompletePeriods": false,
+        "explicitDate": false
+       },
+       "filterTestAccounts": null,
+       "interval": null,
+       "properties": null
+      },
+      "kind": "HogQLQuery",
+      "modifiers": null,
+      "name": null,
+      "query": "SELECT\n  round(quantile(0.5)(toFloat(properties.score)), 0) AS `рахунок p50`,\n  round(quantile(0.9)(toFloat(properties.score)), 0) AS `рахунок p90`,\n  round(quantile(0.5)(toFloat(properties.duration_s)), 1) AS `тривалість p50`,\n  round(quantile(0.9)(toFloat(properties.duration_s)), 1) AS `тривалість p90`,\n  count() AS `забіги`\nFROM events\nWHERE event = 'game_over' AND {filters}",
+      "response": null,
+      "sendRawQuery": null,
+      "tags": null,
+      "values": null,
+      "variables": null,
+      "version": null
+     }
+    },
+    "tags": []
+   }
+  },
+  {
+   "id": 7512949,
+   "layouts": {
+    "sm": {
+     "h": 2,
+     "w": 6,
+     "x": 6,
+     "y": 2
+    }
+   },
+   "text": null,
+   "insight": {
+    "id": 6604463,
+    "short_id": "vdguju5X",
+    "name": "Короткі смерті (до 40k)",
+    "description": "Якщо частка до 40k > 55% — Львів / щілина ріжуть занадто рано.",
+    "query": {
+     "kind": "DataTableNode",
+     "source": {
+      "connectionId": null,
+      "executionTarget": null,
+      "explain": null,
+      "filters": {
+       "breakdownFilter": null,
+       "compareFilter": null,
+       "dateRange": {
+        "date_from": "-30d",
+        "date_to": null,
+        "daysOfWeek": null,
+        "excludeIncompletePeriods": false,
+        "explicitDate": false
+       },
+       "filterTestAccounts": null,
+       "interval": null,
+       "properties": null
+      },
+      "kind": "HogQLQuery",
+      "modifiers": null,
+      "name": null,
+      "query": "SELECT\n  countIf(toFloat(properties.score) < 40000) AS `до 40k`,\n  countIf(toFloat(properties.duration_s) < 25) AS `до 25 с`,\n  count() AS `забіги`,\n  round(100 * countIf(toFloat(properties.score) < 40000) / nullIf(count(), 0), 1) AS `частка до 40k`\nFROM events\nWHERE event = 'game_over' AND {filters}",
+      "response": null,
+      "sendRawQuery": null,
+      "tags": null,
+      "values": null,
+      "variables": null,
+      "version": null
+     }
+    },
+    "tags": []
+   }
+  },
+  {
+   "id": 7513535,
+   "layouts": {
+    "sm": {
+     "h": 2,
+     "w": 12,
+     "x": 0,
+     "y": 4
+    }
+   },
+   "text": {
+    "id": 664368,
+    "created_by": {
+     "id": 193815,
+     "uuid": "019d000f-0b12-0000-c72a-3495d76d8476",
+     "distinct_id": "bPReS0mr8tu6hXo25i3K7Ul5xCnGV2lzPMPRKZCRS7i",
+     "first_name": "Sviatoslav",
+     "last_name": "Kuchmenko",
+     "email": "skuchmenko23@gmail.com",
+     "is_email_verified": true,
+     "hedgehog_config": null,
+     "role_at_organization": "marketing"
+    },
+    "last_modified_by": null,
+    "body": "## Чим і де кінчають\nПадіння, хейтери, вихід з паузи. Якщо багато «вийшов» на Сумах — здаються, не вмирають.",
+    "agent_context": null,
+    "dashboard_tiles": [
+     {
+      "id": 7513535,
+      "dashboard_id": 1027951,
+      "deleted": null
+     }
+    ],
+    "last_modified_at": "2026-10-15T22:22:14.785534Z",
+    "team": 307751
+   },
+   "insight": null
+  },
+  {
+   "id": 7512936,
+   "layouts": {
+    "sm": {
+     "h": 6,
+     "w": 6,
+     "x": 0,
+     "y": 6
+    }
+   },
+   "text": null,
+   "insight": {
+    "id": 6604450,
+    "short_id": "qkjMhScB",
+    "name": "Смерті за причиною",
+    "description": "fall / хейтери / інші cause з game_over.",
+    "query": {
+     "kind": "InsightVizNode",
+     "source": {
+      "aggregation_group_type_index": null,
+      "breakdownFilter": {
+       "breakdown": "cause",
+       "breakdown_group_type_index": null,
+       "breakdown_hide_other_aggregation": null,
+       "breakdown_histogram_bin_count": null,
+       "breakdown_limit": null,
+       "breakdown_normalize_url": null,
+       "breakdown_path_cleaning": null,
+       "breakdown_type": "event",
+       "breakdowns": null
+      },
+      "calendarHeatmapFilter": null,
+      "compareFilter": null,
+      "conversionGoal": null,
+      "dataColorTheme": null,
+      "dateRange": {
+       "date_from": "-30d",
+       "date_to": null,
+       "daysOfWeek": null,
+       "excludeIncompletePeriods": false,
+       "explicitDate": false
+      },
+      "filterTestAccounts": false,
+      "interval": "day",
+      "kind": "TrendsQuery",
+      "modifiers": null,
+      "properties": [],
+      "response": null,
+      "samplingFactor": null,
+      "series": [
+       {
+        "custom_name": null,
+        "event": "game_over",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": "total",
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "game_over",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": null,
+        "response": null,
+        "version": null
+       }
+      ],
+      "tags": null,
+      "trendsFilter": {
+       "aggregationAxisFormat": "numeric",
+       "aggregationAxisPostfix": null,
+       "aggregationAxisPrefix": null,
+       "annotationsScope": null,
+       "breakdown_histogram_bin_count": null,
+       "chartStyle": null,
+       "confidenceLevel": null,
+       "decimalPlaces": null,
+       "detailedResultsAggregationType": null,
+       "display": "ActionsBarValue",
+       "excludeBoxPlotOutliers": true,
+       "formula": null,
+       "formulaNodes": null,
+       "formulas": null,
+       "goalLines": null,
+       "hiddenLegendIndexes": null,
+       "hideWeekends": false,
+       "legendPosition": "bottom",
+       "metricChangeDecreaseColor": null,
+       "metricChangeIncreaseColor": null,
+       "metricColorByDirection": false,
+       "metricLineDecreaseColor": null,
+       "metricLineIncreaseColor": null,
+       "metricShowChange": true,
+       "metricSummary": "total",
+       "minDecimalPlaces": null,
+       "movingAverageIntervals": null,
+       "resultCustomizationBy": "value",
+       "resultCustomizations": null,
+       "showAlertThresholdLines": false,
+       "showAnnotations": true,
+       "showConfidenceIntervals": null,
+       "showLabelsOnSeries": null,
+       "showLegend": false,
+       "showMovingAverage": null,
+       "showMultipleYAxes": false,
+       "showPercentStackView": false,
+       "showTrendLines": null,
+       "showValuesOnSeries": false,
+       "smoothingIntervals": 1,
+       "stackBreakdownValues": false,
+       "xAxisLabel": null,
+       "yAxisLabel": null,
+       "yAxisMax": null,
+       "yAxisMin": null,
+       "yAxisScaleType": "linear",
+       "yAxisStartAtZero": true
+      },
+      "version": 4.0
+     }
+    },
+    "tags": []
+   }
+  },
+  {
+   "id": 7512938,
+   "layouts": {
+    "sm": {
+     "h": 6,
+     "w": 6,
+     "x": 6,
+     "y": 6
+    }
+   },
+   "text": null,
+   "insight": {
+    "id": 6604452,
+    "short_id": "hB2VD0dv",
+    "name": "Де відвалюються",
+    "description": "Зона на момент фіналу. Багато Суми — не бачать Стукача.",
+    "query": {
+     "kind": "InsightVizNode",
+     "source": {
+      "aggregation_group_type_index": null,
+      "breakdownFilter": {
+       "breakdown": "zone",
+       "breakdown_group_type_index": null,
+       "breakdown_hide_other_aggregation": null,
+       "breakdown_histogram_bin_count": null,
+       "breakdown_limit": null,
+       "breakdown_normalize_url": null,
+       "breakdown_path_cleaning": null,
+       "breakdown_type": "event",
+       "breakdowns": null
+      },
+      "calendarHeatmapFilter": null,
+      "compareFilter": null,
+      "conversionGoal": null,
+      "dataColorTheme": null,
+      "dateRange": {
+       "date_from": "-30d",
+       "date_to": null,
+       "daysOfWeek": null,
+       "excludeIncompletePeriods": false,
+       "explicitDate": false
+      },
+      "filterTestAccounts": false,
+      "interval": "day",
+      "kind": "TrendsQuery",
+      "modifiers": null,
+      "properties": [],
+      "response": null,
+      "samplingFactor": null,
+      "series": [
+       {
+        "custom_name": null,
+        "event": "game_over",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": "total",
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "game_over",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": null,
+        "response": null,
+        "version": null
+       }
+      ],
+      "tags": null,
+      "trendsFilter": {
+       "aggregationAxisFormat": "numeric",
+       "aggregationAxisPostfix": null,
+       "aggregationAxisPrefix": null,
+       "annotationsScope": null,
+       "breakdown_histogram_bin_count": null,
+       "chartStyle": null,
+       "confidenceLevel": null,
+       "decimalPlaces": null,
+       "detailedResultsAggregationType": null,
+       "display": "ActionsBarValue",
+       "excludeBoxPlotOutliers": true,
+       "formula": null,
+       "formulaNodes": null,
+       "formulas": null,
+       "goalLines": null,
+       "hiddenLegendIndexes": null,
+       "hideWeekends": false,
+       "legendPosition": "bottom",
+       "metricChangeDecreaseColor": null,
+       "metricChangeIncreaseColor": null,
+       "metricColorByDirection": false,
+       "metricLineDecreaseColor": null,
+       "metricLineIncreaseColor": null,
+       "metricShowChange": true,
+       "metricSummary": "total",
+       "minDecimalPlaces": null,
+       "movingAverageIntervals": null,
+       "resultCustomizationBy": "value",
+       "resultCustomizations": null,
+       "showAlertThresholdLines": false,
+       "showAnnotations": true,
+       "showConfidenceIntervals": null,
+       "showLabelsOnSeries": null,
+       "showLegend": false,
+       "showMovingAverage": null,
+       "showMultipleYAxes": false,
+       "showPercentStackView": false,
+       "showTrendLines": null,
+       "showValuesOnSeries": false,
+       "smoothingIntervals": 1,
+       "stackBreakdownValues": false,
+       "xAxisLabel": null,
+       "yAxisLabel": null,
+       "yAxisMax": null,
+       "yAxisMin": null,
+       "yAxisScaleType": "linear",
+       "yAxisStartAtZero": true
+      },
+      "version": 4.0
+     }
+    },
+    "tags": []
+   }
+  },
+  {
+   "id": 7512935,
+   "layouts": {
+    "sm": {
+     "h": 4,
+     "w": 12,
+     "x": 0,
+     "y": 12
+    }
+   },
+   "text": null,
+   "insight": {
+    "id": 6604449,
+    "short_id": "zDpkTofG",
+    "name": "Чим кінчають",
+    "description": "Смерть або вихід з паузи (quit). Багато quit на Сумах — здаються, не вмирають.",
+    "query": {
+     "kind": "DataTableNode",
+     "source": {
+      "connectionId": null,
+      "executionTarget": null,
+      "explain": null,
+      "filters": {
+       "breakdownFilter": null,
+       "compareFilter": null,
+       "dateRange": {
+        "date_from": "-30d",
+        "date_to": null,
+        "daysOfWeek": null,
+        "excludeIncompletePeriods": false,
+        "explicitDate": false
+       },
+       "filterTestAccounts": null,
+       "interval": null,
+       "properties": null
+      },
+      "kind": "HogQLQuery",
+      "modifiers": null,
+      "name": null,
+      "query": "SELECT\n  if(event = 'run_abandon', 'вийшов', toString(properties.cause)) AS `чим`,\n  count() AS `скільки`\nFROM events\nWHERE event IN ('game_over', 'run_abandon') AND {filters}\nGROUP BY 1\nORDER BY `скільки` DESC",
+      "response": null,
+      "sendRawQuery": null,
+      "tags": null,
+      "values": null,
+      "variables": null,
+      "version": null
+     }
+    },
+    "tags": []
+   }
+  },
+  {
+   "id": 7513536,
+   "layouts": {
+    "sm": {
+     "h": 2,
+     "w": 12,
+     "x": 0,
+     "y": 16
+    }
+   },
+   "text": {
+    "id": 664369,
+    "created_by": {
+     "id": 193815,
+     "uuid": "019d000f-0b12-0000-c72a-3495d76d8476",
+     "distinct_id": "bPReS0mr8tu6hXo25i3K7Ul5xCnGV2lzPMPRKZCRS7i",
+     "first_name": "Sviatoslav",
+     "last_name": "Kuchmenko",
+     "email": "skuchmenko23@gmail.com",
+     "is_email_verified": true,
+     "hedgehog_config": null,
+     "role_at_organization": "marketing"
+    },
+    "last_modified_by": null,
+    "body": "## Куди долітають\nЧастка забігів через Львів → Суджа → Київ → Одіссея → Стадіон.",
+    "agent_context": null,
+    "dashboard_tiles": [
+     {
+      "id": 7513536,
+      "dashboard_id": 1027951,
+      "deleted": null
+     }
+    ],
+    "last_modified_at": "2026-10-15T22:22:15.342539Z",
+    "team": 307751
+   },
+   "insight": null
+  },
+  {
+   "id": 7512939,
+   "layouts": {
+    "sm": {
+     "h": 6,
+     "w": 12,
+     "x": 0,
+     "y": 18
+    }
+   },
+   "text": null,
+   "insight": {
+    "id": 6604453,
+    "short_id": "RtP9k4B7",
+    "name": "Воронка етапів",
+    "description": "Львів 60k → Суджа 240k → Київ 370k → Одіссея 530k → Стадіон 750k.",
+    "query": {
+     "kind": "InsightVizNode",
+     "source": {
+      "aggregation_group_type_index": null,
+      "breakdownFilter": null,
+      "compareFilter": null,
+      "dataColorTheme": null,
+      "dateRange": {
+       "date_from": "-30d",
+       "date_to": null,
+       "daysOfWeek": null,
+       "excludeIncompletePeriods": false,
+       "explicitDate": false
+      },
+      "filterTestAccounts": false,
+      "funnelsFilter": {
+       "annotationsScope": null,
+       "binCount": null,
+       "breakdownAttributionType": "first_touch",
+       "breakdownAttributionValue": null,
+       "breakdownSorting": null,
+       "chartStyle": null,
+       "customAggregationTarget": null,
+       "exclusions": [],
+       "funnelAggregateByHogQL": null,
+       "funnelFromStep": null,
+       "funnelOrderType": "ordered",
+       "funnelStepReference": "total",
+       "funnelToStep": null,
+       "funnelVizType": "steps",
+       "funnelWindowInterval": 1,
+       "funnelWindowIntervalUnit": "day",
+       "goalLines": null,
+       "hiddenLegendBreakdowns": null,
+       "hideIncompleteConversionWindowPeriods": false,
+       "layout": "vertical",
+       "legendPosition": "bottom",
+       "resultCustomizations": null,
+       "showAnnotations": true,
+       "showLegend": false,
+       "showTrendLines": null,
+       "showValuesOnSeries": false,
+       "useUdf": null
+      },
+      "interval": null,
+      "kind": "FunnelsQuery",
+      "modifiers": null,
+      "properties": [],
+      "response": null,
+      "samplingFactor": null,
+      "series": [
+       {
+        "custom_name": null,
+        "event": "play_start",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": null,
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "Старт",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": null,
+        "response": null,
+        "version": null
+       },
+       {
+        "custom_name": null,
+        "event": "zone_enter",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": null,
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "Львів 60k",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": [
+         {
+          "key": "zone_idx",
+          "label": null,
+          "operator": "exact",
+          "type": "event",
+          "value": 1.0
+         }
+        ],
+        "response": null,
+        "version": null
+       },
+       {
+        "custom_name": null,
+        "event": "zone_enter",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": null,
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "Суджа 240k",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": [
+         {
+          "key": "zone_idx",
+          "label": null,
+          "operator": "exact",
+          "type": "event",
+          "value": 3.0
+         }
+        ],
+        "response": null,
+        "version": null
+       },
+       {
+        "custom_name": null,
+        "event": "zone_enter",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": null,
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "Київ 370k",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": [
+         {
+          "key": "zone_idx",
+          "label": null,
+          "operator": "exact",
+          "type": "event",
+          "value": 4.0
+         }
+        ],
+        "response": null,
+        "version": null
+       },
+       {
+        "custom_name": null,
+        "event": "zone_enter",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": null,
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "Одіссея 530k",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": [
+         {
+          "key": "zone_idx",
+          "label": null,
+          "operator": "exact",
+          "type": "event",
+          "value": 5.0
+         }
+        ],
+        "response": null,
+        "version": null
+       },
+       {
+        "custom_name": null,
+        "event": "zone_enter",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": null,
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "Стадіон 750k",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": [
+         {
+          "key": "zone_idx",
+          "label": null,
+          "operator": "exact",
+          "type": "event",
+          "value": 6.0
+         }
+        ],
+        "response": null,
+        "version": null
+       }
+      ],
+      "tags": null,
+      "version": 4.0
+     }
+    },
+    "tags": []
+   }
+  },
+  {
+   "id": 7513537,
+   "layouts": {
+    "sm": {
+     "h": 2,
+     "w": 12,
+     "x": 0,
+     "y": 24
+    }
+   },
+   "text": {
+    "id": 664370,
+    "created_by": {
+     "id": 193815,
+     "uuid": "019d000f-0b12-0000-c72a-3495d76d8476",
+     "distinct_id": "bPReS0mr8tu6hXo25i3K7Ul5xCnGV2lzPMPRKZCRS7i",
+     "first_name": "Sviatoslav",
+     "last_name": "Kuchmenko",
+     "email": "skuchmenko23@gmail.com",
+     "is_email_verified": true,
+     "hedgehog_config": null,
+     "role_at_organization": "marketing"
+    },
+    "last_modified_by": null,
+    "body": "## Бонуси\nЕкспрес після 60k, Гордон після 300k, квитки й топти. Мало подій — бонус не чіпляє.",
+    "agent_context": null,
+    "dashboard_tiles": [
+     {
+      "id": 7513537,
+      "dashboard_id": 1027951,
+      "deleted": null
+     }
+    ],
+    "last_modified_at": "2026-10-15T22:22:16.042769Z",
+    "team": 307751
+   },
+   "insight": null
+  },
+  {
+   "id": 7512941,
+   "layouts": {
+    "sm": {
+     "h": 5,
+     "w": 6,
+     "x": 0,
+     "y": 26
+    }
+   },
+   "text": null,
+   "insight": {
+    "id": 6604455,
+    "short_id": "xp2YNyQ4",
+    "name": "Гордон",
+    "description": "offered / caught / missed після 300k. Майже всі missed — бонус не читається.",
+    "query": {
+     "kind": "InsightVizNode",
+     "source": {
+      "aggregation_group_type_index": null,
+      "breakdownFilter": {
+       "breakdown": "result",
+       "breakdown_group_type_index": null,
+       "breakdown_hide_other_aggregation": null,
+       "breakdown_histogram_bin_count": null,
+       "breakdown_limit": null,
+       "breakdown_normalize_url": null,
+       "breakdown_path_cleaning": null,
+       "breakdown_type": "event",
+       "breakdowns": null
+      },
+      "calendarHeatmapFilter": null,
+      "compareFilter": null,
+      "conversionGoal": null,
+      "dataColorTheme": null,
+      "dateRange": {
+       "date_from": "-30d",
+       "date_to": null,
+       "daysOfWeek": null,
+       "excludeIncompletePeriods": false,
+       "explicitDate": false
+      },
+      "filterTestAccounts": false,
+      "interval": "day",
+      "kind": "TrendsQuery",
+      "modifiers": null,
+      "properties": [],
+      "response": null,
+      "samplingFactor": null,
+      "series": [
+       {
+        "custom_name": null,
+        "event": "gordon",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": "total",
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "gordon",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": null,
+        "response": null,
+        "version": null
+       }
+      ],
+      "tags": null,
+      "trendsFilter": {
+       "aggregationAxisFormat": "numeric",
+       "aggregationAxisPostfix": null,
+       "aggregationAxisPrefix": null,
+       "annotationsScope": null,
+       "breakdown_histogram_bin_count": null,
+       "chartStyle": null,
+       "confidenceLevel": null,
+       "decimalPlaces": null,
+       "detailedResultsAggregationType": null,
+       "display": "ActionsBar",
+       "excludeBoxPlotOutliers": true,
+       "formula": null,
+       "formulaNodes": null,
+       "formulas": null,
+       "goalLines": null,
+       "hiddenLegendIndexes": null,
+       "hideWeekends": false,
+       "legendPosition": "bottom",
+       "metricChangeDecreaseColor": null,
+       "metricChangeIncreaseColor": null,
+       "metricColorByDirection": false,
+       "metricLineDecreaseColor": null,
+       "metricLineIncreaseColor": null,
+       "metricShowChange": true,
+       "metricSummary": "total",
+       "minDecimalPlaces": null,
+       "movingAverageIntervals": null,
+       "resultCustomizationBy": "value",
+       "resultCustomizations": null,
+       "showAlertThresholdLines": false,
+       "showAnnotations": true,
+       "showConfidenceIntervals": null,
+       "showLabelsOnSeries": null,
+       "showLegend": false,
+       "showMovingAverage": null,
+       "showMultipleYAxes": false,
+       "showPercentStackView": false,
+       "showTrendLines": null,
+       "showValuesOnSeries": false,
+       "smoothingIntervals": 1,
+       "stackBreakdownValues": false,
+       "xAxisLabel": null,
+       "yAxisLabel": null,
+       "yAxisMax": null,
+       "yAxisMin": null,
+       "yAxisScaleType": "linear",
+       "yAxisStartAtZero": true
+      },
+      "version": 4.0
+     }
+    },
+    "tags": []
+   }
+  },
+  {
+   "id": 7512942,
+   "layouts": {
+    "sm": {
+     "h": 5,
+     "w": 6,
+     "x": 6,
+     "y": 26
+    }
+   },
+   "text": null,
+   "insight": {
+    "id": 6604456,
+    "short_id": "Z0W1Iai3",
+    "name": "Експреси",
+    "description": "Подія express. Мало після 60k — експрес не чіпляє.",
+    "query": {
+     "kind": "InsightVizNode",
+     "source": {
+      "aggregation_group_type_index": null,
+      "breakdownFilter": null,
+      "calendarHeatmapFilter": null,
+      "compareFilter": null,
+      "conversionGoal": null,
+      "dataColorTheme": null,
+      "dateRange": {
+       "date_from": "-30d",
+       "date_to": null,
+       "daysOfWeek": null,
+       "excludeIncompletePeriods": false,
+       "explicitDate": false
+      },
+      "filterTestAccounts": false,
+      "interval": "day",
+      "kind": "TrendsQuery",
+      "modifiers": null,
+      "properties": [],
+      "response": null,
+      "samplingFactor": null,
+      "series": [
+       {
+        "custom_name": null,
+        "event": "express",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": "total",
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "express",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": null,
+        "response": null,
+        "version": null
+       }
+      ],
+      "tags": null,
+      "trendsFilter": {
+       "aggregationAxisFormat": "numeric",
+       "aggregationAxisPostfix": null,
+       "aggregationAxisPrefix": null,
+       "annotationsScope": null,
+       "breakdown_histogram_bin_count": null,
+       "chartStyle": null,
+       "confidenceLevel": null,
+       "decimalPlaces": null,
+       "detailedResultsAggregationType": null,
+       "display": "ActionsLineGraph",
+       "excludeBoxPlotOutliers": true,
+       "formula": null,
+       "formulaNodes": null,
+       "formulas": null,
+       "goalLines": null,
+       "hiddenLegendIndexes": null,
+       "hideWeekends": false,
+       "legendPosition": "bottom",
+       "metricChangeDecreaseColor": null,
+       "metricChangeIncreaseColor": null,
+       "metricColorByDirection": false,
+       "metricLineDecreaseColor": null,
+       "metricLineIncreaseColor": null,
+       "metricShowChange": true,
+       "metricSummary": "total",
+       "minDecimalPlaces": null,
+       "movingAverageIntervals": null,
+       "resultCustomizationBy": "value",
+       "resultCustomizations": null,
+       "showAlertThresholdLines": false,
+       "showAnnotations": true,
+       "showConfidenceIntervals": null,
+       "showLabelsOnSeries": null,
+       "showLegend": false,
+       "showMovingAverage": null,
+       "showMultipleYAxes": false,
+       "showPercentStackView": false,
+       "showTrendLines": null,
+       "showValuesOnSeries": false,
+       "smoothingIntervals": 1,
+       "stackBreakdownValues": false,
+       "xAxisLabel": null,
+       "yAxisLabel": null,
+       "yAxisMax": null,
+       "yAxisMin": null,
+       "yAxisScaleType": "linear",
+       "yAxisStartAtZero": true
+      },
+      "version": 4.0
+     }
+    },
+    "tags": []
+   }
+  },
+  {
+   "id": 7512944,
+   "layouts": {
+    "sm": {
+     "h": 5,
+     "w": 6,
+     "x": 0,
+     "y": 31
+    }
+   },
+   "text": null,
+   "insight": {
+    "id": 6604458,
+    "short_id": "nLppx36h",
+    "name": "Квитки",
+    "description": "Подія ticket (~кожні 12k).",
+    "query": {
+     "kind": "InsightVizNode",
+     "source": {
+      "aggregation_group_type_index": null,
+      "breakdownFilter": null,
+      "calendarHeatmapFilter": null,
+      "compareFilter": null,
+      "conversionGoal": null,
+      "dataColorTheme": null,
+      "dateRange": {
+       "date_from": "-30d",
+       "date_to": null,
+       "daysOfWeek": null,
+       "excludeIncompletePeriods": false,
+       "explicitDate": false
+      },
+      "filterTestAccounts": false,
+      "interval": "day",
+      "kind": "TrendsQuery",
+      "modifiers": null,
+      "properties": [],
+      "response": null,
+      "samplingFactor": null,
+      "series": [
+       {
+        "custom_name": null,
+        "event": "ticket",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": "total",
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "ticket",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": null,
+        "response": null,
+        "version": null
+       }
+      ],
+      "tags": null,
+      "trendsFilter": {
+       "aggregationAxisFormat": "numeric",
+       "aggregationAxisPostfix": null,
+       "aggregationAxisPrefix": null,
+       "annotationsScope": null,
+       "breakdown_histogram_bin_count": null,
+       "chartStyle": null,
+       "confidenceLevel": null,
+       "decimalPlaces": null,
+       "detailedResultsAggregationType": null,
+       "display": "ActionsLineGraph",
+       "excludeBoxPlotOutliers": true,
+       "formula": null,
+       "formulaNodes": null,
+       "formulas": null,
+       "goalLines": null,
+       "hiddenLegendIndexes": null,
+       "hideWeekends": false,
+       "legendPosition": "bottom",
+       "metricChangeDecreaseColor": null,
+       "metricChangeIncreaseColor": null,
+       "metricColorByDirection": false,
+       "metricLineDecreaseColor": null,
+       "metricLineIncreaseColor": null,
+       "metricShowChange": true,
+       "metricSummary": "total",
+       "minDecimalPlaces": null,
+       "movingAverageIntervals": null,
+       "resultCustomizationBy": "value",
+       "resultCustomizations": null,
+       "showAlertThresholdLines": false,
+       "showAnnotations": true,
+       "showConfidenceIntervals": null,
+       "showLabelsOnSeries": null,
+       "showLegend": false,
+       "showMovingAverage": null,
+       "showMultipleYAxes": false,
+       "showPercentStackView": false,
+       "showTrendLines": null,
+       "showValuesOnSeries": false,
+       "smoothingIntervals": 1,
+       "stackBreakdownValues": false,
+       "xAxisLabel": null,
+       "yAxisLabel": null,
+       "yAxisMax": null,
+       "yAxisMin": null,
+       "yAxisScaleType": "linear",
+       "yAxisStartAtZero": true
+      },
+      "version": 4.0
+     }
+    },
+    "tags": []
+   }
+  },
+  {
+   "id": 7512945,
+   "layouts": {
+    "sm": {
+     "h": 5,
+     "w": 6,
+     "x": 6,
+     "y": 31
+    }
+   },
+   "text": null,
+   "insight": {
+    "id": 6604459,
+    "short_id": "qDsOBuRq",
+    "name": "Топти",
+    "description": "stomp по типу хейтера.",
+    "query": {
+     "kind": "InsightVizNode",
+     "source": {
+      "aggregation_group_type_index": null,
+      "breakdownFilter": {
+       "breakdown": "kind",
+       "breakdown_group_type_index": null,
+       "breakdown_hide_other_aggregation": null,
+       "breakdown_histogram_bin_count": null,
+       "breakdown_limit": null,
+       "breakdown_normalize_url": null,
+       "breakdown_path_cleaning": null,
+       "breakdown_type": "event",
+       "breakdowns": null
+      },
+      "calendarHeatmapFilter": null,
+      "compareFilter": null,
+      "conversionGoal": null,
+      "dataColorTheme": null,
+      "dateRange": {
+       "date_from": "-30d",
+       "date_to": null,
+       "daysOfWeek": null,
+       "excludeIncompletePeriods": false,
+       "explicitDate": false
+      },
+      "filterTestAccounts": false,
+      "interval": "day",
+      "kind": "TrendsQuery",
+      "modifiers": null,
+      "properties": [],
+      "response": null,
+      "samplingFactor": null,
+      "series": [
+       {
+        "custom_name": null,
+        "event": "stomp",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": "total",
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "stomp",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": null,
+        "response": null,
+        "version": null
+       }
+      ],
+      "tags": null,
+      "trendsFilter": {
+       "aggregationAxisFormat": "numeric",
+       "aggregationAxisPostfix": null,
+       "aggregationAxisPrefix": null,
+       "annotationsScope": null,
+       "breakdown_histogram_bin_count": null,
+       "chartStyle": null,
+       "confidenceLevel": null,
+       "decimalPlaces": null,
+       "detailedResultsAggregationType": null,
+       "display": "ActionsBar",
+       "excludeBoxPlotOutliers": true,
+       "formula": null,
+       "formulaNodes": null,
+       "formulas": null,
+       "goalLines": null,
+       "hiddenLegendIndexes": null,
+       "hideWeekends": false,
+       "legendPosition": "bottom",
+       "metricChangeDecreaseColor": null,
+       "metricChangeIncreaseColor": null,
+       "metricColorByDirection": false,
+       "metricLineDecreaseColor": null,
+       "metricLineIncreaseColor": null,
+       "metricShowChange": true,
+       "metricSummary": "total",
+       "minDecimalPlaces": null,
+       "movingAverageIntervals": null,
+       "resultCustomizationBy": "value",
+       "resultCustomizations": null,
+       "showAlertThresholdLines": false,
+       "showAnnotations": true,
+       "showConfidenceIntervals": null,
+       "showLabelsOnSeries": null,
+       "showLegend": false,
+       "showMovingAverage": null,
+       "showMultipleYAxes": false,
+       "showPercentStackView": false,
+       "showTrendLines": null,
+       "showValuesOnSeries": false,
+       "smoothingIntervals": 1,
+       "stackBreakdownValues": false,
+       "xAxisLabel": null,
+       "yAxisLabel": null,
+       "yAxisMax": null,
+       "yAxisMin": null,
+       "yAxisScaleType": "linear",
+       "yAxisStartAtZero": true
+      },
+      "version": 4.0
+     }
+    },
+    "tags": []
+   }
+  },
+  {
+   "id": 7513538,
+   "layouts": {
+    "sm": {
+     "h": 2,
+     "w": 12,
+     "x": 0,
+     "y": 36
+    }
+   },
+   "text": {
+    "id": 664371,
+    "created_by": {
+     "id": 193815,
+     "uuid": "019d000f-0b12-0000-c72a-3495d76d8476",
+     "distinct_id": "bPReS0mr8tu6hXo25i3K7Ul5xCnGV2lzPMPRKZCRS7i",
+     "first_name": "Sviatoslav",
+     "last_name": "Kuchmenko",
+     "email": "skuchmenko23@gmail.com",
+     "is_email_verified": true,
+     "hedgehog_config": null,
+     "role_at_organization": "marketing"
+    },
+    "last_modified_by": null,
+    "body": "## Прогрес\nЧи живе гардероб і ачивки.",
+    "agent_context": null,
+    "dashboard_tiles": [
+     {
+      "id": 7513538,
+      "dashboard_id": 1027951,
+      "deleted": null
+     }
+    ],
+    "last_modified_at": "2026-10-15T22:22:16.583980Z",
+    "team": 307751
+   },
+   "insight": null
+  },
+  {
+   "id": 7512946,
+   "layouts": {
+    "sm": {
+     "h": 5,
+     "w": 6,
+     "x": 0,
+     "y": 38
+    }
+   },
+   "text": null,
+   "insight": {
+    "id": 6604460,
+    "short_id": "cb3jJjXI",
+    "name": "Покупки луків",
+    "description": "look_buy — чи живе гардероб.",
+    "query": {
+     "kind": "InsightVizNode",
+     "source": {
+      "aggregation_group_type_index": null,
+      "breakdownFilter": {
+       "breakdown": "look",
+       "breakdown_group_type_index": null,
+       "breakdown_hide_other_aggregation": null,
+       "breakdown_histogram_bin_count": null,
+       "breakdown_limit": null,
+       "breakdown_normalize_url": null,
+       "breakdown_path_cleaning": null,
+       "breakdown_type": "event",
+       "breakdowns": null
+      },
+      "calendarHeatmapFilter": null,
+      "compareFilter": null,
+      "conversionGoal": null,
+      "dataColorTheme": null,
+      "dateRange": {
+       "date_from": "-30d",
+       "date_to": null,
+       "daysOfWeek": null,
+       "excludeIncompletePeriods": false,
+       "explicitDate": false
+      },
+      "filterTestAccounts": false,
+      "interval": "day",
+      "kind": "TrendsQuery",
+      "modifiers": null,
+      "properties": [],
+      "response": null,
+      "samplingFactor": null,
+      "series": [
+       {
+        "custom_name": null,
+        "event": "look_buy",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": "total",
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "look_buy",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": null,
+        "response": null,
+        "version": null
+       }
+      ],
+      "tags": null,
+      "trendsFilter": {
+       "aggregationAxisFormat": "numeric",
+       "aggregationAxisPostfix": null,
+       "aggregationAxisPrefix": null,
+       "annotationsScope": null,
+       "breakdown_histogram_bin_count": null,
+       "chartStyle": null,
+       "confidenceLevel": null,
+       "decimalPlaces": null,
+       "detailedResultsAggregationType": null,
+       "display": "ActionsBar",
+       "excludeBoxPlotOutliers": true,
+       "formula": null,
+       "formulaNodes": null,
+       "formulas": null,
+       "goalLines": null,
+       "hiddenLegendIndexes": null,
+       "hideWeekends": false,
+       "legendPosition": "bottom",
+       "metricChangeDecreaseColor": null,
+       "metricChangeIncreaseColor": null,
+       "metricColorByDirection": false,
+       "metricLineDecreaseColor": null,
+       "metricLineIncreaseColor": null,
+       "metricShowChange": true,
+       "metricSummary": "total",
+       "minDecimalPlaces": null,
+       "movingAverageIntervals": null,
+       "resultCustomizationBy": "value",
+       "resultCustomizations": null,
+       "showAlertThresholdLines": false,
+       "showAnnotations": true,
+       "showConfidenceIntervals": null,
+       "showLabelsOnSeries": null,
+       "showLegend": false,
+       "showMovingAverage": null,
+       "showMultipleYAxes": false,
+       "showPercentStackView": false,
+       "showTrendLines": null,
+       "showValuesOnSeries": false,
+       "smoothingIntervals": 1,
+       "stackBreakdownValues": false,
+       "xAxisLabel": null,
+       "yAxisLabel": null,
+       "yAxisMax": null,
+       "yAxisMin": null,
+       "yAxisScaleType": "linear",
+       "yAxisStartAtZero": true
+      },
+      "version": 4.0
+     }
+    },
+    "tags": []
+   }
+  },
+  {
+   "id": 7512948,
+   "layouts": {
+    "sm": {
+     "h": 5,
+     "w": 6,
+     "x": 6,
+     "y": 38
+    }
+   },
+   "text": null,
+   "insight": {
+    "id": 6604462,
+    "short_id": "4NoKoPq9",
+    "name": "Ачивки",
+    "description": "ach — чи є що збирати.",
+    "query": {
+     "kind": "InsightVizNode",
+     "source": {
+      "aggregation_group_type_index": null,
+      "breakdownFilter": {
+       "breakdown": "id",
+       "breakdown_group_type_index": null,
+       "breakdown_hide_other_aggregation": null,
+       "breakdown_histogram_bin_count": null,
+       "breakdown_limit": null,
+       "breakdown_normalize_url": null,
+       "breakdown_path_cleaning": null,
+       "breakdown_type": "event",
+       "breakdowns": null
+      },
+      "calendarHeatmapFilter": null,
+      "compareFilter": null,
+      "conversionGoal": null,
+      "dataColorTheme": null,
+      "dateRange": {
+       "date_from": "-30d",
+       "date_to": null,
+       "daysOfWeek": null,
+       "excludeIncompletePeriods": false,
+       "explicitDate": false
+      },
+      "filterTestAccounts": false,
+      "interval": "day",
+      "kind": "TrendsQuery",
+      "modifiers": null,
+      "properties": [],
+      "response": null,
+      "samplingFactor": null,
+      "series": [
+       {
+        "custom_name": null,
+        "event": "ach",
+        "fixedProperties": null,
+        "kind": "EventsNode",
+        "limit": null,
+        "math": "total",
+        "math_group_type_index": null,
+        "math_hogql": null,
+        "math_multiplier": null,
+        "math_property": null,
+        "math_property_revenue_currency": null,
+        "math_property_type": null,
+        "name": "ach",
+        "optionalInFunnel": null,
+        "orderBy": null,
+        "properties": null,
+        "response": null,
+        "version": null
+       }
+      ],
+      "tags": null,
+      "trendsFilter": {
+       "aggregationAxisFormat": "numeric",
+       "aggregationAxisPostfix": null,
+       "aggregationAxisPrefix": null,
+       "annotationsScope": null,
+       "breakdown_histogram_bin_count": null,
+       "chartStyle": null,
+       "confidenceLevel": null,
+       "decimalPlaces": null,
+       "detailedResultsAggregationType": null,
+       "display": "ActionsBar",
+       "excludeBoxPlotOutliers": true,
+       "formula": null,
+       "formulaNodes": null,
+       "formulas": null,
+       "goalLines": null,
+       "hiddenLegendIndexes": null,
+       "hideWeekends": false,
+       "legendPosition": "bottom",
+       "metricChangeDecreaseColor": null,
+       "metricChangeIncreaseColor": null,
+       "metricColorByDirection": false,
+       "metricLineDecreaseColor": null,
+       "metricLineIncreaseColor": null,
+       "metricShowChange": true,
+       "metricSummary": "total",
+       "minDecimalPlaces": null,
+       "movingAverageIntervals": null,
+       "resultCustomizationBy": "value",
+       "resultCustomizations": null,
+       "showAlertThresholdLines": false,
+       "showAnnotations": true,
+       "showConfidenceIntervals": null,
+       "showLabelsOnSeries": null,
+       "showLegend": false,
+       "showMovingAverage": null,
+       "showMultipleYAxes": false,
+       "showPercentStackView": false,
+       "showTrendLines": null,
+       "showValuesOnSeries": false,
+       "smoothingIntervals": 1,
+       "stackBreakdownValues": false,
+       "xAxisLabel": null,
+       "yAxisLabel": null,
+       "yAxisMax": null,
+       "yAxisMin": null,
+       "yAxisScaleType": "linear",
+       "yAxisStartAtZero": true
+      },
+      "version": 4.0
+     }
+    },
+    "tags": []
+   }
+  }
+ ]
+}
