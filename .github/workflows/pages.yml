@@ -20,7 +20,7 @@ jobs:
       - name: Pack site
         run: |
           mkdir -p _site
-          cp index.html _site/
+          cp index.html favicon.ico apple-touch-icon.png robots.txt _site/
           cp -a art _site/art
           rm -f _site/art/*.py _site/art/*.json
       - uses: cloudflare/wrangler-action@v3
