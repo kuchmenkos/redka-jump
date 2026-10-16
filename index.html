@@ -1634,7 +1634,7 @@ function drawEnv(e){ctx.save();ctx.translate(e.x,e.y-camY);ctx.rotate(Math.sin(e
   ctx.drawImage(ENV_SPR,-ENV_SPR.width/2,-ENV_SPR.height/2);
   ctx.font='800 9px Manrope, sans-serif';ctx.fillStyle='#b02020';ctx.textAlign='center';ctx.fillText('СКАРГА',0,ENV_SPR.height/2+9);ctx.restore()}
 const GORDON_RATE=1.2,GORDON_VOL=.7;
-let gordonBuf=null,gordonSrc=null,gordonGain=null,gordonT0=0,gordonLoading=false,gordonPrimed=false;
+let gordonBuf=null,gordonSrc=null,gordonGain=null,gordonT0=0,gordonLoading=false,gordonPrimed=false,gordonF=0;
 function loadGordonBuf(){
   if(!AC||gordonBuf||gordonLoading)return;gordonLoading=true;
   fetch('art/gordon-intro.mp3').then(r=>{if(!r.ok)throw new Error('gordon mp3');return r.arrayBuffer()}).then(b=>AC.decodeAudioData(b.slice(0))).then(buf=>{gordonBuf=buf;gordonLoading=false}).catch(()=>{gordonLoading=false});
@@ -1650,7 +1650,7 @@ function ensureGordonAudio(){
   gordonAudio=a;return a;
 }
 function startGordonMusic(){
-  audioOn();loadGordonBuf();
+  gordonF=0;audioOn();loadGordonBuf();
   if(bgmAudio)bgmAudio.pause();
   if(muted){stopGordonSource();if(gordonAudio)gordonAudio.pause();return}
   stopGordonSource();
@@ -1699,6 +1699,7 @@ function pauseGordonAudio(){
 }
 function resumeGordonAudio(){
   if(muted||!player||player.flyKind!=='gordon'||player.fly<=0)return;
+  audioOn();
   if(gordonBuf&&AC){
     const elapsed=gordonT0<0?-gordonT0:0;
     stopGordonSource();
@@ -1718,16 +1719,24 @@ function resumeGordonAudio(){
   }
 }
 function syncGordonFly(p,dt){
-  if(gordonSrc&&AC&&gordonBuf){
+  /* Політ тримається на годиннику аудіо, але лише коли контекст реально грає. Якщо браузер його призупинив
+     (фон, iOS), годинник стоїть і політ ішов би вічно й без звуку, тож є ще жорсткий ліміт у кадрах. */
+  gordonF+=dt;
+  const cap=(gordonBuf?gordonBuf.duration/GORDON_RATE*60:GORDON_FLY)+90;
+  if(gordonSrc&&AC&&gordonBuf&&AC.state==='running'){
     const elapsed=AC.currentTime-gordonT0,total=gordonBuf.duration/GORDON_RATE;
-    p.flyMax=total*60;p.fly=Math.max(0,(total-elapsed)*60);return;
+    p.flyMax=total*60;p.fly=Math.max(0,(total-elapsed)*60);
+    if(gordonF>cap)p.fly=0;
+    return;
   }
+  if(gordonSrc&&AC&&AC.state!=='running'){try{AC.resume()}catch(e){}}
   const a=gordonAudio;
   const timed=a&&!muted&&!a.paused&&a.volume>0&&isFinite(a.duration)&&a.duration>0;
   if(timed){
     const rate=a.playbackRate||GORDON_RATE,total=a.duration/rate*60;
     p.flyMax=total;p.fly=Math.max(0,(a.duration-a.currentTime)/rate*60);
   }else p.fly-=dt;
+  if(gordonF>cap)p.fly=0;
 }
 const GORDON_EDGE=[[-.22,-.18],[.5,-.22],[1.22,-.18],[1.28,.5],[1.22,1.18],[.5,1.22],[-.22,1.18],[-.28,.5]];
 function shuffleGordonDeck(avoid){
@@ -2094,7 +2103,7 @@ function fillHatePanel(){
 let bestAtStart=0,recordShown=false,colBack='start';
 let runTok='';
 function runTokFetch(){runTok='';try{fetch('/api/run?pid='+encodeURIComponent(lbPid()),{method:'POST'}).then(r=>r.json()).then(j=>{runTok=(j&&j.tok)||''}).catch(()=>{})}catch(e){}}
-function start(){runTokFetch();
+function start(){runTokFetch();try{redkaChar(STATS.wear||0,SPX,null,'side');redkaChar(STATS.wear||0,SPX,'felix-fly','up')}catch(e){}
   $('helpScr').hidden=true;
   reset();bestAtStart=best;recordShown=false;isRecord=false;comboMax=1;pauseN=0;
   runT0=performance.now();playAcc=0;playMark=runT0;
