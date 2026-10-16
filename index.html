@@ -184,6 +184,8 @@ button.ghost{background:transparent;box-shadow:inset 0 0 0 2px var(--ink),0 3px 
 .legend b{font-weight:800}
 .legend .hatertip{grid-column:1/-1;margin:2px 0 0;padding:7px 10px;font-size:12px;font-weight:800;color:#8f5f08;line-height:1.3;text-align:center;background:#fff1c2;border-radius:8px}
 .patch{width:40px;height:16px;border-radius:3px;box-sizing:border-box;outline:1.5px dashed rgba(255,255,255,.85);outline-offset:-4px;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.patch.spring{background:#8a4dff;display:flex;align-items:center;justify-content:center;color:#ffd23a;font-size:7px;letter-spacing:1px}
+.patch.spring::before{content:"▲▲▲"}
 .patch.worn{opacity:.7;outline-color:rgba(255,255,255,.35)}
 .keys{display:flex;gap:3px}
 .keys i{font-style:normal;font-size:11px;background:var(--ink);color:var(--card);border-radius:4px;padding:3px 5px}
@@ -487,7 +489,7 @@ button.nudge{min-height:42px;font-size:13px;color:#8f5f08;box-shadow:inset 0 0 0
         <div class="legend" role="tabpanel" data-panel="how">
           <span class="ic"><span class="keys"><i>◀</i><i>▶</i></span></span><span><b>Тицяй вбік</b> — Редька стрибає сам</span>
           <span class="ic"><span class="patch" style="background:#2ea043"></span></span><span><b>Ярлик</b> — стрибай, росте рахунок</span>
-          <span class="ic"><span class="patch" style="background:#7bcf3a"></span></span><span><b>Скандал</b> — підкидає вище</span>
+          <span class="ic"><span class="patch spring"></span></span><span><b>Скандал</b> — пружина підкидає вище</span>
           <span class="ic"><span class="patch" style="background:#ff7a1a"></span></span><span><b>Перевзувалка</b> — їздить туди-сюди</span>
           <span class="ic"><span class="patch" style="background:#4f5866"></span></span><span><b>Відписка</b> — забирає бали</span>
           <span class="ic"><span class="patch worn" style="background:#2ea043"></span></span><span><b>Потертий</b> — лише 2 стрибки</span>
@@ -1459,8 +1461,8 @@ function update(dt){
           pl.broken=true;sfx('break');if(mode==='play')fakeCnt++;burst(pl.x+pl.w/2,pl.y+8,['#d63434','#fff8f0','#e53935'],10,3,1);
           continue;
         }
-        p.y=pl.y-FEET;p.vy=pl.type==='spring'?-16.5:-10.3;p.sq=1;
-        if(mode==='play'){const sp=pl.type==='spring';burst(p.x,pl.y,sp?['#6b4fd8','#ffffff','#7bcf3a']:['#fff8f0','#e8dcc4'],sp?16:4,sp?3.8:1.6,.5);if(sp)shake=Math.max(shake,3)}
+        p.y=pl.y-FEET;p.vy=pl.type==='spring'?-16.5:-10.3;p.sq=1;if(pl.type==='spring')pl.pulse=1;
+        if(mode==='play'){const sp=pl.type==='spring';burst(p.x,pl.y,sp?['#b78bff','#ffd23a','#ffffff']:['#fff8f0','#e8dcc4'],sp?16:4,sp?3.8:1.6,.5);if(sp)shake=Math.max(shake,3)}
         sfx(pl.type==='spring'?'spring':pl.type==='minus'&&!pl.visited?'minus':'jump');
         pl.hits++;if(pl.hits>=pl.life){pl.broken=true;pl.peeled=true;sfx('peel');burst(pl.x+pl.w/2,pl.y+8,['#2ea043','#ffffff','#9ed99a'],12,3.2,1)}
         if(!pl.visited&&mode==='play'){pl.visited=true;logHate(pl);if(/МАЛОРОС/.test(pl.label))malorosN++;if(pl.type!=='minus'){streak++;const nm=Math.min(5,1+Math.floor(streak/12));if(nm>mult){mult=nm;if(nm>comboMax)comboMax=nm;addFloat('КОМБО ×'+mult,p.x,pl.y-60,'#1a7a32',16);sfx('combo')}bonus+=100*mult}else breakCombo(p);if(pl.type==='spring'){bonus+=1800;addFloat(pick(SPRING_Q),p.x,pl.y-40,'#3d8a18')}
@@ -1478,6 +1480,7 @@ function update(dt){
   }
   if(clothZone!==zoneIdx)makeCloth(zoneIdx);
   for(const pl of plats){
+    if(pl.pulse>0)pl.pulse=Math.max(0,pl.pulse-.06*dt);
     if(pl.vx){pl.x+=pl.vx*dt;if(pl.x<2){pl.x=2;pl.vx*=-1}if(pl.x+pl.w>W-2){pl.x=W-2-pl.w;pl.vx*=-1}}
     if(pl.broken){pl.fy+=.5*dt;pl.y+=pl.fy*dt;pl.alpha=Math.max(0,pl.alpha-.03*dt)}
   }
@@ -1541,7 +1544,7 @@ function patch(w,h,bg,dk){
   ctx.fillStyle=dk;ctx.fillRect(2,3,w-4,h);ctx.fillRect(0,5,w,h-4);
   ctx.fillStyle=bg;ctx.fillRect(2,0,w-4,h);ctx.fillRect(0,2,w,h-4);
 }
-const PLAT_COL={normal:['#2ea043','#1a6b32'],spring:['#7bcf3a','#3d8a18'],minus:['#4f5866','#262c35'],moving:['#ff7a1a','#a3410a']};
+const PLAT_COL={normal:['#2ea043','#1a6b32'],spring:['#8a4dff','#4a22b0'],minus:['#4f5866','#262c35'],moving:['#ff7a1a','#a3410a']};
 function stitches(w,h,col,step){const s=step||7;ctx.fillStyle=col;for(let x=6;x<w-6;x+=s){ctx.fillRect(x,3,4,2);ctx.fillRect(x,h-5,4,2)}for(let y=8;y<h-7;y+=7){ctx.fillRect(3,y,2,4);ctx.fillRect(w-5,y,2,4)}}
 function drawPlat(pl){
   const sy=Math.round(pl.y-camY),w=Math.round(pl.w),h=pl.h;
@@ -1553,13 +1556,23 @@ function drawPlat(pl){
     ctx.fillStyle='#c62828';
   }else{
     const C=PLAT_COL[pl.type]||PLAT_COL.normal,brief=pl.type==='normal'&&(pl.life||4)<=2;
+    if(pl.type==='spring'){ctx.save();ctx.globalAlpha*=.28+.16*Math.sin(tick*.1);ctx.fillStyle='#c9a6ff';ctx.fillRect(-4,-4,w+8,h+10);ctx.fillStyle='#e6d4ff';ctx.fillRect(-1,-1,w+2,h+4);ctx.restore()}
     ctx.fillStyle='rgba(30,12,24,.3)';ctx.fillRect(3,6,w-1,h-1);
     patch(w,h,pl.type==='minus'&&pl.dim?'#8a919c':brief?'#9ed99a':C[0],brief?'#3d8a18':C[1]);
     ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(2,2,w-4,2);
     const wear=Math.min(1,(pl.hits||0)/(pl.life||4));
     stitches(w,h,'rgba(255,255,255,'+(.85-.65*wear).toFixed(2)+')',brief&&pl.hits?14:7);
     if(wear>0&&!pl.broken){ctx.fillStyle='rgba(0,0,0,.35)';const t=Math.round(6+wear*14);for(let i=0;i<t;i+=3)ctx.fillRect(w-4-i,i,2,2)}
-    if(pl.type==='spring'){ctx.fillStyle='#3d8a18';const cx=Math.round(w/2);for(let i=0;i<4;i++){ctx.fillRect(cx-8+(i%2)*8,-4-i*4,8,3)}}
+    if(pl.type==='spring'){
+      // справжня пружина: тарілка, 4 витки, червона шапка; стискається при приземленні
+      const cx=Math.round(w/2),pu=pl.pulse||0,Hc=Math.max(8,Math.round(22*(1-.62*pu*pu)));
+      ctx.fillStyle='#fff3b0';
+      for(const x of [11,w-11]){for(let r=0;r<5;r++){ctx.globalAlpha=pl.alpha*(.45+.55*Math.max(0,Math.sin(tick*.2-(x<cx?0:1.4))));ctx.fillRect(x-1-r,5+2*r,2+2*r,2)}}
+      ctx.globalAlpha=pl.alpha;
+      ctx.fillStyle='#2a1722';ctx.fillRect(cx-17,-4,34,6);ctx.fillStyle='#ffd23a';ctx.fillRect(cx-16,-4,32,4);
+      for(let j=0;j<4;j++){const y=-5-Math.round((j+1)*Hc/4);ctx.fillStyle='#2a1722';ctx.fillRect(cx-14,y-1,28,6);ctx.fillStyle=j%2?'#ffd23a':'#c88e12';ctx.fillRect(cx-13,y,26,4);ctx.fillStyle='#fff3b0';ctx.fillRect(cx-13+(j%2?12:2),y,7,1)}
+      const ty=-5-Hc-7;ctx.fillStyle='#2a1722';ctx.fillRect(cx-20,ty-1,40,9);ctx.fillStyle='#ff4f7b';ctx.fillRect(cx-19,ty,38,7);ctx.fillStyle='#ffb3c8';ctx.fillRect(cx-19,ty,38,2);
+    }
     if(pl.type==='moving'){ctx.fillStyle='#ffffff';for(const [x,d] of [[8,1],[w-8,-1]]){ctx.fillRect(x,h/2-1,2*d,2);ctx.fillRect(x+2*d,h/2-3,2*d,6)}}
     if(pl.type==='minus'){ctx.fillStyle='#ffffff';ctx.fillRect(9,h/2-1,8,3)}
     ctx.fillStyle='#ffffff';
@@ -1808,7 +1821,6 @@ function drawRedka(){
 /* ---------- intro: жива афіша (attract-режим) ---------- */
 let att=null;
 const ATT_LABELS=['КВНЩИК','НЕ СМІШНО','ІПСО','КЛОУН','ХАЙПОЖЕР','НОНЕЙМ','ВИСКОЧКА','ПРОВІНЦІАЛ','ЗРАДНИК','СКАСУВАТИ!','ТОКСИК','ДЯДЯ, ВИ ХТО?','ПРОВОКАТОР'];
-const ATT_SLOTS=[[-68,-58],[66,-44],[-62,-4],[60,16],[-2,50]];
 function attractFeetY(){
   try{
     const s=$('introSubs').getBoundingClientRect(),b=document.querySelector('#startScr .intro-bottom').getBoundingClientRect(),w=wrap.getBoundingClientRect();
@@ -1818,7 +1830,7 @@ function attractFeetY(){
 }
 function attractInit(){
   const fy=attractFeetY(),base=Math.round(H*.6);
-  att={t:0,fy,cam:base-fy,top:base,plats:[],stk:[],fall:[],n:0,tilt:0,tiltT:0,subs:att?att.subs:0,
+  att={t:0,fy,cam:base-fy,top:base,plats:[],tilt:0,tiltT:0,subs:att?att.subs:0,
     hero:{x:W/2,y:base-FEET,vx:0,vy:-4,face:1,sq:0,tgt:null}};
   const p0=makePlat('normal',base,'ПЕРШИЙ ЖАРТ');p0.w=150;p0.x=W/2-75;p0.hits=1;p0.life=99;att.plats.push(p0);
   attractFill();
@@ -1838,14 +1850,9 @@ function attractPick(){
 }
 function attractLand(pl){
   const h=att.hero;h.sq=1;
-  burst(h.x,pl.y,['#ffffff','#fff3b0','#d63434'],6,2.4,.8);
+  burst(h.x,pl.y,['#ffffff','#fff3b0','#ffd23a'],6,2.4,.8);
   att.subs+=Math.round(rnd(700,2100));
   const n=$('introSubsN');if(n){n.textContent=fmt(att.subs);const s=$('introSubs');s.classList.remove('bump');void s.offsetWidth;s.classList.add('bump')}
-  // новий ярлик прилітає з краю екрана й липне на Редьку
-  const slot=att.n++%ATT_SLOTS.length,old=att.stk.findIndex(s=>s.slot===slot);
-  if(old>=0){const o=att.stk.splice(old,1)[0];att.fall.push({x:o.x,y:o.y,vy:-2,vx:(Math.random()-.5)*3,rot:o.rot,label:o.label,life:1})}
-  const side=Math.random()<.5?-1:1;
-  att.stk.push({label:pick(ATT_LABELS),slot,t0:att.t,fx:side<0?-70:W+70,fy:(h.y-att.cam)+rnd(-160,40),rot:(Math.random()-.5)*.5,x:0,y:0});
   const next=att.plats.indexOf(pl);if(next>=0)attractPick();
 }
 function attractUpdate(dt){
@@ -1866,16 +1873,6 @@ function attractUpdate(dt){
   camY=att.cam;attractFill();
   att.plats=att.plats.filter(pl=>pl.y-att.cam<H+80);
   for(const s of sparks){s.x+=s.vx*dt;s.y+=s.vy*dt;s.vy+=.18*dt;s.life-=.032*dt}sparks=sparks.filter(s=>s.life>0);
-  for(const f of att.fall){f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy+=.35*dt;f.rot+=.05*dt;f.life-=.02*dt}att.fall=att.fall.filter(f=>f.life>0);
-}
-function stickerDraw(label,x,y,rot,al){
-  ctx.save();ctx.globalAlpha=al;ctx.translate(Math.round(x),Math.round(y));ctx.rotate(rot);
-  ctx.font='800 11px Manrope, system-ui, sans-serif';const w=Math.round(ctx.measureText(label).width+16),hh=20;
-  ctx.translate(-Math.round(w/2),-Math.round(hh/2));
-  ctx.fillStyle='rgba(30,12,24,.35)';ctx.fillRect(3,5,w,hh);
-  patch(w,hh,'#d63434','#8c1a1e');stitches(w,hh,'rgba(255,255,255,.8)');
-  ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,w/2,hh/2+1);
-  ctx.restore();
 }
 function attractDraw(){
   if(!att)return;
@@ -1895,14 +1892,6 @@ function attractDraw(){
     ctx.fillStyle='rgba(20,10,16,.22)';ctx.beginPath();ctx.ellipse(hx,hy+FEET+2,26,5,0,0,7);ctx.fill();
     drawChar(ctx,ch,hx,hy+FEET,sx*h.face*SSX*sc,sy*SSC*sc,'feet',lean);
   }
-  const cx=hx,cy=hy+FEET-82;
-  for(const s of att.stk){
-    const p=Math.min(1,(att.t-s.t0)/520),e=1-Math.pow(1-p,3)*(1+(1-p)*.8);
-    const [dx,dy]=ATT_SLOTS[s.slot],tx=cx+dx,ty=cy+dy+Math.sin(att.t*.004+s.slot)*2;
-    s.x=s.fx+(tx-s.fx)*e;s.y=s.fy+(ty-s.fy)*e;
-    stickerDraw(s.label,s.x,s.y,s.rot*(p<1?1+(1-p)*4:1),1);
-  }
-  for(const f of att.fall)stickerDraw(f.label,f.x,f.y,f.rot,Math.max(0,f.life));
   ctx.restore();
 }
 function attractFrame(dt){attractUpdate(dt);attractDraw()}
