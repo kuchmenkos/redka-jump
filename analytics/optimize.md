@@ -22,6 +22,10 @@ MCP у Cloud Agent не логіниться. SQL нижче — якщо тре
 | `game_over` | знімок катки: `duration_s`, `score`, `zone`, `cause`, механіки |
 | `run_abandon` | вихід з паузи (`cause=quit`) або закрита вкладка посеред забігу (`cause=closed`); багато vs смерті — здаються, не вмирають |
 | `hater_met` | вперше зустрінутий хейтер | 
+| `shield_get` / `shield_save` | підібрано Блок / Блок урятував від удару |
+| `chain` | ланцюг топтань ×2 / ×5 |
+| `raid` | рейд: `started` / `won` / `failed` |
+| `gordon` | `offered` / `caught` / `missed` / `started` (`mode`, `heat`, `nth`) |
 | `lb_open` / `lb_submit` | відкрито лідерборд / відправлено імʼя |
 | `dock` | кнопки дока на інтро (`btn`: achs, ward, help) |
 | `zone_enter` | де відвалюються |

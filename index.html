@@ -680,6 +680,10 @@ const SFX={
   express:()=>{[392,523,659,784,1046].forEach((f,i)=>tone('triangle',f,f,.1,.04,i*.08));tone('sine',1318,1318,.4,.045,.42)},
   shout:()=>{tone('triangle',260,140,.14,.05);tone('sine',220,130,.12,.03,.03)},
   stamp:()=>{tone('sine',150,70,.09,.05);noise(.04,.05,500)},
+  alert:()=>{tone('square',880,880,.06,.05);tone('square',660,660,.06,.045,.07)},
+  ring:()=>{[0,.18,.36].forEach(t=>{tone('sine',1320,1320,.08,.04,t);tone('sine',1760,1760,.08,.03,t+.04)})},
+  shield:()=>{tone('sine',330,880,.12,.06);tone('triangle',1175,1568,.16,.045,.08)},
+  shieldBreak:()=>{tone('sawtooth',520,120,.2,.06);noise(.12,.07,1200)},
   ticket:()=>{tone('triangle',784,988,.08,.04);tone('sine',1175,1318,.12,.035,.05)},
   ach:()=>{noise(.05,.045,900);[659,784,988,1318].forEach((f,i)=>tone('sine',f,f,.07,.045,i*.06))},
   lose:()=>{tone('sine',280,110,.4,.08);noise(.2,.05,600)}
@@ -779,6 +783,7 @@ const ROCKET_SPR=buildSprite(IGRID.ROCKET,IPAL,3,'#ffffff');
 const ENV_SPR=buildSprite(IGRID.ENV,IPAL,2,null);
 const THREAD_SPR=buildSprite(IGRID.THREAD,IPAL,2,'#ffffff');
 const TICKET=["KKKKKKKKKKKK","KYYYYYYYYYYK","KYRRRYYYYYYK","KYYYYYYYYYYK","KYKKKKKKKKYK","KYYYYYYYYYYK","KKKKKKKKKKKK"];
+const SHIELD_SPR=buildSprite([".KKKKKKKKK.","KBBBBBBBBBK","KBbBBBBBbBK","KBBWBBBWBBK","KBBBWBWBBBK","KBBBBWBBBBK","KBBBWBWBBBK","KBBWBBBWBBK",".KBBBBBBBK.","..KBBBBBK..","...KBBBK...","....KKK...."],{K:'#1e1820',B:'#2b6fd6',b:'#9fd6ff',W:'#ffffff'},3,'#ffffff');
 const TICKET_SPR=buildSprite(TICKET,{K:'#1e1820',Y:'#fff3b0',R:'#d63434'},3,'#ffffff');
 const JACKAL={"frames":[[[".......................A..........","......................APA.a.......","......................APAAa.......","....................AAAPAaa.......","....................AAAAAAEB......",".........DDDDDDDDDAAAAAAAAAAAAAAB.",".AAAAA.DDDDDDADDDDDAAAAAAAAAAAAAB.","DDDAAAADDDDADDDADDDDAAAAAASSSSS...","DDDAAAAAAAAAAAAAAAAAAAAA..........","DDDAAAAAAAAAAAAAAAAAAAA...........",".....AAAAAAAAAAAAAAAASS...........",".......ASAASSSSSSSSAASS...........",".......aAASSSSSSSSSSAAS...........","......aaAA..........AAaa..........",".....aaAA............AAaa.........","....aaAA..............AAaa........","...aaAA................AAaa.......","..DD.AA................AA.DD......","....DD..................DD........",".................................."],["..................................",".......................A..........","......................APA.a.......","......................APAAa.......","....................AAAPAaa.......",".AAAAA..............AAAAAAEB......","DDDAAAA..DDDDDDDDDAAAAAAAAAAAAAAB.","DDDAAAADDDDDDADDDDDAAAAAAAAAAAAAB.","DDDAAAADDDDADDDADDDDAAAAAASSSSS...","....AAAAAAAAAAAAAAAAAAAA..........","....AAAAAAAAAAAAAAAAAAA...........",".....AAAAAAAAAAAAAAAASS...........",".......ASAASSSSSSSSAASS...........","........SAASSSSSSSSAASS...........",".......aaAA........AAaa...........",".......aAA..........AAa...........",".......aAA..........AAa...........","......aaAA..........AAaa..........","......DDDD..........DDDD..........",".................................."],[".......................A..........","......................APA.a.......","......................APAAa.......","....................AAAPAaa.......","....................AAAAAAEB......",".........DDDDDDDDDAAAAAAAAAAAAAAB.",".AAAAA.DDDDDDADDDDDAAAAAAAAAAAAAB.","DDDAAAADDDDADDDADDDDAAAAAASSSSS...","DDDAAAAAAAAAAAAAAAAAAAAA..........","DDDAAAAAAAAAAAAAAAAAAAA...........",".....AAAAAAAAAAAAAAAASS...........",".......ASAASSSSSSSSAASS...........","........SAASSSSSSSAASSS...........","..........AA......AA..............","..........AAa....AAa..............","...........AAa..AAa...............","...........AAaaAAa................","............AADAA.................","............DDDD..................",".................................."],["......................APA.a.......","......................APAAa.......","....................AAAPAaa.......","....................AAAAAAEB......",".........DDDDDDDDDAAAAAAAAAAAAAAB.",".......DDDDDDADDDDDAAAAAAAAAAAAAB.",".....AADDDDADDDADDDDAAAAAASSSSS...",".AAAAAAAAAAAAAAAAAAAAAAA..........","DDDAAAAAAAAAAAAAAAAAAAA...........","DDDAAAAAAAAAAAAAAAAAASS...........","DDDAAA.ASAASSSSSSSSAASS...........","........SAASSSSSSSSAASS...........","........aAA........AAa............",".........AA........AAaa...........","........AAa.........AAa...........","........AAa.........AAa...........","........AAaa........AAaa..........","........AAaa........AAaa..........","........DDDD........DDDD..........",".................................."]],[[".......................A..........","......................APA.a.......","......................APAAa.......","....................AAAPAaa.......","....................AAAAAAEB......",".........DDDDDDDDDAAAAAAAAAAAAAAB.",".AAAAA.DDDDDDADDDDDAAAAAAAAAAAAAB.","DDDAAAADDDDADDDADDDDAAAAAARWRRWR..","DDDAAAAAAAAAAAAAAAAAAAAA..RPPPRR..","DDDAAAAAAAAAAAAAAAAAAAA...SSWSS...",".....AAAAAAAAAAAAAAAASS...........",".......ASAASSSSSSSSAASS...........",".......aAASSSSSSSSSSAAS...........","......aaAA..........AAaa..........",".....aaAA............AAaa.........","....aaAA..............AAaa........","...aaAA................AAaa.......","..DD.AA................AA.DD......","....DD..................DD........",".................................."],["..................................",".......................A..........","......................APA.a.......","......................APAAa.......","....................AAAPAaa.......",".AAAAA..............AAAAAAEB......","DDDAAAA..DDDDDDDDDAAAAAAAAAAAAAAB.","DDDAAAADDDDDDADDDDDAAAAAAAAAAAAAB.","DDDAAAADDDDADDDADDDDAAAAAARWRRWR..","....AAAAAAAAAAAAAAAAAAAA..RPPPRR..","....AAAAAAAAAAAAAAAAAAA...SSWSS...",".....AAAAAAAAAAAAAAAASS...........",".......ASAASSSSSSSSAASS...........","........SAASSSSSSSSAASS...........",".......aaAA........AAaa...........",".......aAA..........AAa...........",".......aAA..........AAa...........","......aaAA..........AAaa..........","......DDDD..........DDDD..........",".................................."],[".......................A..........","......................APA.a.......","......................APAAa.......","....................AAAPAaa.......","....................AAAAAAEB......",".........DDDDDDDDDAAAAAAAAAAAAAAB.",".AAAAA.DDDDDDADDDDDAAAAAAAAAAAAAB.","DDDAAAADDDDADDDADDDDAAAAAARWRRWR..","DDDAAAAAAAAAAAAAAAAAAAAA..RPPPRR..","DDDAAAAAAAAAAAAAAAAAAAA...SSWSS...",".....AAAAAAAAAAAAAAAASS...........",".......ASAASSSSSSSSAASS...........","........SAASSSSSSSAASSS...........","..........AA......AA..............","..........AAa....AAa..............","...........AAa..AAa...............","...........AAaaAAa................","............AADAA.................","............DDDD..................",".................................."],["......................APA.a.......","......................APAAa.......","....................AAAPAaa.......","....................AAAAAAEB......",".........DDDDDDDDDAAAAAAAAAAAAAAB.",".......DDDDDDADDDDDAAAAAAAAAAAAAB.",".....AADDDDADDDADDDDAAAAAARWRRWR..",".AAAAAAAAAAAAAAAAAAAAAAA..RPPPRR..","DDDAAAAAAAAAAAAAAAAAAAA...SSWSS...","DDDAAAAAAAAAAAAAAAAAASS...........","DDDAAA.ASAASSSSSSSSAASS...........","........SAASSSSSSSSAASS...........","........aAA........AAa............",".........AA........AAaa...........","........AAa.........AAa...........","........AAa.........AAa...........","........AAaa........AAaa..........","........AAaa........AAaa..........","........DDDD........DDDD..........",".................................."]]],"pals":{"gold":{"A":"#d9953f","a":"#a8692a","D":"#5b3a1c","S":"#f6e6c0","W":"#ffffff","B":"#1a141a","P":"#e8707c","R":"#7a1c2a","E":"#ffd23a"},"grey":{"A":"#b3a590","a":"#857866","D":"#3d3832","S":"#ece4d4","W":"#ffffff","B":"#1a141a","P":"#e8707c","R":"#7a1c2a","E":"#ffd23a"},"dark":{"A":"#8e6c48","a":"#614932","D":"#2a2018","S":"#dccaa6","W":"#ffffff","B":"#1a141a","P":"#e8707c","R":"#7a1c2a","E":"#ffd23a"}}};
 const JACKAL_SPR={};
@@ -872,6 +877,7 @@ const FEET=22*PX;
 
 let items=[],waves=[],causeKind='fall',mode='start',player,plats,enemies,envs,floats,camY,topY,bonus,zoneIdx,lookIdx,banner,stomps,cause,best=0,input={l:false,r:false},pointers=new Map(),player0=0,tick=0,recent=[];
 let ticketsRun=0,lastTicketStep=-99;
+let shield=0,shieldGrace=0,shieldN=0,shieldSaved=0,lastShieldStep=-99,chainN=0,chainT=0,chainMax=0,heat=0,gordonNextGs=0,gordonNeed=30,gordonPendStep=-1,gordonCount=0,gordonMode='',gordonLive=0,gordonLiveT=0,raidLastGs=-1e9,raidNext=1e12,raid=null,raidWins=0;
 let runT0=0,playAcc=0,playMark=0,pauseN=0,playFrom='cta',comboMax=1;
 function ph(n,p){try{window.posthog&&posthog.capture&&posthog.capture(n,p||{})}catch(e){}}
 function accPlay(){if(playMark){playAcc+=performance.now()-playMark;playMark=0}}
@@ -886,7 +892,7 @@ function runPhProps(extra){
   return Object.assign({
     cause:causeKind,score:phScore(),zone:phZone(),zone_idx:zoneIdx|0,
     duration_s:Math.round(playMs()/100)/10,wall_s:Math.round(wallMs()/100)/10,
-    look:L.name,tickets:ticketsRun|0,express:expressN|0,gordon:gordonState(),
+    look:L.name,tickets:ticketsRun|0,express:expressN|0,gordon:gordonState(),gordon_mode:gordonMode,shield_got:shieldN|0,shield_saved:shieldSaved|0,chain_max:chainMax|0,raid_wins:raidWins|0,
     stomps:stomps|0,stomp_stuk:sk.stuk|0,stomp_lang:sk.lang|0,stomp_threads:sk.threads|0,stomp_cancel:sk.cancel|0,stomp_koms:sk.koms|0,
     combo_max:comboMax|0,minus:minusCnt|0,fakes:fakeCnt|0,threads:threadHits|0,labels:hateSum(),
     idle_s:Math.round((idlePeak/60)*10)/10,record:!!isRecord,million:!!million,pauses:pauseN|0
@@ -1320,7 +1326,7 @@ function placePlat(p,calm){
   p.x=best-p.w/2;centreHist.push(mid(best)?1:0);if(centreHist.length>3)centreHist.shift();
   lastCx=best;lastW=p.w;
 }
-const GORDON_AT=300000,GORDON_P=.34,GORDON_FLY=768,EXPRESS_FLY=120,EXPRESS_FROM=60000,EXPRESS_CD=70000;
+const GORDON_FLY=768,EXPRESS_FLY=120,EXPRESS_FROM=60000,EXPRESS_CD=70000;
 function genStep(){
   stepN++;
   const gs0=Math.max(0,player0-topY)*SC,d=curD=ramp(gs0,0,1000000),gap=rnd(72,88)+80*ramp(gs0,40000,700000);topY-=gap;
@@ -1338,8 +1344,15 @@ function genStep(){
   placePlat(p,calm);
   plats.push(p);
   // After 300k, every eligible platform rolls 34% until the first spawn; one item per run.
-  if(!gordonDecided&&gs>=GORDON_AT&&player.fly<=0&&type==='normal'&&!p.vx&&!calm){
-    if(Math.random()<GORDON_P){items.push({kind:'gordon',x:p.x+p.w/2,y:topY-30,t:0});lastItemStep=stepN;gordonOffered=true;gordonDecided=true;ph('gordon',{result:'offered',score:Math.max(0,Math.floor(gs))})}
+  // Гордон: ні фіксованого порогу, ні одного шансу на кожній латці. Забіг сам набирає «напругу» (комбо, топтання),
+  // і коли вона досягає особистого випадкового порогу, спершу дзвонить телефон, а за 3 латки з'являється гість.
+  if(player.fly<=0&&type==='normal'&&!p.vx&&!calm){
+    if(gordonPendStep<0&&gs>=gordonNextGs&&(heat>=gordonNeed||gs>=gordonNextGs+120000)){
+      gordonPendStep=stepN+3;pushToast('Гордон набирає номер…','Тримай темп');sfx('ring');
+    }else if(gordonPendStep>=0&&stepN>=gordonPendStep){
+      items.push({kind:'gordon',x:p.x+p.w/2,y:topY-30,t:0});lastItemStep=stepN;gordonOffered=true;gordonDecided=true;gordonPendStep=-1;gordonNextGs=1e12;gordonCount++;
+      ph('gordon',{result:'offered',score:Math.max(0,Math.floor(gs)),heat:Math.round(heat),nth:gordonCount});
+    }
   }
   if(player.flyKind!=='gordon'&&player.flyKind!=='express'&&!items.some(it=>it.kind==='express')&&!calm&&!p.vx&&type!=='minus'&&gs>=EXPRESS_FROM&&gs-lastExpressGs>EXPRESS_CD){
     if(Math.random()<.05+.04*ramp(gs,EXPRESS_FROM,400000))items.push({kind:'express',x:p.x+p.w/2,y:topY-26,t:0});
@@ -1347,8 +1360,18 @@ function genStep(){
   if(gs>12000&&!calm&&type==='normal'&&!p.vx&&player.fly<=0&&stepN-lastTicketStep>=8&&Math.random()<(.10+.06*ramp(gs,20000,500000))){
     items.push({kind:'ticket',x:p.x+p.w/2,y:topY-26,t:0});lastTicketStep=stepN;
   }
+  if(gs>20000&&!calm&&type==='normal'&&!p.vx&&player.fly<=0&&stepN-lastShieldStep>=16&&Math.random()<(shieldN===0&&gs>45000?.16:.035+.025*ramp(gs,20000,300000))){
+    items.push({kind:'shield',x:p.x+p.w/2,y:topY-26,t:0});lastShieldStep=stepN;
+  }
   const ep=EPOOL[zi]||[],ecap=gs<60000?0:gs<140000?1:gs<280000?2:gs<550000?3:4,live=enemies.filter(e=>!e.dead).length;
   if(!calm&&ep.length&&live<ecap&&Math.random()<.08+.2*ramp(gs,60000,700000))spawnHater(pick(ep),topY-gap*rnd(.22,.78),d,p.x+p.w/2,p);
+  // Рейд: рідкісна хвиля з трьох хейтерів; усіх потоптав = +15 000 і Блок
+  if(!calm&&!raid&&gs>=raidNext&&gs>100000&&live===0&&ep.length>=2&&player.fly<=0){
+    const id=stepN;raid={id,n:3,dead:0};raidLastGs=gs;raidNext=gs+rnd(150000,250000);
+    for(let k=0;k<3;k++){const before=enemies.length;spawnHater(pick(ep.filter(x=>x!=='koms')),topY-gap*(.25+.25*k),d,p.x+p.w/2+(k-1)*60,p);if(enemies.length>before)enemies[enemies.length-1].raid=id}
+    raid.n=enemies.filter(e=>e.raid===id).length;if(raid.n<2)raid=null;
+    else{pushToast('РЕЙД!','Потопчи всіх трьох');sfx('spawn');ph('raid',{result:'started',score:Math.max(0,Math.floor(gs))})}
+  }
 }
 function sayHate(en){
   const b=ENEMIES[en.kind].bubbles;if(!b||!b.length)return;
@@ -1419,6 +1442,7 @@ function reset(){
   hateLog={};minusCnt=0;fakeCnt=0;
   camY=0;bonus=0;zoneIdx=0;lookIdx=STATS.wear||0;banner=null;stomps=0;cause='Впав у прірву скасування';causeKind='fall';recent=[];stepN=0;million=false;streak=0;mult=1;shownCnt={};lastItemStep=-99;lastExpressGs=-1e9;lastTicketStep=-99;ticketsRun=0;seenNew=new Set();
   gordonDecided=false;gordonBits=[];gordonTitle=0;gordonLastEdge=-1;gordonDeck=[];gordonDeckI=0;gordonCaught=false;gordonDemo=false;gordonMissed=false;gordonOffered=false;stopGordonMusic();
+  shield=0;shieldGrace=0;shieldN=0;shieldSaved=0;lastShieldStep=-99;chainN=0;chainT=0;chainMax=0;heat=0;gordonCount=0;gordonMode='';gordonPendStep=-1;gordonLive=0;gordonLiveT=0;gordonNextGs=rnd(150000,450000);gordonNeed=rnd(18,42);raid=null;raidWins=0;raidLastGs=-1e9;raidNext=rnd(110000,200000);
   toasts=[];toastNow=null;stompKind={};expressN=0;malorosN=0;threadHits=0;idlePeak=0;newAchs=[];hideAchPop();
   floats=[];plats=[];enemies=[];envs=[];items=[];waves=[];sparks=[];shake=0;flashA=0;lastMult=1;lastSc=0;
   const sy=H*.8;player0=sy;
@@ -1437,12 +1461,34 @@ function addFloat(text,x,y,color,size){const t=floats.filter(f=>!f.puff);if(t.le
 function pushToast(top,text){if(toasts.length+(toastNow?1:0)>=5)toasts.shift();toasts.push({top,text})}
 function tickToast(dt){if(!toastNow&&toasts.length)toastNow=Object.assign({life:2.2,max:2.2},toasts.shift());if(toastNow){toastNow.life-=.012*dt;if(toastNow.life<=0)toastNow=null}}
 function breakCombo(p){if(mult>1){addFloat('комбо збито',p.x,p.y-10,'#6f5a52',13);sfx('breakCombo')}streak=0;mult=1}
+/* Блок: поглинає один удар хейтера або скарги (не падіння), далі 1,5 с невразливості */
+function tryShield(x,y){
+  if(shieldGrace>0)return true;
+  if(!shield)return false;
+  shield=0;shieldGrace=90;shieldSaved++;heat=Math.max(0,heat-20);
+  sfx('shieldBreak');burst(x,y,['#2b6fd6','#9fd6ff','#ffffff'],22,4.6,1.2);shake=Math.max(shake,6);
+  addFloat('ЗАБЛОКУВАВ!',player.x,player.y-34,'#2b6fd6',15);bonus+=1000;
+  ph('shield_save',{score:phScore(),n:shieldSaved});
+  return true;
+}
+function raidReward(){
+  const p=player;raidWins++;bonus+=15000;raid=null;
+  pushToast('Рейд відбито','+15 000 і Блок');sfx('gordonGet');
+  if(!shield){shield=1;shieldN++}
+  addFloat('+15 000',p.x,p.y-60,'#1a7a32',16);
+  ph('raid',{result:'won',score:phScore()});
+}
 function stompHater(en,bounce){
   const p=player,ey=en.y+Math.sin(en.t)*5;
   en.dead=true;sfx('stomp');burst(en.x,ey,['#ffd23a','#ffffff','#d63434'],18,4.4,1.6);shake=Math.max(shake,5);buzz(16);
   if(bounce){p.vy=-12;p.sq=1}
-  bonus+=2500;stomps++;stompKind[en.kind]=(stompKind[en.kind]||0)+1;
-  addFloat('+2500',en.x,ey-40,'#1a7a32');
+  chainN=chainT>0?chainN+1:1;chainT=190;if(chainN>chainMax)chainMax=chainN;
+  const cm=Math.min(5,chainN),pts=2500*cm;
+  bonus+=pts;stomps++;stompKind[en.kind]=(stompKind[en.kind]||0)+1;heat=Math.min(100,heat+12);
+  addFloat('+'+pts,en.x,ey-40,'#1a7a32');
+  if(cm>=2){addFloat('ЛАНЦЮГ ×'+cm,en.x,ey-76,'#b02020',15);sfx('combo');if(cm===2||cm===5)ph('chain',{n:cm,score:phScore()})}
+  if(Math.random()<(en.kind==='cancel'||en.kind==='koms'?.2:.13)){items.push({kind:'ticket',x:en.x,y:ey,t:0})}
+  if(en.raid&&raid&&en.raid===raid.id){raid.dead++;if(raid.dead>=raid.n)raidReward()}
   const q=STOMP_Q[en.kind];if(q)addFloat(pick(q),en.x,ey-58,'#1a7a32',13);
   ph('stomp',{kind:en.kind,score:phScore()});
   checkAchLive();
@@ -1501,7 +1547,7 @@ function update(dt){
   for(const en of enemies){
     en.t+=.05*dt;if(en.bi===undefined)en.bi=0;
     if(en.dead){en.fy+=.6*dt;en.y+=en.fy*dt;continue}
-    if(en.vx){en.x+=en.vx*dt;if(en.x<26||en.x>W-26){en.vx*=-1;if(en.kind==='koms')sayHate(en)}}
+    if(en.vx){en.x+=en.vx*dt;if(en.x<26||en.x>W-26){en.vx*=-1;if(en.kind==='koms'){sayHate(en);if(Math.abs(en.vx)<2.6)en.vx*=1.12}}}
     const ey=en.y+Math.sin(en.t)*5;
     if(en.kind==='stuk'&&mode==='play'){
       en.cool-=dt;const sy=ey-camY;
@@ -1510,10 +1556,11 @@ function update(dt){
     const esy=ey-camY,onScr=esy>30&&esy<H-40;
     if(mode==='play'&&onScr&&!seenNew.has(en.kind)){seenNew.add(en.kind);if(!STATS.met[en.kind]){STATS.met[en.kind]=1;saveStats();pushToast('Новий хейтер',ENEMIES[en.kind].name);sfx('spawn');ph('hater_met',{kind:en.kind})}}
     if(mode==='play'&&onScr&&en.kind!=='stuk'){en.cool-=dt;
+      if(en.cool<36&&en.cool>0&&!en.warned){en.warned=true;if(en.kind!=='koms')sfx('alert')}else if(en.cool>=36)en.warned=false;
       if(en.cool<=0){
         if(en.kind==='cancel'){let best=null,bd=1e9;for(const pl of plats){if(pl.broken||pl.type==='breaking'||pl.type==='spring'||pl.label==='ПЕРШИЙ ЖАРТ')continue;const dy=pl.y-ey;if(dy<-40||dy>200)continue;if(Math.abs(pl.y-(p.y+FEET))<50&&Math.abs(pl.x+pl.w/2-p.x)<pl.w/2+20)continue;const dd=Math.abs(pl.x+pl.w/2-en.x)+dy;if(dd<bd){bd=dd;best=pl}}
           if(best){sayHate(en);best.type='breaking';best.label='СКАСОВАНО';best.vx=0;best.hits=Math.max(best.hits||0,1);best.fs=fontFor('СКАСОВАНО',best.w-20);addFloat('СКАСОВАНО!',best.x+best.w/2,best.y-10,'#b02020',14);sfx('stamp')}en.cool=rnd(168,224)-en.d*77}
-        else if(en.kind==='lang'){if(Math.abs(ey-p.y)<150&&Math.abs(en.x-p.x)<110){sayHate(en);waves.push({x:en.x,y:ey,r:10,life:1});const dir=p.x>=en.x?1:-1;p.push=dir*(4.5+en.d*2);breakCombo(p);sfx('shout');addFloat(ENEMIES.lang.bubbles[en.bi],en.x,ey-50,'#b02020',13)}en.cool=rnd(200,260)-en.d*56}
+        else if(en.kind==='lang'){if(p.fly<=0&&Math.abs(ey-p.y)<150&&Math.abs(en.x-p.x)<110){sayHate(en);waves.push({x:en.x,y:ey,r:10,life:1});const dir=p.x>=en.x?1:-1;p.push=dir*(4.5+en.d*2);breakCombo(p);sfx('shout');addFloat(ENEMIES.lang.bubbles[en.bi],en.x,ey-50,'#b02020',13)}en.cool=rnd(200,260)-en.d*56}
         else if(en.kind==='threads'){sayHate(en);envs.push({x:en.x,y:ey+10,vx:(p.x-en.x)*.003,vy:1,rot:0,kind:'thread'});en.cool=rnd(161,210)-en.d*70}
         else en.cool=999;
       }}
@@ -1522,27 +1569,36 @@ function update(dt){
     if(mode==='play'&&Math.abs(en.x-p.x)<34){
       // Fall onto the upper half (tall PNG heads sit well above centre). Side/torso stays fatal.
       if(falling&&prevB<=ey+8&&bot>=etop-2){stompHater(en,true);continue}
-      if(Math.abs(ey-(p.y+22))<42){cause=ENEMIES[en.kind].cause;causeKind=en.kind;gameOver();return}
+      if(Math.abs(ey-(p.y+22))<42){
+        if(tryShield(en.x,ey)){if(!en.dead){en.dead=true;en.fy=-3;p.push=(p.x>=en.x?1:-1)*5}continue}
+        cause=ENEMIES[en.kind].cause;causeKind=en.kind;gameOver();return}
     }
   }
   for(const e of envs){e.vy=Math.min(3,e.vy+.03*dt);e.x+=e.vx*dt;e.y+=e.vy*dt;e.rot+=.04*dt;
-    if(mode==='play'&&p.fly<=0&&!e.hit&&Math.abs(e.x-p.x)<24&&Math.abs(e.y-(p.y+22))<38){e.hit=true;sfx('hit');breakCombo(p);if(e.kind==='thread'){const pen=2000+zoneIdx*1000;bonus-=pen;threadHits++;addFloat('−'+fmt(pen),p.x,p.y-30,'#3c434e',14)}else{p.vy=Math.max(p.vy,4);addFloat('−стрибок',p.x,p.y-30,'#b02020',14)}}}
+    if(mode==='play'&&p.fly<=0&&!e.hit&&Math.abs(e.x-p.x)<24&&Math.abs(e.y-(p.y+22))<38){e.hit=true;if(tryShield(e.x,e.y))continue;sfx('hit');breakCombo(p);if(e.kind==='thread'){const pen=2000+zoneIdx*1000;bonus-=pen;threadHits++;addFloat('−'+fmt(pen),p.x,p.y-30,'#3c434e',14)}else{p.vy=Math.max(p.vy,4);addFloat('−стрибок',p.x,p.y-30,'#b02020',14)}}}
   envs=envs.filter(e=>!e.hit&&e.y-camY<H+40);
-  for(const it of items){it.t+=.07*dt;if(mode==='play'&&!seenNew.has(it.kind)&&it.y-camY>30&&it.y-camY<H-40){seenNew.add(it.kind);pushToast('Новий бонус',it.kind==='gordon'?'В гостях у Гордона':it.kind==='ticket'?'Квиток на концерт':'Шакалячий експрес')}
+  for(const it of items){it.t+=.07*dt;if(mode==='play'&&!seenNew.has(it.kind)&&it.y-camY>30&&it.y-camY<H-40){seenNew.add(it.kind);pushToast('Новий бонус',it.kind==='gordon'?'В гостях у Гордона':it.kind==='ticket'?'Квиток на концерт':it.kind==='shield'?'Блок':'Шакалячий експрес')}
     const reach=it.kind==='gordon'?90:30,yreach=it.kind==='gordon'?52:44;
     if(mode==='play'&&!it.got&&Math.abs(it.x-p.x)<reach&&Math.abs(it.y-(p.y+22))<yreach){it.got=1;
-    if(it.kind==='gordon'){gordonCaught=true;sfx('gordonGet');beginGordon(p);ph('gordon',{result:'caught',score:phScore()});checkAchLive('gordon')}
+    if(it.kind==='shield'){shield=1;shieldN++;sfx('shield');addFloat('БЛОК',it.x,it.y-14,'#2b6fd6',14);burst(it.x,it.y,['#2b6fd6','#9fd6ff','#ffffff'],14,3.4,1.2);pushToast('Блок','Один удар хейтера не страшний');ph('shield_get',{score:phScore(),n:shieldN})}
+    else if(it.kind==='gordon'){gordonCaught=true;scheduleNextGordon();sfx('gordonGet');beginGordon(p);ph('gordon',{result:'caught',score:phScore()});checkAchLive('gordon')}
     else if(it.kind==='ticket'){STATS.tickets=(STATS.tickets|0)+1;ticketsRun++;saveStats();sfx('ticket');addFloat('+квиток',it.x,it.y-12,'#8f5f08',13);burst(it.x,it.y,['#ffd23a','#fff3b0','#ff9a2a'],12,3.4,1.2);popEl($('hudTix'),'get');paintTickets();ph('ticket',{run:ticketsRun,total:STATS.tickets|0})}
     else{lastExpressGs=hs();if(p.flyKind!=='gordon'){p.fly=EXPRESS_FLY;p.flyMax=EXPRESS_FLY;p.flyKind='express';chase=[];startDogs();shake=Math.max(shake,5);flashA=.35;sfx('express');sfx('whoosh');bonus+=12000;expressN++;pushToast('Шакалячий експрес','+12 000');ph('express',{score:phScore(),zone:phZone()});checkAchLive('express')}}}}
-  items=items.filter(it=>{if(it.kind==='gordon'&&!it.got&&it.y-camY>=H+40){gordonMissed=true;ph('gordon',{result:'missed',score:phScore()});checkAchLive('gmiss')}return !it.got&&it.y-camY<H+40});
+  items=items.filter(it=>{if(it.kind==='gordon'&&!it.got&&it.y-camY>=H+40){gordonMissed=true;scheduleNextGordon();ph('gordon',{result:'missed',score:phScore()});checkAchLive('gmiss')}return !it.got&&it.y-camY<H+40});
   for(const w of waves){w.r+=4*dt;w.life-=.03*dt}waves=waves.filter(w=>w.life>0);
-  plats=plats.filter(pl=>pl.y-camY<H+80&&pl.alpha>0);enemies=enemies.filter(e=>e.y-camY<H+90);
+  plats=plats.filter(pl=>pl.y-camY<H+80&&pl.alpha>0);enemies=enemies.filter(e=>e.y-camY<H+90);if(raid&&!enemies.some(e=>e.raid===raid.id)){ph('raid',{result:'failed',score:phScore()});raid=null}
   while(topY>camY-160)genStep();
   for(const f of floats){if(f.puff){f.y+=1.4*dt;f.life-=.05*dt}else{f.y-=.55*dt;f.life-=.011*dt}}floats=floats.filter(f=>f.life>0);
   for(const s of sparks){s.x+=s.vx*dt;s.y+=s.vy*dt;s.vy+=.18*dt;s.life-=.032*dt}sparks=sparks.filter(s=>s.life>0);
   shake*=Math.pow(.86,dt);if(shake<.2)shake=0;flashA=Math.max(0,flashA-.03*dt);
   if(banner){banner.life-=.006*dt;if(banner.life<=0)banner=null}
   tickToast(dt);if(gordonTitle>0)gordonTitle-=.016*dt;
+  if(mode==='play'){
+    if(chainT>0){chainT-=dt;if(chainT<=0)chainN=0}
+    if(shieldGrace>0)shieldGrace-=dt;
+    heat=Math.max(0,Math.min(100,heat+((mult>1?(mult-1)*.05:0)-.014)*dt));
+    if(p.flyKind==='gordon'&&gordonMode==='live'&&gordonLive>0){gordonLiveT-=dt;if(gordonLiveT<=0){gordonLive--;gordonLiveT=150;STATS.tickets=(STATS.tickets|0)+1;ticketsRun++;saveStats();sfx('ticket');addFloat('+квиток',p.x,p.y-40,'#8f5f08',14);paintTickets()}}
+  }
   p.sq*=Math.pow(.84,dt);
   if(mode==='play'){
     const sc0=Math.max(0,score());$('score').textContent=fmt(sc0);{const sf=$('stageFill');if(sf)sf.style.transform='scaleX('+Math.max(0,Math.min(1,zoneFrac())).toFixed(3)+')'}if(sc0-lastSc>=1500)popEl($('score'),'bump');lastSc=sc0;
@@ -1613,6 +1669,7 @@ function drawEnemy(en){
     ctx.restore();
   }
   drawChar(ctx,ch,x,y,flip,1,'center',rot);
+  if(alert&&en.kind!=='koms'&&Math.floor(tick/4)%2===0){ctx.fillStyle='#fff3e0';ctx.fillRect(Math.round(x-7),Math.round(y-top-22),14,22);ctx.fillStyle='#d63434';ctx.fillRect(Math.round(x-5),Math.round(y-top-20),10,18);ctx.fillStyle='#fff3e0';ctx.fillRect(Math.round(x-1),Math.round(y-top-17),3,8);ctx.fillRect(Math.round(x-1),Math.round(y-top-7),3,3)}
   if(!en.dead&&Math.abs(en.y-player.y)<320){
     ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.font='800 9px Manrope, sans-serif';const tag=E.tag||E.name.toUpperCase(),nw=ctx.measureText(tag).width+10;
@@ -1753,6 +1810,7 @@ function gordonPhoto(){
   return gordonDeck[gordonDeckI++];
 }
 function pushGordonBit(){
+  if(gordonMode==='interview'&&player&&player.flyKind==='gordon'&&mode==='play'){bonus+=2000;addFloat('+2000',player.x,player.y-46,'#e2a91c',14)}
   let e=Math.floor(Math.random()*8);
   if(e===gordonLastEdge)e=(e+1+Math.floor(Math.random()*7))%8;
   gordonLastEdge=e;
@@ -1766,10 +1824,18 @@ function spinGordon(dt){
   for(const b of gordonBits)b.age+=dt;
   gordonBits=gordonBits.filter(b=>b.age<b.span);
 }
+function scheduleNextGordon(){
+  // другий візит можливий (25%), але не раніше ніж за 200–320k
+  gordonPendStep=-1;gordonNextGs=Math.random()<.25?hs()+rnd(200000,320000):1e12;gordonNeed=rnd(18,42);
+}
 function beginGordon(p){
   p.fly=GORDON_FLY;p.flyMax=GORDON_FLY;p.flyKind='gordon';
+  gordonMode=pick(['interview','live','exclusive']);gordonLive=gordonMode==='live'?3:0;gordonLiveT=40;
   seedGordon();startGordonMusic();
-  pushToast('Рідкісний гість','В гостях у Гордона');
+  if(gordonMode==='exclusive'){bonus+=20000;if(!shield){shield=1;shieldN++}pushToast('Ексклюзив','+20 000 і Блок')}
+  else if(gordonMode==='live')pushToast('Прямий ефір','Дощ квитків')
+  else pushToast('Інтерв’ю','+2 000 за кожне фото');
+  ph('gordon',{result:'started',mode:gordonMode,score:phScore()});
 }
 function drawGordonTitle(){
   if(gordonTitle<=0||mode!=='play')return;
@@ -1803,7 +1869,7 @@ function drawItem(it){
     if(gimg){ctx.save();ctx.imageSmoothingEnabled=true;ctx.beginPath();ctx.arc(it.x,y,16,0,7);ctx.clip();ctx.drawImage(gimg,it.x-18,y-18,36,36);ctx.restore()}
     return;
   }
-  const s=it.kind==='ticket'?TICKET_SPR:ROCKET_SPR;
+  const s=it.kind==='ticket'?TICKET_SPR:it.kind==='shield'?SHIELD_SPR:ROCKET_SPR;
   ctx.drawImage(s,Math.round(it.x-s.width/2),Math.round(y-s.height/2));
 }
 function drawGordonBits(){
@@ -1835,7 +1901,9 @@ function drawRedka(){
     ctx.restore();
   }
   if(p.flyKind==='express')drawChaseDogs(p,py);
-  drawChar(ctx,ch,p.x,py+FEET,sx*p.face*SSX,sy*SSC,'feet',lean);
+  const blink=shieldGrace>0&&Math.floor(tick/3)%2===0;
+  if(!blink)drawChar(ctx,ch,p.x,py+FEET,sx*p.face*SSX,sy*SSC,'feet',lean);
+  if(shield||shieldGrace>0){ctx.save();ctx.globalAlpha=shield?.55+.2*Math.sin(tick*.18):.35;ctx.strokeStyle=shieldGrace>0?'#ffffff':'#7cc4f0';ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,py+FEET-34,42,0,7);ctx.stroke();ctx.globalAlpha*=.35;ctx.fillStyle='#9fd6ff';ctx.fill();ctx.restore()}
   const star=(x,y,sz,c)=>{ctx.fillStyle=c;ctx.fillRect(x-1,y-sz,3,sz*2+1);ctx.fillRect(x-sz,y-1,sz*2+1,3)};
   if(L.gold){const a=tick*.06;for(let i=0;i<4;i++){const ang=a+i*1.57,x=Math.round(p.x+Math.cos(ang)*42),y=Math.round(py+20+Math.sin(ang)*44);star(x,y,4+Math.round(2*Math.sin(tick*.2+i)),'#f5c542')}}
   if(gordon){const a=tick*.1;for(let i=0;i<8;i++){const ang=a+i*.785,x=Math.round(p.x+Math.cos(ang)*54),y=Math.round(py+20+Math.sin(ang)*58);star(x,y,5,i%2?'#fff3b0':'#e2a91c')}}
