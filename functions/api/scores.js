@@ -2,12 +2,15 @@
 // Потрібен KV binding LEADERBOARD (Pages → Settings → Functions → KV namespace bindings).
 // GET  /api/scores?pid=…   → { ok, top:[{n,s,z,l,me}], total, rank }
 // POST /api/scores         → { pid, name, score, dur, zone, look } → { ok, rank, top }
+// Ім'я до 12 символів; до 15 — лише якщо рахунок бʼє поточний №1 (новий загальний рекорд).
 
 const SHOW = 50;          // скільки віддаємо клієнту
 const KEEP = 100;         // скільки тримаємо в KV
 const MAX_SCORE = 2000000;
 const MAX_RATE = 9000;    // найбільший реалістичний приріст рахунку за секунду забігу
-const NAME_RE = /^[\p{L}\p{N} _.!\-]{1,12}$/u;
+const NAME_MAX = 12;       // звичайне ім'я
+const NAME_MAX_RECORD = 15; // той, хто побив загальний рекорд (№1), може до 15
+const NAME_RE = /^[\p{L}\p{N} _.!\-]{1,15}$/u;
 const PID_RE = /^[A-Za-z0-9-]{8,64}$/;
 
 // Грубий фільтр лайки: нормалізуємо схожі латинські літери й цифри, прибираємо все крім літер.
@@ -64,12 +67,14 @@ export async function onRequestPost({ request, env }) {
   if (score > 3000 + dur * MAX_RATE) return json({ ok: false, error: 'implausible' }, 422);
 
   const kv = env.LEADERBOARD;
+  const top = await readTop(kv);
+  const newOverallRecord = !top.length || score > top[0].s;
+  if ([...name].length > (newOverallRecord ? NAME_MAX_RECORD : NAME_MAX)) return json({ ok: false, error: 'name_too_long' }, 422);
   const ip = request.headers.get('cf-connecting-ip') || 'x';
   const rl = 'rl:' + ip;
   if (await kv.get(rl)) return json({ ok: false, error: 'slow_down' }, 429);
   await kv.put(rl, '1', { expirationTtl: 60 });
 
-  const top = await readTop(kv);
   const i = top.findIndex(e => e.p === pid);
   const entry = { p: pid, n: name, s: score, z: Math.max(0, Math.min(9, body.zone | 0)), l: Math.max(0, Math.min(20, body.look | 0)), t: Date.now() };
   if (i >= 0) {
