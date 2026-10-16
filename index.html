@@ -754,11 +754,11 @@ const REDKA_FACE={
   'felix-fly':{ax:15,chin:18,sink:.5,cells:19}
 };
 const REDKA_CH={};
-function redkaChar(li,px,faceKey,pose){
+function redkaChar(li,px,faceKey,pose,outline){
   const fk=faceKey&&FACES[faceKey]?faceKey:'felix';
-  const key=li+':'+px+':'+fk+(pose?':'+pose:'');if(REDKA_CH[key])return REDKA_CH[key];
+  const key=li+':'+px+':'+fk+(pose?':'+pose:'')+(outline?':'+outline:'');if(REDKA_CH[key])return REDKA_CH[key];
   const L=LOOKS[li],f=FACES[fk]||FACES.felix,bg=pose==='up'&&L.bodyUp?L.bodyUp:pose==='side'&&L.bodySide?L.bodySide:lookGrid(L),grid=f?bg:withHead(bg);
-  const ch=makeChar(grid,Object.assign(lookPal(L),{h:'#ff9a7a'}),px,L.out||'#ffffff',f,REDKA_FACE[fk]||REDKA_FACE.felix);
+  const ch=makeChar(grid,Object.assign(lookPal(L),{h:'#ff9a7a'}),px,outline||L.out||'#ffffff',f,REDKA_FACE[fk]||REDKA_FACE.felix);
   if(f)REDKA_CH[key]=ch;return ch;
 }
 const EGRID={"stuk":["....................","....................","....................","....................","....................","....................","....................","....................",".....KKKKKKKKKK.....","...KKHHHHHHHHHhKK...","..KHHHHHHHHHHHhhhK..","..KHHhhhhhhhhhhhhK..","...KHHHHfFFfHHhhK...","....KKKCCCCCCKKKKKK.","....KCCCCSSSCcPPPPPK","...KCCCCCSSSCcPLLLPK","...KCCCCCccCCFPPPPPK","..KCCCCCCccCCFPLLLPK","..KCCCCCCccCCcPPPPPK","..KCCCCCCccCCcPTTTPK","...KCCCCCccCCcPPPPPK","...KCCCCCccCCcPPPPPK","....KCCCCccCCccKKKK.",".....KnnnCCnnnK.....",".....KnnnKKnnnK.....",".....KKKK..KKKK....."],"koms":["....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","........KKKK........",".......KfFFfK.......",".......KFFFFKK...KKK",".....KKTTTTTttKKKMMM","....KSSTTTTTttsMMMmm","....KSSTTTTTttFMMMmm","...KSSSTTTTTttFMMMmm","...KSSSTTStSsssMMMmm","...KSSSSSSSSssssKMMM","...KSSSSSSSSssssKKKK","....KSSSSSSSsssK....","....KSSSSSSSsssK....",".....KNNNSSNNNK.....",".....KNNNKKNNNK.....",".....KKKK..KKKK....."],"cancel":[".....KKKKKKKKKK.....","....KBBBBBBBBBBK....","...KGGGGGGGGGGGGK...","...KBBBBBBBBBBBBBK..","..KGBBBBBBBBBBBBGK..","..KGFFBBBBBBBBffGK..","..KGFFKFFFFFFFKfGK..","..KGFFFKFFFFFKffGK..","..KGFFFWKFFFWKffGK..","..KGFFFKKFFFKKffGK..","..KGFpFFFFFFFFfpGK..","...KKFFFFFFFFFGGK...","....KFFFKKKKFKYYYK..",".....KKFFFFFFKYYYK..",".....KKDDSSSDKYYYK..","....KDDDDddDDdFYYK..","...KDDDDDddDDdFYYK..","...KDDDDDddDDdYYYKKK","...KDDDDDddDDRRRRRRR","...KDDDDDddDDRRRRRRR","...KDDDDDddDDRRRRRRR","...KDDDDDddDDrrrrrrr","....KDDDDddDDddKKKKK",".....KdddDDdddK.....",".....KdddKKdddK.....",".....KKKK..KKKK....."],"lang":[".....KKKKKKKKKK.....","....KHHHHHHHHhhK....","...KHHHHHHHHHhhhK...","...KHHHHHHHHHHHHK...","...KHHHHHHHHHHHHK...","...KHHHHHHHHHHHHK...","..KHHFKFHHHHFFKHHK..","..KHHKKKKFFKKKKHHK..","..KHHKWKKKKKWKKHHK..","..KHHKKKKFFKKKKHHK..","...KFpFFFFFFFFfpK...","....KFFFKKKKFFfK....","....KFFFKTTKFFfK....",".....KKFfFFfFKK.....","......KKFFFFKK......","..KKKKXXSSSSSxKK....",".KUUZUXXSSSSSxFFK...",".KUPPPXXXSSSXxFFK...",".KUPKPFXXXXXXxFFK...",".KUPPPXXXXXXXxxxK...",".KUPVPXXXXXXXxxxK...",".KUUUUXXXXXXXxxxK...","..KKKXXXXXXXXxxK....",".....KxxxXXxxxK.....",".....KxxxKKxxxK.....",".....KKKK..KKKK....."],"threads":["....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","........KKKK........",".......KfFFfK.......",".......KFFFFKKKKKK..",".....KKIIIIIIIEEEEK.","....KIIIWIIIWiEeeEK.","...KIIIIIIIIIiEeeEK.","..KIIIIIIWWWIFEeeEK.","..KIIIIIWIeIWFEeeEK.","..KIIIIIIWWWWiEeeEK.","..KIIIIIIIIIIiEeeEK.","...KIIIIIIIIIiEEEEK.","...KIIIIIIIIIiiiKK..","....KKiiiIIiiiKK....",".....KiiiIIiiiK.....",".....KKKKKKKKKK....."]};
@@ -877,6 +877,7 @@ const FEET=22*PX;
 
 let items=[],waves=[],causeKind='fall',mode='start',player,plats,enemies,envs,floats,camY,topY,bonus,zoneIdx,lookIdx,banner,stomps,cause,best=0,input={l:false,r:false},pointers=new Map(),player0=0,tick=0,recent=[];
 let ticketsRun=0,lastTicketStep=-99;
+let lastGap=100,lastHaterStep=-99;
 let shield=0,shieldGrace=0,shieldN=0,shieldSaved=0,lastShieldStep=-99,chainN=0,chainT=0,chainMax=0,heat=0,gordonNextGs=0,gordonNeed=30,gordonPendStep=-1,gordonCount=0,gordonMode='',gordonLive=0,gordonLiveT=0,raidLastGs=-1e9,raidNext=1e12,raid=null,raidWins=0;
 let runT0=0,playAcc=0,playMark=0,pauseN=0,playFrom='cta',comboMax=1;
 function ph(n,p){try{window.posthog&&posthog.capture&&posthog.capture(n,p||{})}catch(e){}}
@@ -892,7 +893,7 @@ function runPhProps(extra){
   return Object.assign({
     cause:causeKind,score:phScore(),zone:phZone(),zone_idx:zoneIdx|0,
     duration_s:Math.round(playMs()/100)/10,wall_s:Math.round(wallMs()/100)/10,
-    look:L.name,tickets:ticketsRun|0,express:expressN|0,gordon:gordonState(),gordon_mode:gordonMode,shield_got:shieldN|0,shield_saved:shieldSaved|0,chain_max:chainMax|0,raid_wins:raidWins|0,
+    look:L.name,tickets:ticketsRun|0,express:expressN|0,gordon:gordonState(),gordon_mode:gordonMode,diff:Math.round((curD||0)*100)/100,shield_got:shieldN|0,shield_saved:shieldSaved|0,chain_max:chainMax|0,raid_wins:raidWins|0,
     stomps:stomps|0,stomp_stuk:sk.stuk|0,stomp_lang:sk.lang|0,stomp_threads:sk.threads|0,stomp_cancel:sk.cancel|0,stomp_koms:sk.koms|0,
     combo_max:comboMax|0,minus:minusCnt|0,fakes:fakeCnt|0,threads:threadHits|0,labels:hateSum(),
     idle_s:Math.round((idlePeak/60)*10)/10,record:!!isRecord,million:!!million,pauses:pauseN|0
@@ -1307,7 +1308,7 @@ function platLife(gs,type,label){
 function makePlat(type,y,label,extra){
   ctx.font='800 '+PFONT+'px Manrope, system-ui, sans-serif';
   const d=diff(),w=Math.round(Math.max(60,Math.min(160-30*d,ctx.measureText(label).width+20)));
-  return Object.assign({type,label,x:rnd(4,W-w-4),y,w,h:PH,vx:type==='moving'?(Math.random()<.5?-1:1)*rnd(.6,.8+d*1.6):0,broken:false,fy:0,alpha:1,visited:false,hits:0,life:4,fs:fontFor(label,w-12)},extra||{});
+  return Object.assign({type,label,x:rnd(4,W-w-4),y,w,h:PH,vx:type==='moving'?(Math.random()<.5?-1:1)*rnd(.6,.8+Math.min(1.2,d*1.6)):0,broken:false,fy:0,alpha:1,visited:false,hits:0,life:4,fs:fontFor(label,w-12)},extra||{});
 }
 const ramp=(v,a,b)=>Math.max(0,Math.min(1,(v-a)/(b-a)));
 let streak=0,mult=1,shownCnt={},million=false,stepN=0,lastItemStep=-99,lastExpressGs=-1e9,seenNew=new Set(),lastCx=W/2,lastW=130,centreHist=[1,1,1];
@@ -1326,17 +1327,23 @@ function placePlat(p,calm){
   p.x=best-p.w/2;centreHist.push(mid(best)?1:0);if(centreHist.length>3)centreHist.shift();
   lastCx=best;lastW=p.w;
 }
-const GORDON_FLY=768,EXPRESS_FLY=120,EXPRESS_FROM=60000,EXPRESS_CD=70000;
+const GORDON_FLY=768,EXPRESS_FLY=120,EXPRESS_FROM=60000,EXPRESS_CD=60000;
 function genStep(){
   stepN++;
-  const gs0=Math.max(0,player0-topY)*SC,d=curD=ramp(gs0,0,1000000),gap=rnd(72,88)+80*ramp(gs0,40000,700000);topY-=gap;
+  const gs0=Math.max(0,player0-topY)*SC,breath=.5-.5*Math.cos(gs0/115000*6.2832);
+  // складність росте плавно, а не «усе на максимум о 700k»; кожні ~115k — «видих» (до −15%)
+  const d=curD=ramp(gs0,0,1000000)*(1-.15*breath);
+  let gap=rnd(72,88)+60*ramp(gs0,40000,800000)*(1-.15*breath);
+  if(lastGap>140&&gap>140)gap=rnd(110,130);
+  lastGap=gap;topY-=gap;
   const gs=Math.max(0,player0-topY)*SC,zi=zoneAt(gs),z=ZONES[zi];
-  const calm=gs>100000&&stepN%64>=59,calmStart=gs>100000&&stepN%64===59;
+  const calm=gs>100000&&stepN%56>=48,calmStart=gs>100000&&stepN%56===48;
   const r=Math.random();let type='normal';
-  const pSpring=.055-.02*d,pMove=gs<40000?0:.04+.22*ramp(gs,40000,600000);
+  const pSpring=.055-.015*d,pMove=gs<40000?0:.04+.2*ramp(gs,40000,600000);
   if(r<pSpring)type='spring';else if(r<pSpring+pMove)type='moving';
-  if(calm)type=Math.random()<.12?'spring':'normal';
-  if(!calm&&type==='normal'&&gs>80000&&Math.random()<.03+.09*ramp(gs,80000,700000))type='minus';
+  if(calm)type=Math.random()<.25?'spring':'normal';
+  if(gap>135&&(type==='moving'))type='normal';
+  if(!calm&&gap<=135&&type==='normal'&&gs>80000&&Math.random()<.03+.09*ramp(gs,80000,700000))type='minus';
   const lr=Math.random(),pool=lr<.38?HOT:(z.labels.length&&lr<.8)?z.labels:COMMON;
   const label=calmStart?'АНТРАКТ':type==='spring'?pick(z.springs):type==='minus'?'− '+pick(MINUS[Math.max(1,zi)]):type==='moving'?pickFresh(MOVERS):pickFresh(pool);
   const p=makePlat(type,topY,label,type==='minus'?{pen:Math.round((2500+gs*.01)/500)*500}:null);
@@ -1360,11 +1367,12 @@ function genStep(){
   if(gs>12000&&!calm&&type==='normal'&&!p.vx&&player.fly<=0&&stepN-lastTicketStep>=8&&Math.random()<(.10+.06*ramp(gs,20000,500000))){
     items.push({kind:'ticket',x:p.x+p.w/2,y:topY-26,t:0});lastTicketStep=stepN;
   }
-  if(gs>20000&&!calm&&type==='normal'&&!p.vx&&player.fly<=0&&stepN-lastShieldStep>=16&&Math.random()<(shieldN===0&&gs>45000?.16:.035+.025*ramp(gs,20000,300000))){
+  if(gs>20000&&!calm&&type==='normal'&&!p.vx&&player.fly<=0&&stepN-lastShieldStep>=16&&Math.random()<(shieldN===0&&gs>45000?.16:.035+.025*ramp(gs,20000,300000)+.02*ramp(gs,500000,800000))){
     items.push({kind:'shield',x:p.x+p.w/2,y:topY-26,t:0});lastShieldStep=stepN;
   }
-  const ep=EPOOL[zi]||[],ecap=gs<60000?0:gs<140000?1:gs<280000?2:gs<550000?3:4,live=enemies.filter(e=>!e.dead).length;
-  if(!calm&&ep.length&&live<ecap&&Math.random()<.08+.2*ramp(gs,60000,700000))spawnHater(pick(ep),topY-gap*rnd(.22,.78),d,p.x+p.w/2,p);
+  if(calm&&stepN%56===51&&!shield&&player.fly<=0&&!p.vx&&type==='normal'){items.push({kind:'shield',x:p.x+p.w/2,y:topY-26,t:0});lastShieldStep=stepN}
+  const ep=EPOOL[zi]||[],ecap=gs<60000?0:gs<140000?1:gs<280000?2:3,live=enemies.filter(e=>!e.dead).length;
+  if(!calm&&ep.length&&live<ecap&&stepN-lastHaterStep>=4&&Math.random()<.08+.14*ramp(gs,60000,700000)){lastHaterStep=stepN;spawnHater(pick(ep),topY-gap*rnd(.22,.78),d,p.x+p.w/2,p)}
   // Рейд: рідкісна хвиля з трьох хейтерів; усіх потоптав = +15 000 і Блок
   if(!calm&&!raid&&gs>=raidNext&&gs>100000&&live===0&&ep.length>=2&&player.fly<=0){
     const id=stepN;raid={id,n:3,dead:0};raidLastGs=gs;raidNext=gs+rnd(150000,250000);
@@ -1378,7 +1386,8 @@ function sayHate(en){
   let i=Math.floor(Math.random()*b.length);if(b.length>1&&i===en.bi)i=(i+1)%b.length;en.bi=i;
 }
 function haterX(kind,near,y){
-  let x=near+rnd(-38,38);
+  let x=near+(Math.random()<.5?-1:1)*rnd(62,110);
+  if(x<32||x>W-32)x=near+(x<32?1:-1)*rnd(62,110);
   if(kind==='stuk')x=near>W/2?rnd(32,70):rnd(W-70,W-32);
   x=Math.max(32,Math.min(W-32,x));
   for(const e of enemies){if(e.dead||Math.abs(e.y-y)>90)continue;if(Math.abs(e.x-x)<90)x=e.x<W/2?Math.min(W-32,e.x+96):Math.max(32,e.x-96)}
@@ -1442,7 +1451,7 @@ function reset(){
   hateLog={};minusCnt=0;fakeCnt=0;
   camY=0;bonus=0;zoneIdx=0;lookIdx=STATS.wear||0;banner=null;stomps=0;cause='Впав у прірву скасування';causeKind='fall';recent=[];stepN=0;million=false;streak=0;mult=1;shownCnt={};lastItemStep=-99;lastExpressGs=-1e9;lastTicketStep=-99;ticketsRun=0;seenNew=new Set();
   gordonDecided=false;gordonBits=[];gordonTitle=0;gordonLastEdge=-1;gordonDeck=[];gordonDeckI=0;gordonCaught=false;gordonDemo=false;gordonMissed=false;gordonOffered=false;stopGordonMusic();
-  shield=0;shieldGrace=0;shieldN=0;shieldSaved=0;lastShieldStep=-99;chainN=0;chainT=0;chainMax=0;heat=0;gordonCount=0;gordonMode='';gordonPendStep=-1;gordonLive=0;gordonLiveT=0;gordonNextGs=rnd(150000,450000);gordonNeed=rnd(18,42);raid=null;raidWins=0;raidLastGs=-1e9;raidNext=rnd(110000,200000);
+  lastGap=100;lastHaterStep=-99;shield=0;shieldGrace=0;shieldN=0;shieldSaved=0;lastShieldStep=-99;chainN=0;chainT=0;chainMax=0;heat=0;gordonCount=0;gordonMode='';gordonPendStep=-1;gordonLive=0;gordonLiveT=0;gordonNextGs=rnd(150000,450000);gordonNeed=rnd(18,42);raid=null;raidWins=0;raidLastGs=-1e9;raidNext=rnd(110000,200000);
   toasts=[];toastNow=null;stompKind={};expressN=0;malorosN=0;threadHits=0;idlePeak=0;newAchs=[];hideAchPop();
   floats=[];plats=[];enemies=[];envs=[];items=[];waves=[];sparks=[];shake=0;flashA=0;lastMult=1;lastSc=0;
   const sy=H*.8;player0=sy;
@@ -1461,19 +1470,19 @@ function addFloat(text,x,y,color,size){const t=floats.filter(f=>!f.puff);if(t.le
 function pushToast(top,text){if(toasts.length+(toastNow?1:0)>=5)toasts.shift();toasts.push({top,text})}
 function tickToast(dt){if(!toastNow&&toasts.length)toastNow=Object.assign({life:2.2,max:2.2},toasts.shift());if(toastNow){toastNow.life-=.012*dt;if(toastNow.life<=0)toastNow=null}}
 function breakCombo(p){if(mult>1){addFloat('комбо збито',p.x,p.y-10,'#6f5a52',13);sfx('breakCombo')}streak=0;mult=1}
-/* Блок: поглинає один удар хейтера або скарги (не падіння), далі 1,5 с невразливості */
+/* Бронювання: поглинає один удар хейтера або скарги (не падіння), далі 1,5 с невразливості */
 function tryShield(x,y){
   if(shieldGrace>0)return true;
   if(!shield)return false;
   shield=0;shieldGrace=90;shieldSaved++;heat=Math.max(0,heat-20);
   sfx('shieldBreak');burst(x,y,['#2b6fd6','#9fd6ff','#ffffff'],22,4.6,1.2);shake=Math.max(shake,6);
-  addFloat('ЗАБЛОКУВАВ!',player.x,player.y-34,'#2b6fd6',15);bonus+=1000;
+  addFloat('БРОНЮВАННЯ!',player.x,player.y-34,'#2b6fd6',15);bonus+=1000;
   ph('shield_save',{score:phScore(),n:shieldSaved});
   return true;
 }
 function raidReward(){
   const p=player;raidWins++;bonus+=15000;raid=null;
-  pushToast('Рейд відбито','+15 000 і Блок');sfx('gordonGet');
+  pushToast('Рейд відбито','+15 000 і Бронювання');sfx('gordonGet');
   if(!shield){shield=1;shieldN++}
   addFloat('+15 000',p.x,p.y-60,'#1a7a32',16);
   ph('raid',{result:'won',score:phScore()});
@@ -1551,7 +1560,7 @@ function update(dt){
     const ey=en.y+Math.sin(en.t)*5;
     if(en.kind==='stuk'&&mode==='play'){
       en.cool-=dt;const sy=ey-camY;
-      if(en.cool<=0&&sy>40&&sy<H-60){sayHate(en);en.cool=rnd(147,189)-en.d*77;envs.push({x:en.x,y:ey+10,vx:(p.x-en.x)*.004,vy:1.2,rot:0})}
+      if(en.cool<=0&&sy>40&&sy<H-60){sayHate(en);en.cool=Math.max(112,rnd(147,189)-en.d*77);envs.push({x:en.x,y:ey+10,vx:(p.x-en.x)*.004,vy:1.2,rot:0})}
     }
     const esy=ey-camY,onScr=esy>30&&esy<H-40;
     if(mode==='play'&&onScr&&!seenNew.has(en.kind)){seenNew.add(en.kind);if(!STATS.met[en.kind]){STATS.met[en.kind]=1;saveStats();pushToast('Новий хейтер',ENEMIES[en.kind].name);sfx('spawn');ph('hater_met',{kind:en.kind})}}
@@ -1559,9 +1568,9 @@ function update(dt){
       if(en.cool<36&&en.cool>0&&!en.warned){en.warned=true;if(en.kind!=='koms')sfx('alert')}else if(en.cool>=36)en.warned=false;
       if(en.cool<=0){
         if(en.kind==='cancel'){let best=null,bd=1e9;for(const pl of plats){if(pl.broken||pl.type==='breaking'||pl.type==='spring'||pl.label==='ПЕРШИЙ ЖАРТ')continue;const dy=pl.y-ey;if(dy<-40||dy>200)continue;if(Math.abs(pl.y-(p.y+FEET))<50&&Math.abs(pl.x+pl.w/2-p.x)<pl.w/2+20)continue;const dd=Math.abs(pl.x+pl.w/2-en.x)+dy;if(dd<bd){bd=dd;best=pl}}
-          if(best){sayHate(en);best.type='breaking';best.label='СКАСОВАНО';best.vx=0;best.hits=Math.max(best.hits||0,1);best.fs=fontFor('СКАСОВАНО',best.w-20);addFloat('СКАСОВАНО!',best.x+best.w/2,best.y-10,'#b02020',14);sfx('stamp')}en.cool=rnd(168,224)-en.d*77}
-        else if(en.kind==='lang'){if(p.fly<=0&&Math.abs(ey-p.y)<150&&Math.abs(en.x-p.x)<110){sayHate(en);waves.push({x:en.x,y:ey,r:10,life:1});const dir=p.x>=en.x?1:-1;p.push=dir*(4.5+en.d*2);breakCombo(p);sfx('shout');addFloat(ENEMIES.lang.bubbles[en.bi],en.x,ey-50,'#b02020',13)}en.cool=rnd(200,260)-en.d*56}
-        else if(en.kind==='threads'){sayHate(en);envs.push({x:en.x,y:ey+10,vx:(p.x-en.x)*.003,vy:1,rot:0,kind:'thread'});en.cool=rnd(161,210)-en.d*70}
+          if(best){sayHate(en);best.type='breaking';best.label='СКАСОВАНО';best.vx=0;best.hits=Math.max(best.hits||0,1);best.fs=fontFor('СКАСОВАНО',best.w-20);addFloat('СКАСОВАНО!',best.x+best.w/2,best.y-10,'#b02020',14);sfx('stamp')}en.cool=Math.max(120,rnd(168,224)-en.d*77)}
+        else if(en.kind==='lang'){if(p.fly<=0&&Math.abs(ey-p.y)<150&&Math.abs(en.x-p.x)<110){sayHate(en);waves.push({x:en.x,y:ey,r:10,life:1});const dir=p.x>=en.x?1:-1;p.push=dir*(4.5+Math.min(1,en.d)*1);breakCombo(p);sfx('shout');addFloat(ENEMIES.lang.bubbles[en.bi],en.x,ey-50,'#b02020',13)}en.cool=Math.max(150,rnd(200,260)-en.d*56)}
+        else if(en.kind==='threads'){sayHate(en);envs.push({x:en.x,y:ey+10,vx:(p.x-en.x)*.003,vy:1,rot:0,kind:'thread'});en.cool=Math.max(115,rnd(161,210)-en.d*70)}
         else en.cool=999;
       }}
     const ch=enemyChar(en.kind),etop=ey-ch.cy/ch.k;
@@ -1577,10 +1586,10 @@ function update(dt){
   for(const e of envs){e.vy=Math.min(3,e.vy+.03*dt);e.x+=e.vx*dt;e.y+=e.vy*dt;e.rot+=.04*dt;
     if(mode==='play'&&p.fly<=0&&!e.hit&&Math.abs(e.x-p.x)<24&&Math.abs(e.y-(p.y+22))<38){e.hit=true;if(tryShield(e.x,e.y))continue;sfx('hit');breakCombo(p);if(e.kind==='thread'){const pen=2000+zoneIdx*1000;bonus-=pen;threadHits++;addFloat('−'+fmt(pen),p.x,p.y-30,'#3c434e',14)}else{p.vy=Math.max(p.vy,4);addFloat('−стрибок',p.x,p.y-30,'#b02020',14)}}}
   envs=envs.filter(e=>!e.hit&&e.y-camY<H+40);
-  for(const it of items){it.t+=.07*dt;if(mode==='play'&&!seenNew.has(it.kind)&&it.y-camY>30&&it.y-camY<H-40){seenNew.add(it.kind);pushToast('Новий бонус',it.kind==='gordon'?'В гостях у Гордона':it.kind==='ticket'?'Квиток на концерт':it.kind==='shield'?'Блок':'Шакалячий експрес')}
+  for(const it of items){it.t+=.07*dt;if(mode==='play'&&!seenNew.has(it.kind)&&it.y-camY>30&&it.y-camY<H-40){seenNew.add(it.kind);pushToast('Новий бонус',it.kind==='gordon'?'В гостях у Гордона':it.kind==='ticket'?'Квиток на концерт':it.kind==='shield'?'Бронювання':'Шакалячий експрес')}
     const reach=it.kind==='gordon'?90:30,yreach=it.kind==='gordon'?52:44;
     if(mode==='play'&&!it.got&&Math.abs(it.x-p.x)<reach&&Math.abs(it.y-(p.y+22))<yreach){it.got=1;
-    if(it.kind==='shield'){shield=1;shieldN++;sfx('shield');addFloat('БЛОК',it.x,it.y-14,'#2b6fd6',14);burst(it.x,it.y,['#2b6fd6','#9fd6ff','#ffffff'],14,3.4,1.2);pushToast('Блок','Один удар хейтера не страшний');ph('shield_get',{score:phScore(),n:shieldN})}
+    if(it.kind==='shield'){shield=1;shieldN++;sfx('shield');addFloat('БРОНЮВАННЯ',it.x,it.y-14,'#2b6fd6',14);burst(it.x,it.y,['#2b6fd6','#9fd6ff','#ffffff'],14,3.4,1.2);pushToast('Бронювання','Один удар хейтера не страшний');ph('shield_get',{score:phScore(),n:shieldN})}
     else if(it.kind==='gordon'){gordonCaught=true;scheduleNextGordon();sfx('gordonGet');beginGordon(p);ph('gordon',{result:'caught',score:phScore()});checkAchLive('gordon')}
     else if(it.kind==='ticket'){STATS.tickets=(STATS.tickets|0)+1;ticketsRun++;saveStats();sfx('ticket');addFloat('+квиток',it.x,it.y-12,'#8f5f08',13);burst(it.x,it.y,['#ffd23a','#fff3b0','#ff9a2a'],12,3.4,1.2);popEl($('hudTix'),'get');paintTickets();ph('ticket',{run:ticketsRun,total:STATS.tickets|0})}
     else{lastExpressGs=hs();if(p.flyKind!=='gordon'){p.fly=EXPRESS_FLY;p.flyMax=EXPRESS_FLY;p.flyKind='express';chase=[];startDogs();shake=Math.max(shake,5);flashA=.35;sfx('express');sfx('whoosh');bonus+=12000;expressN++;pushToast('Шакалячий експрес','+12 000');ph('express',{score:phScore(),zone:phZone()});checkAchLive('express')}}}}
@@ -1832,7 +1841,7 @@ function beginGordon(p){
   p.fly=GORDON_FLY;p.flyMax=GORDON_FLY;p.flyKind='gordon';
   gordonMode=pick(['interview','live','exclusive']);gordonLive=gordonMode==='live'?3:0;gordonLiveT=40;
   seedGordon();startGordonMusic();
-  if(gordonMode==='exclusive'){bonus+=20000;if(!shield){shield=1;shieldN++}pushToast('Ексклюзив','+20 000 і Блок')}
+  if(gordonMode==='exclusive'){bonus+=20000;if(!shield){shield=1;shieldN++}pushToast('Ексклюзив','+20 000 і Бронювання')}
   else if(gordonMode==='live')pushToast('Прямий ефір','Дощ квитків')
   else pushToast('Інтерв’ю','+2 000 за кожне фото');
   ph('gordon',{result:'started',mode:gordonMode,score:phScore()});
@@ -1891,7 +1900,8 @@ function drawRedka(){
   const p=player,L=LOOKS[lookIdx],py=p.y-camY;
   const flying=p.flyKind==='express'||p.flyKind==='gordon',gordon=p.flyKind==='gordon';
   const jp=jumpPose(p.sq,p.vy,flying),sx=jp.sx,sy=jp.sy;
-  const ch=redkaChar(lookIdx,SPX,flying?'felix-fly':null,jp.pose);
+  const armor=shield>0||shieldGrace>0;
+  const ch=redkaChar(lookIdx,SPX,flying||armor?'felix-fly':null,jp.pose,shield>0&&shieldGrace<=0?'#3d8bff':undefined);
   const lean=flying?(gordon?0.22:0.12)*p.face+Math.sin(tick*(gordon?0.28:0.18))*(gordon?0.12:0.05):0;
   if(flying){
     const n=gordon?4:3;
@@ -1903,7 +1913,6 @@ function drawRedka(){
   if(p.flyKind==='express')drawChaseDogs(p,py);
   const blink=shieldGrace>0&&Math.floor(tick/3)%2===0;
   if(!blink)drawChar(ctx,ch,p.x,py+FEET,sx*p.face*SSX,sy*SSC,'feet',lean);
-  if(shield||shieldGrace>0){ctx.save();ctx.globalAlpha=shield?.55+.2*Math.sin(tick*.18):.35;ctx.strokeStyle=shieldGrace>0?'#ffffff':'#7cc4f0';ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,py+FEET-34,42,0,7);ctx.stroke();ctx.globalAlpha*=.35;ctx.fillStyle='#9fd6ff';ctx.fill();ctx.restore()}
   const star=(x,y,sz,c)=>{ctx.fillStyle=c;ctx.fillRect(x-1,y-sz,3,sz*2+1);ctx.fillRect(x-sz,y-1,sz*2+1,3)};
   if(L.gold){const a=tick*.06;for(let i=0;i<4;i++){const ang=a+i*1.57,x=Math.round(p.x+Math.cos(ang)*42),y=Math.round(py+20+Math.sin(ang)*44);star(x,y,4+Math.round(2*Math.sin(tick*.2+i)),'#f5c542')}}
   if(gordon){const a=tick*.1;for(let i=0;i<8;i++){const ang=a+i*.785,x=Math.round(p.x+Math.cos(ang)*54),y=Math.round(py+20+Math.sin(ang)*58);star(x,y,5,i%2?'#fff3b0':'#e2a91c')}}
@@ -2171,7 +2180,7 @@ function fillHatePanel(){
 let bestAtStart=0,recordShown=false,colBack='start';
 let runTok='';
 function runTokFetch(){runTok='';try{fetch('/api/run?pid='+encodeURIComponent(lbPid()),{method:'POST'}).then(r=>r.json()).then(j=>{runTok=(j&&j.tok)||''}).catch(()=>{})}catch(e){}}
-function start(){runTokFetch();try{redkaChar(STATS.wear||0,SPX,null,'side');redkaChar(STATS.wear||0,SPX,'felix-fly','up')}catch(e){}
+function start(){runTokFetch();try{redkaChar(STATS.wear||0,SPX,null,'side');redkaChar(STATS.wear||0,SPX,'felix-fly','up');redkaChar(STATS.wear||0,SPX,'felix-fly','side','#3d8bff');redkaChar(STATS.wear||0,SPX,'felix-fly',undefined,'#3d8bff');redkaChar(STATS.wear||0,SPX,'felix-fly','side')}catch(e){}
   $('helpScr').hidden=true;
   reset();bestAtStart=best;recordShown=false;isRecord=false;comboMax=1;pauseN=0;
   runT0=performance.now();playAcc=0;playMark=runT0;
