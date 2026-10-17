@@ -2384,7 +2384,7 @@ $('lbName').addEventListener('input',e=>{const v=lbNameClean(e.target.value);if(
 $('lbName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lbSubmit()}});
 /* ---------- картка для шерингу: аркадний «GAME OVER» + хайскор, 1080×1350 ---------- */
 const CARD_W=1080,CARD_H=1350;
-const END_FOCUS={fall:[.5,.5],stuk:[.5,.45],threads:[.5,.45],lang:[.5,.45],cancel:[.5,.5],koms:[.5,.4]};
+const END_FOCUS={fall:[.5,.5],stuk:[.5,.5],threads:[.5,.5],lang:[.5,.5],cancel:[.5,.5],koms:[.5,.5]};
 const END_STAMP={fall:'СКАСОВАНО',cancel:'СКАСОВАНО',stuk:'СКАРГУ ПРИЙНЯТО',threads:'ТРЕД 1/47',lang:'ШТРАФ',koms:'ЗБОРИ'};
 function drawCover(g,im,x,y,w,h,fx,fy){
   const iw=im.naturalWidth||im.width,ih=im.naturalHeight||im.height,k=Math.max(w/iw,h/ih),sw=w/k,sh=h/k;
