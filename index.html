@@ -323,6 +323,7 @@ button.ghost{background:transparent;box-shadow:inset 0 0 0 2px var(--ink),0 3px 
 #shareSheet{z-index:9;background:rgba(20,10,16,.78)}
 #shareHint{margin:0;min-height:1.2em}
 .overshare button{min-height:44px;font-size:14px}
+.homebtn{min-height:44px;font-size:14px;width:100%}
 
 /* ---- Пауза / yell ---- */
 #yellScr{z-index:7;background:rgba(43,30,25,.72)}
@@ -423,7 +424,7 @@ button.nudge{min-height:42px;font-size:13px;color:#8f5f08;box-shadow:inset 0 0 0
 }
 @media (max-height:640px){
   .card.over .scene{max-height:140px}
-  .card.over .overshare button{min-height:40px}
+  .card.over .overshare button,.card.over .homebtn{min-height:40px}
   .card.start .sub{display:none}
   .card.start .hero img{height:64px}
   .stage .mannequin{min-height:120px}
@@ -650,6 +651,7 @@ button.nudge{min-height:42px;font-size:13px;color:#8f5f08;box-shadow:inset 0 0 0
         <button class="ghost" id="shareBtn" type="button">Поділитись</button>
         <button class="ghost" id="lbBtn2" type="button">Лідерборд</button>
       </div>
+      <button class="ghost homebtn" id="overHome" type="button">На головну</button>
     </div>
   </div>
 </div>
@@ -664,7 +666,14 @@ const PX=3;
 /* ---------- sound ---------- */
 let AC=null,muted=false,bgmOn=true,bgmAudio=null,bgmPrimed=false;try{muted=localStorage.getItem('redkaMute')==='1'}catch(e){}try{bgmOn=localStorage.getItem('redkaBgm')!=='0'}catch(e){}
 const BGM_VOL=.63,SFX_VOL=5;
-function audioOn(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();loadGordonBuf()}catch(e){}}
+function audioOn(){
+  try{
+    if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();AC.onstatechange=gordonCtxBack}
+    // не лише 'suspended': на iOS після дзвінка/блокування стан 'interrupted' сам не повертається
+    if(AC.state!=='running'){const r=AC.resume();if(r&&r.catch)r.catch(()=>{})}
+    loadGordonBuf();
+  }catch(e){}
+}
 function tone(type,f0,f1,dur,vol,delay){
   if(!AC||muted)return;const t=AC.currentTime+(delay||0),o=AC.createOscillator(),g=AC.createGain();
   o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(30,f1),t+dur);
@@ -913,6 +922,13 @@ const FEET=22*PX;
 let items=[],waves=[],causeKind='fall',mode='start',player,plats,enemies,envs,floats,camY,topY,bonus,zoneIdx,lookIdx,banner,stomps,cause,best=0,input={l:false,r:false},pointers=new Map(),player0=0,tick=0,recent=[];
 let ticketsRun=0,lastTicketStep=-99;
 let lastGap=100,lastHaterStep=-99;
+let gordonLuck=false;
+function rollGordonLuck(){
+  // ≈1 забіг із 4–5 має Гордона в запасі, але до нього дожиє менше половини; якщо він був у попередньому забігу, шанс падає до 6%
+  const recent=STATS.gordonRun!==undefined&&(STATS.runs|0)-STATS.gordonRun<=1;
+  gordonLuck=Math.random()<(recent?.06:.22);
+  gordonNextGs=gordonLuck?Math.min(1200000,60000-Math.log(1-Math.random())*180000):1e12;gordonNeed=0;gordonPendStep=-1;
+}
 let shield=0,shieldGrace=0,shieldN=0,shieldSaved=0,lastShieldStep=-99,chainN=0,chainT=0,chainMax=0,heat=0,gordonNextGs=0,gordonNeed=30,gordonPendStep=-1,gordonCount=0,gordonMode='',gordonLive=0,gordonLiveT=0;
 let runT0=0,playAcc=0,playMark=0,pauseN=0,playFrom='cta',comboMax=1;
 function ph(n,p){try{window.posthog&&posthog.capture&&posthog.capture(n,p||{})}catch(e){}}
@@ -1390,16 +1406,13 @@ function genStep(){
   p.life=platLife(gs,type,label);
   placePlat(p,calm);
   plats.push(p);
-  // After 300k, every eligible platform rolls 34% until the first spawn; one item per run.
-  // Гордон: ні фіксованого порогу, ні одного шансу на кожній латці. Забіг сам набирає «напругу» (комбо, топтання),
-  // і коли вона досягає особистого випадкового порогу, спершу дзвонить телефон, а за 3 латки з'являється гість.
-  if(player.fly<=0&&type==='normal'&&!p.vx&&!calm){
-    if(gordonPendStep<0&&gs>=gordonNextGs&&(heat>=gordonNeed||gs>=gordonNextGs+120000)){
-      gordonPendStep=stepN+3;pushToast('Гордон набирає номер…','Тримай темп');sfx('ring');
-    }else if(gordonPendStep>=0&&stepN>=gordonPendStep){
-      items.push({kind:'gordon',x:p.x+p.w/2,y:topY-30,t:0});lastItemStep=stepN;gordonOffered=true;gordonDecided=true;gordonPendStep=-1;gordonNextGs=1e12;gordonCount++;
-      ph('gordon',{result:'offered',score:Math.max(0,Math.floor(gs)),heat:Math.round(heat),nth:gordonCount});
-    }
+  // Гордон — рідка пасхалка. Жереб на забіг (gordonLuck) і випадкова мета в очках (gordonNextGs, довгий хвіст);
+  // як тільки забіг її минув, гість з'являється на першій придатній латці в трохи різному місці. Без попередження й дедлайнів.
+  if(gordonLuck&&!gordonDecided&&player.fly<=0&&(type==='normal'||type==='moving')&&!calm&&gs>=gordonNextGs&&stepN-lastHaterStep>=15&&!items.some(it=>it.kind==='gordon')){
+    const ix=Math.max(24,Math.min(W-24,p.x+p.w*rnd(.15,.85)+rnd(-40,40)));
+    items.push({kind:'gordon',x:ix,y:topY-rnd(26,62),t:0});lastItemStep=stepN;gordonOffered=true;gordonDecided=true;gordonCount++;
+    STATS.gordonRun=STATS.runs|0;saveStats();
+    ph('gordon',{result:'offered',score:Math.max(0,Math.floor(gs)),heat:Math.round(heat),nth:gordonCount});
   }
   if(player.flyKind!=='gordon'&&player.flyKind!=='express'&&!items.some(it=>it.kind==='express')&&!calm&&!p.vx&&type!=='minus'&&gs>=EXPRESS_FROM&&gs-lastExpressGs>EXPRESS_CD){
     if(Math.random()<.05+.04*ramp(gs,EXPRESS_FROM,400000))items.push({kind:'express',x:p.x+p.w/2,y:topY-26,t:0});
@@ -1484,7 +1497,7 @@ function reset(){
   hateLog={};minusCnt=0;fakeCnt=0;
   camY=0;bonus=0;zoneIdx=0;lookIdx=STATS.wear||0;banner=null;stomps=0;cause='Впав у прірву скасування';causeKind='fall';recent=[];stepN=0;million=false;streak=0;mult=1;shownCnt={};lastItemStep=-99;lastExpressGs=-1e9;lastTicketStep=-99;ticketsRun=0;seenNew=new Set();
   gordonDecided=false;gordonBits=[];gordonTitle=0;gordonLastEdge=-1;gordonDeck=[];gordonDeckI=0;gordonCaught=false;gordonDemo=false;gordonMissed=false;gordonOffered=false;stopGordonMusic();
-  lastGap=100;lastHaterStep=-99;shield=0;shieldGrace=0;shieldN=0;shieldSaved=0;lastShieldStep=-99;chainN=0;chainT=0;chainMax=0;heat=0;gordonCount=0;gordonMode='';gordonPendStep=-1;gordonLive=0;gordonLiveT=0;gordonNextGs=rnd(150000,450000);gordonNeed=rnd(18,42);
+  lastGap=100;lastHaterStep=-99;shield=0;shieldGrace=0;shieldN=0;shieldSaved=0;lastShieldStep=-99;chainN=0;chainT=0;chainMax=0;heat=0;gordonCount=0;gordonMode='';gordonPendStep=-1;gordonLive=0;gordonLiveT=0;rollGordonLuck();
   toasts=[];toastNow=null;stompKind={};expressN=0;malorosN=0;threadHits=0;idlePeak=0;newAchs=[];hideAchPop();
   floats=[];plats=[];enemies=[];envs=[];items=[];waves=[];sparks=[];shake=0;flashA=0;lastMult=1;lastSc=0;
   const sy=H*.8;player0=sy;
@@ -1542,7 +1555,7 @@ function update(dt){
     const nPuff=p.flyKind==='gordon'?2:1;
     if(Math.random()<.9)for(let i=0;i<nPuff;i++)floats.push(p.flyKind==='express'?{puff:1,dust:1,x:p.x-p.face*rnd(-30,50),y:p.y+FEET+rnd(70,84),life:.8}:{puff:1,x:p.x+rnd(-12,12),y:p.y+FEET+rnd(0,10),life:.8,gold:p.flyKind==='gordon'});
     if(p.flyKind==='gordon')spinGordon(dt);
-    if(p.fly<=0){const was=p.flyKind;p.flyKind=null;p.vy=-8;if(was==='express')stopDogs();stopGordonMusic();gordonBits=[]}
+    if(p.fly<=0){const was=p.flyKind;p.flyKind=null;p.vy=-8;if(was==='express')stopDogs();if(was==='gordon'&&!muted)ph('gordon_audio',{ended:gordonHeard?'ok':'silent',ac:AC?AC.state:'none',path:gordonPath,frames:Math.round(gordonF)});stopGordonMusic();gordonBits=[]}
   }
   if(p.fly>0)p.y+=p.vy*dt;
   else{p.y+=p.vy*dt+.15*dt*dt;p.vy+=.3*dt}
@@ -1611,7 +1624,7 @@ function update(dt){
   for(const e of envs){e.vy=Math.min(3,e.vy+.03*dt);e.x+=e.vx*dt;e.y+=e.vy*dt;e.rot+=.04*dt;
     if(mode==='play'&&p.fly<=0&&!e.hit&&Math.abs(e.x-p.x)<24&&Math.abs(e.y-(p.y+22))<38){e.hit=true;if(tryShield(e.x,e.y))continue;sfx('hit');breakCombo(p);if(e.kind==='thread'){const pen=2000+zoneIdx*1000;bonus-=pen;threadHits++;addFloat('−'+fmt(pen),p.x,p.y-30,'#3c434e',14)}else{p.vy=Math.max(p.vy,4);addFloat('−стрибок',p.x,p.y-30,'#b02020',14)}}}
   envs=envs.filter(e=>!e.hit&&e.y-camY<H+40);
-  for(const it of items){it.t+=.07*dt;if(mode==='play'&&!seenNew.has(it.kind)&&it.y-camY>30&&it.y-camY<H-40){seenNew.add(it.kind);pushToast('Новий бонус',it.kind==='gordon'?'В гостях у Гордона':it.kind==='ticket'?'Квиток на концерт':it.kind==='shield'?'Бронювання':'Шакалячий експрес')}
+  for(const it of items){it.t+=.07*dt;if(mode==='play'&&!seenNew.has(it.kind)&&it.y-camY>30&&it.y-camY<H-40){seenNew.add(it.kind);if(it.kind==='gordon')sfx('ring');pushToast('Новий бонус',it.kind==='gordon'?'В гостях у Гордона':it.kind==='ticket'?'Квиток на концерт':it.kind==='shield'?'Бронювання':'Шакалячий експрес')}
     const reach=it.kind==='gordon'?90:30,yreach=it.kind==='gordon'?52:44;
     if(mode==='play'&&!it.got&&Math.abs(it.x-p.x)<reach&&Math.abs(it.y-(p.y+22))<yreach){it.got=1;
     if(it.kind==='shield'){shield=1;shieldN++;sfx('shield');addFloat('БРОНЮВАННЯ',it.x,it.y-14,'#2b6fd6',14);burst(it.x,it.y,['#2b6fd6','#9fd6ff','#ffffff'],14,3.4,1.2);pushToast('Бронювання','Один удар хейтера не страшний');ph('shield_get',{score:phScore(),n:shieldN})}
@@ -1725,10 +1738,10 @@ function drawEnv(e){ctx.save();ctx.translate(e.x,e.y-camY);ctx.rotate(Math.sin(e
   ctx.drawImage(ENV_SPR,-ENV_SPR.width/2,-ENV_SPR.height/2);
   ctx.font='800 9px Manrope, sans-serif';ctx.fillStyle='#b02020';ctx.textAlign='center';ctx.fillText('СКАРГА',0,ENV_SPR.height/2+9);ctx.restore()}
 const GORDON_RATE=1.2,GORDON_VOL=.7;
-let gordonBuf=null,gordonSrc=null,gordonGain=null,gordonT0=0,gordonLoading=false,gordonPrimed=false,gordonF=0;
+let gordonBuf=null,gordonSrc=null,gordonGain=null,gordonT0=0,gordonLoading=false,gordonPrimed=false,gordonF=0,gordonPath='none',gordonHeard=false,gordonLoadTry=0;
 function loadGordonBuf(){
   if(!AC||gordonBuf||gordonLoading)return;gordonLoading=true;
-  fetch('art/gordon-intro.mp3').then(r=>{if(!r.ok)throw new Error('gordon mp3');return r.arrayBuffer()}).then(b=>AC.decodeAudioData(b.slice(0))).then(buf=>{gordonBuf=buf;gordonLoading=false}).catch(()=>{gordonLoading=false});
+  fetch('art/gordon-intro.mp3').then(r=>{if(!r.ok)throw new Error('gordon mp3');return r.arrayBuffer()}).then(b=>AC.decodeAudioData(b.slice(0))).then(buf=>{gordonBuf=buf;gordonLoading=false;gordonBufReady()}).catch(()=>{gordonLoading=false;if(++gordonLoadTry<4)setTimeout(loadGordonBuf,2500*gordonLoadTry)});
 }
 function stopGordonSource(){
   if(gordonSrc){try{gordonSrc.stop()}catch(e){}try{gordonSrc.disconnect()}catch(e){}gordonSrc=null}
@@ -1740,26 +1753,49 @@ function ensureGordonAudio(){
   a.preload='auto';a.playsInline=true;a.volume=0;a.muted=true;a.loop=false;
   gordonAudio=a;return a;
 }
+/* Позиція треку завжди береться з годинника польоту ((flyMax-fly)/60 с у реальному часі), а не з окремих прапорців:
+   так пауза, mute, перерваний контекст і запізніле розкодування вертають музику рівно туди, де зараз політ. */
+function gordonOffset(p){
+  if(!gordonBuf||!p||!(p.flyMax>0))return 0;
+  return Math.max(0,Math.min(gordonBuf.duration-.05,(p.flyMax-p.fly)/60*GORDON_RATE));
+}
+function gordonPlay(offset){
+  stopGordonSource();
+  const g=AC.createGain();g.gain.value=muted?0:GORDON_VOL;
+  const src=AC.createBufferSource();src.buffer=gordonBuf;src.playbackRate.value=GORDON_RATE;
+  src.connect(g);g.connect(AC.destination);
+  try{src.start(0,offset)}catch(e){src.start(0)}
+  gordonSrc=src;gordonGain=g;gordonT0=AC.currentTime-offset/GORDON_RATE;gordonPath='buffer';
+  src.onended=()=>{if(gordonSrc===src)gordonSrc=null};
+}
+function gordonFlying(){return !!(player&&player.flyKind==='gordon'&&player.fly>0&&mode==='play')}
+function gordonCtxBack(){ // контекст знову 'running' посеред польоту: трек міг відстати, ставимо його на годинник польоту
+  if(!(AC&&AC.state==='running'&&gordonFlying()&&!muted&&gordonBuf))return;
+  const want=gordonOffset(player),cur=gordonSrc?(AC.currentTime-gordonT0)*GORDON_RATE:-9;
+  if(Math.abs(cur-want)>.35)gordonPlay(want);
+}
+function gordonBufReady(){ // буфер розкодувався пізніше за появу Гордона: переходимо із запасного <audio> на нього
+  if(!gordonFlying()||muted||!AC||AC.state!=='running'||gordonPath==='buffer')return;
+  if(gordonAudio){gordonAudio.pause();gordonAudio.volume=0}
+  gordonPlay(gordonOffset(player));
+}
 function startGordonMusic(){
-  gordonF=0;audioOn();loadGordonBuf();
+  gordonF=0;gordonHeard=false;gordonPath='none';audioOn();loadGordonBuf();
   if(bgmAudio)bgmAudio.pause();
   if(muted){stopGordonSource();if(gordonAudio)gordonAudio.pause();return}
   stopGordonSource();
-  if(gordonBuf){
-    const g=AC.createGain();g.gain.value=GORDON_VOL;
-    const src=AC.createBufferSource();src.buffer=gordonBuf;src.playbackRate.value=GORDON_RATE;
-    src.connect(g);g.connect(AC.destination);src.start(0);
-    gordonSrc=src;gordonGain=g;gordonT0=AC.currentTime;
-    src.onended=()=>{if(gordonSrc===src)gordonSrc=null};
-    if(gordonAudio){gordonAudio.pause();gordonAudio.volume=0;try{gordonAudio.currentTime=0}catch(e){}}
+  if(gordonBuf&&AC){
     if(player){const tot=gordonBuf.duration/GORDON_RATE*60;player.flyMax=tot;player.fly=tot}
+    gordonPlay(0);
+    if(gordonAudio){gordonAudio.pause();gordonAudio.volume=0;try{gordonAudio.currentTime=0}catch(e){}}
     return;
   }
+  gordonPath='html';
   const a=ensureGordonAudio();
   a.loop=false;a.muted=false;a.volume=GORDON_VOL;a.playbackRate=GORDON_RATE;
   try{a.preservesPitch=false}catch(e){}try{a.webkitPreservesPitch=false}catch(e){}
   try{a.currentTime=0}catch(e){}
-  a.play().catch(()=>{gordonAudio=null;gordonPrimed=false;const b=ensureGordonAudio();b.volume=GORDON_VOL;b.playbackRate=GORDON_RATE;b.play().catch(()=>{})});
+  a.play().catch(()=>{gordonAudio=null;gordonPrimed=false;const b=ensureGordonAudio();b.volume=GORDON_VOL;b.playbackRate=GORDON_RATE;b.muted=false;b.play().catch(()=>{gordonPath='none'})});
 }
 function primeGordonAudio(){
   loadGordonBuf();
@@ -1767,6 +1803,7 @@ function primeGordonAudio(){
   const a=ensureGordonAudio();
   a.muted=true;a.volume=0;a.loop=false;
   a.play().then(()=>{
+    if(player&&player.flyKind==='gordon')return; // запізніла відповідь не має глушити вже запущене відтворення
     a.pause();
     try{a.currentTime=0}catch(e){}
     a.muted=true;a.volume=0;
@@ -1782,27 +1819,13 @@ function stopGordonMusic(){
   syncBgm();
 }
 function pauseGordonAudio(){
-  if(gordonSrc&&AC){
-    const elapsed=Math.max(0,AC.currentTime-gordonT0);
-    stopGordonSource();
-    gordonT0=-elapsed;
-  }else if(gordonAudio&&!gordonAudio.paused)gordonAudio.pause();
+  stopGordonSource();
+  if(gordonAudio&&!gordonAudio.paused)gordonAudio.pause();
 }
 function resumeGordonAudio(){
   if(muted||!player||player.flyKind!=='gordon'||player.fly<=0)return;
   audioOn();
-  if(gordonBuf&&AC){
-    const elapsed=gordonT0<0?-gordonT0:0;
-    stopGordonSource();
-    const g=AC.createGain();g.gain.value=GORDON_VOL;
-    const src=AC.createBufferSource();src.buffer=gordonBuf;src.playbackRate.value=GORDON_RATE;
-    src.connect(g);g.connect(AC.destination);
-    const off=Math.min(gordonBuf.duration,elapsed*GORDON_RATE);
-    try{src.start(0,off)}catch(e){src.start(0)}
-    gordonSrc=src;gordonGain=g;gordonT0=AC.currentTime-elapsed;
-    src.onended=()=>{if(gordonSrc===src)gordonSrc=null};
-    return;
-  }
+  if(gordonBuf&&AC){gordonPlay(gordonOffset(player));return}
   if(gordonAudio){
     const a=gordonAudio;a.muted=false;a.volume=GORDON_VOL;
     if(isFinite(a.duration)&&a.duration>0&&player.flyMax>0){a.currentTime=Math.max(0,a.duration-player.fly/60*GORDON_RATE)}
@@ -1816,7 +1839,7 @@ function syncGordonFly(p,dt){
   const cap=(gordonBuf?gordonBuf.duration/GORDON_RATE*60:GORDON_FLY)+90;
   if(gordonSrc&&AC&&gordonBuf&&AC.state==='running'){
     const elapsed=AC.currentTime-gordonT0,total=gordonBuf.duration/GORDON_RATE;
-    p.flyMax=total*60;p.fly=Math.max(0,(total-elapsed)*60);
+    p.flyMax=total*60;p.fly=Math.max(0,(total-elapsed)*60);gordonHeard=true;
     if(gordonF>cap)p.fly=0;
     return;
   }
@@ -1825,7 +1848,7 @@ function syncGordonFly(p,dt){
   const timed=a&&!muted&&!a.paused&&a.volume>0&&isFinite(a.duration)&&a.duration>0;
   if(timed){
     const rate=a.playbackRate||GORDON_RATE,total=a.duration/rate*60;
-    p.flyMax=total;p.fly=Math.max(0,(a.duration-a.currentTime)/rate*60);
+    p.flyMax=total;p.fly=Math.max(0,(a.duration-a.currentTime)/rate*60);gordonHeard=true;
   }else p.fly-=dt;
   if(gordonF>cap)p.fly=0;
 }
@@ -1860,7 +1883,7 @@ function spinGordon(dt){
 }
 function scheduleNextGordon(){
   // другий візит можливий (25%), але не раніше ніж за 200–320k
-  gordonPendStep=-1;gordonNextGs=Math.random()<.25?hs()+rnd(200000,320000):1e12;gordonNeed=rnd(18,42);
+  gordonPendStep=-1;gordonNextGs=1e12; // один візит за забіг
 }
 function beginGordon(p){
   p.fly=GORDON_FLY;p.flyMax=GORDON_FLY;p.flyKind='gordon';
@@ -1869,7 +1892,7 @@ function beginGordon(p){
   if(gordonMode==='exclusive'){bonus+=20000;if(!shield){shield=1;shieldN++}pushToast('Ексклюзив','+20 000 і Бронювання')}
   else if(gordonMode==='live')pushToast('Прямий ефір','Дощ квитків')
   else pushToast('Інтерв’ю','+2 000 за кожне фото');
-  ph('gordon',{result:'started',mode:gordonMode,score:phScore()});
+  ph('gordon',{result:'started',mode:gordonMode,score:phScore(),ac:AC?AC.state:'none',buf:!!gordonBuf,path:gordonPath});
 }
 function drawGordonTitle(){
   if(gordonTitle<=0||mode!=='play')return;
@@ -2251,6 +2274,12 @@ function toastY(){
   const wr=wrap.getBoundingClientRect(),hr=$('hud').getBoundingClientRect();
   return Math.round((hr.bottom-wr.top)/scale)+8;
 }
+function overHome(){
+  if(mode!=='over')return;
+  ph('over_home',{score:lastScore|0});
+  closeShare();$('lbEntry').hidden=true;$('lbScr').hidden=true;
+  quitToStart();
+}
 function quitToStart(){
   if(mode==='pause'||mode==='play'){accPlay();ph('run_abandon',runPhProps({cause:'quit'}))}
   hideAchPop();stopGordonMusic();gordonBits=[];
@@ -2271,7 +2300,7 @@ function closeCol(){
   if(colBack==='start'&&mode==='start')$('startScr').hidden=false;
   if(colBack==='pause'&&mode==='pause'){$('pauseScr').hidden=false;paintMute();paintBgm()}
 }
-$('playBtn').onclick=goPlay;$('againBtn').onclick=goPlay;$('yellScr').onclick=finishYell;
+$('playBtn').onclick=goPlay;$('againBtn').onclick=goPlay;$('overHome').onclick=overHome;$('yellScr').onclick=finishYell;
 $('menuBtn').onclick=function(e){e.stopPropagation();openPause()};
 $('resumeBtn').onclick=resumePlay;
 $('pauseWardBtn').onclick=()=>openCol('ward','pause');
@@ -2392,7 +2421,8 @@ async function lbAfterRun(score){
   const full=lbTop.length>=50,min=full?lbTop[lbTop.length-1].s:0;
   lbGlobal=!lbTop.length||score>lbTop[0].s;
   if(lbGlobal)recBanner(true,true,0,0);
-  if(!full||score>min){lbQualifies=true;setTimeout(()=>{if(mode==='over'&&$('lbEntry').hidden&&$('lbScr').hidden)openEntry(score)},1400)}
+  // запис пропонуємо лише за новий особистий рекорд (або загальний №1): слабший за власний рекорд результат записувати нема сенсу
+  if((isRecord||lbGlobal)&&(!full||score>min)){lbQualifies=true;setTimeout(()=>{if(mode==='over'&&$('lbEntry').hidden&&$('lbScr').hidden)openEntry(score)},1400)}
 }
 $('overWard').onclick=()=>openCol('ward','over');
 $('lbBtn').onclick=()=>openLb('start');$('lbBtn2').onclick=()=>openLb('over');
@@ -2615,6 +2645,13 @@ addEventListener('keydown',e=>{
     if(!$('yellScr').hidden)return;
     if(mode==='play'){openPause();e.preventDefault();return}
     if(mode==='pause'){if(!$('colScr').hidden)closeCol();else resumePlay();e.preventDefault();return}
+    if(e.key==='Escape'&&mode==='over'){
+      if(!$('shareSheet').hidden)closeShare();
+      else if(!$('lbEntry').hidden)$('lbEntry').hidden=true;
+      else if(!$('lbScr').hidden)closeLb();
+      else if($('colScr').hidden)overHome();
+      e.preventDefault();return;
+    }
   }
   if(KL.includes(e.key)){input.l=true;e.preventDefault();if(mode==='play')noteSteer()}
   if(KR.includes(e.key)){input.r=true;e.preventDefault();if(mode==='play')noteSteer()}
@@ -2635,7 +2672,7 @@ document.addEventListener('visibilitychange',()=>{
     if(gordonAudio)gordonAudio.pause();if(bgmAudio)bgmAudio.pause();stopDogs();return
   }
   if(mode==='pause')return;
-  if(AC&&AC.state==='suspended')AC.resume();
+  if(AC&&AC.state!=='running'){try{AC.resume()}catch(e){}}
   if(player&&player.flyKind==='gordon'&&!muted){
     if(gordonGain)gordonGain.gain.value=GORDON_VOL;
     else if(gordonAudio)gordonAudio.play().catch(()=>{});
@@ -2651,7 +2688,17 @@ if(/\bqa=1\b/.test(location.search)){
     const p=makePlat('normal',player.y+FEET+2,'ТЕСТ');p.x=player.x-p.w/2;p.visited=true;plats.push(p);
     topY=player.y+FEET+2;while(topY>camY-280)genStep();
   }
-  window.__g={cardTest:o=>{causeKind=o.kind;cause=o.cause||'Впав у прірву скасування';zoneIdx=o.zone|0;lookIdx=o.look|0;isRecord=!!o.rec;runRank=o.rank||'Зрадник місяця (втретє поспіль)';lbRankLast=o.place|0;newAchs=(o.achs||[]).map(id=>ACH.find(a=>a.id===id));hateLog=o.hate||{};return makeCard(scene(causeKind,lookIdx),o.score).toDataURL()},startDogs,stopDogs,gameOver,get dogsT(){return dogsAudio?[dogsAudio.currentTime,dogsAudio.paused]:null},get att(){return att},get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get runs(){return STATS.runs},set runs(v){STATS.runs=v|0},get steerN(){return STATS.steerN|0},set steerN(v){STATS.steerN=v|0;saveStats()},get steerOn(){const el=$('steerHint');return !!(el&&!el.hidden&&el.classList.contains('on'))},get steerArmed(){return steerArmed},hideSteer,showSteer,armSteer,get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get muted(){return muted},get bgm(){return bgmAudio},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r;if(mode==='play')noteSteer()}};
+  function gordonSim(n,maxGs){ // Монте-Карло директора Гордона на справжньому генераторі латок (без рендера й гравця)
+    const keepRuns=STATS.runs,keepGR=STATS.gordonRun,res=[];STATS.runs=100;STATS.gordonRun=undefined;
+    for(let i=0;i<n;i++){
+      STATS.runs++;reset();
+      let hit=null;
+      for(let k=0;k<6000&&!hit;k++){genStep();const g=items.find(it=>it.kind==='gordon');if(g)hit={gs:Math.max(0,player0-(plats[plats.length-1].y))*SC,x:Math.round(g.x),dy:Math.round(plats[plats.length-1].y-g.y)};if(Math.max(0,player0-plats[plats.length-1].y)*SC>maxGs)break}
+      res.push(hit);
+    }
+    STATS.runs=keepRuns;STATS.gordonRun=keepGR;reset();return res;
+  }
+  window.__g={gordonSim,get gordonDbg(){return {path:gordonPath,src:!!gordonSrc,ac:AC&&AC.state,off:AC&&gordonSrc?(AC.currentTime-gordonT0)*GORDON_RATE:null,want:gordonBuf&&player?gordonOffset(player):null,fly:player&&player.fly,flyMax:player&&player.flyMax,heard:gordonHeard,buf:!!gordonBuf,muted}},acSuspend:()=>AC.suspend(),acResume:()=>AC.resume(),toggleMute:()=>toggleMute(),cardTest:o=>{causeKind=o.kind;cause=o.cause||'Впав у прірву скасування';zoneIdx=o.zone|0;lookIdx=o.look|0;isRecord=!!o.rec;runRank=o.rank||'Зрадник місяця (втретє поспіль)';lbRankLast=o.place|0;newAchs=(o.achs||[]).map(id=>ACH.find(a=>a.id===id));hateLog=o.hate||{};return makeCard(scene(causeKind,lookIdx),o.score).toDataURL()},startDogs,stopDogs,gameOver,get dogsT(){return dogsAudio?[dogsAudio.currentTime,dogsAudio.paused]:null},get att(){return att},get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get runs(){return STATS.runs},set runs(v){STATS.runs=v|0},get steerN(){return STATS.steerN|0},set steerN(v){STATS.steerN=v|0;saveStats()},get steerOn(){const el=$('steerHint');return !!(el&&!el.hidden&&el.classList.contains('on'))},get steerArmed(){return steerArmed},hideSteer,showSteer,armSteer,get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get muted(){return muted},get bgm(){return bgmAudio},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r;if(mode==='play')noteSteer()}};
 }
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode==='play'){update(dt);draw()}else if(mode==='start'){attractFrame(dt)}requestAnimationFrame(loop)}
