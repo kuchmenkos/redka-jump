@@ -732,15 +732,15 @@ function buildSprite(rows,pal,px,outline){
 }
 const LOOKS=[
   {at:0,cost:0,name:'Жебрак'},
-  {at:30000,cost:6,name:'Перший піджак'},
-  {at:90000,cost:12,name:'Жовтий піджак'},
-  {at:180000,cost:20,name:'Синій оксамит'},
-  {at:300000,cost:30,name:'Малиновий смокінг'},
-  {at:370000,cost:45,name:'Клоун',id:'clown'},
-  {at:450000,cost:65,name:'Смарагдовий костюм'},
-  {at:530000,cost:90,name:'Одіссей',id:'odyssey'},
-  {at:650000,cost:125,name:'Біле пальто'},
-  {at:900000,cost:170,name:'Золотий костюм',id:'gold',gold:1,out:'#ffe08a'}
+  {at:30000,cost:12,name:'Перший піджак'},
+  {at:90000,cost:24,name:'Жовтий піджак'},
+  {at:180000,cost:40,name:'Синій оксамит'},
+  {at:300000,cost:60,name:'Малиновий смокінг'},
+  {at:370000,cost:90,name:'Клоун',id:'clown'},
+  {at:450000,cost:130,name:'Смарагдовий костюм'},
+  {at:530000,cost:180,name:'Одіссей',id:'odyssey'},
+  {at:650000,cost:250,name:'Біле пальто'},
+  {at:900000,cost:340,name:'Золотий костюм',id:'gold',gold:1,out:'#ffe08a'}
 ];
 LOOKS.forEach((L,i)=>{L.body=LOOKGRID[i];L.bodyUp=LOOKGRIDUP[i];L.bodySide=LOOKGRIDSIDE[i];L.pal=LOOKPAL[i]});
 function lookPal(L){return Object.assign({},BASEPAL,{K:'#1a141a',R:'#d63434'},L.pal)}
@@ -935,6 +935,7 @@ function markPlay(){playMark=performance.now()}
 function playMs(){return playAcc+(playMark?performance.now()-playMark:0)}
 function wallMs(){return runT0?performance.now()-runT0:0}
 function phScore(){return Math.max(0,Math.floor(score()))}
+function ownedN(){return (STATS.owned||[0]).length}
 function phZone(){return (ZONES[zoneIdx]||ZONES[0]).name}
 function gordonState(){return gordonCaught?'caught':(gordonMissed||gordonOffered)?'missed':'none'}
 function runPhProps(extra){
@@ -942,7 +943,7 @@ function runPhProps(extra){
   return Object.assign({
     cause:causeKind,score:phScore(),zone:phZone(),zone_idx:zoneIdx|0,
     duration_s:Math.round(playMs()/100)/10,wall_s:Math.round(wallMs()/100)/10,
-    look:L.name,tickets:ticketsRun|0,express:expressN|0,gordon:gordonState(),gordon_mode:gordonMode,diff:Math.round((curD||0)*100)/100,shield_got:shieldN|0,shield_saved:shieldSaved|0,chain_max:chainMax|0,
+    look:L.name,look_idx:lookIdx|0,owned_n:ownedN(),tickets_have:STATS.tickets|0,tickets:ticketsRun|0,express:expressN|0,gordon:gordonState(),gordon_mode:gordonMode,diff:Math.round((curD||0)*100)/100,shield_got:shieldN|0,shield_saved:shieldSaved|0,chain_max:chainMax|0,
     stomps:stomps|0,stomp_stuk:sk.stuk|0,stomp_lang:sk.lang|0,stomp_threads:sk.threads|0,stomp_cancel:sk.cancel|0,stomp_koms:sk.koms|0,
     combo_max:comboMax|0,minus:minusCnt|0,fakes:fakeCnt|0,threads:threadHits|0,labels:hateSum(),
     idle_s:Math.round((idlePeak/60)*10)/10,record:!!isRecord,million:!!million,pauses:pauseN|0
@@ -957,6 +958,7 @@ function pickFresh(a){const c=a.filter(x=>!recent.includes(x));const v=pick(c.le
 const fmt=n=>Math.floor(n).toLocaleString('uk-UA');
 const SC=15,hs=()=>Math.max(0,-camY)*SC;
 const zoneAt=s=>{let i=0;ZONES.forEach((z,j)=>{if(s>=z.from)i=j});return i};
+/* LOOKS[].at — лише для одноразової міграції старих сейвів (без shopV); нові костюми відкриваються тільки купівлею */
 const lookAt=s=>{let i=0;LOOKS.forEach((l,j)=>{if(s>=l.at)i=j});return i};
 function stageD(gs){const zi=zoneAt(gs),z=ZONES[zi],nx=ZONES[zi+1];const frac=nx?Math.min(1,(gs-z.from)/(nx.from-z.from)):Math.min(1,(gs-z.from)/20000);return Math.min(1,(zi+frac*.7)/(ZONES.length-1))}
 let curD=0;const diff=()=>curD;
@@ -997,20 +999,23 @@ function bgCrop(g,i,x,y,w,h,wash){
 }
 
 /* ---------- achievements ---------- */
-function blankStats(){return {stomp:{stuk:0,koms:0,lang:0,cancel:0,threads:0},express:0,gordon:0,gordonMiss:0,labels:0,bestZone:0,looks:0,tickets:0,owned:[0],wear:0,death:{fall:0,stuk:0,koms:0,lang:0,cancel:0,threads:0},runs:0,steerN:0,fakes:0,minus:0,threads:0,met:{}}}
-let STATS=blankStats(),ACH_HAVE={};
-try{const s=JSON.parse(localStorage.getItem('redkaStats')||'null');if(s)STATS=Object.assign(blankStats(),s,{stomp:Object.assign(blankStats().stomp,s.stomp||{}),death:Object.assign(blankStats().death,s.death||{}),met:Object.assign({},s.met||{})})}catch(e){}
+function blankStats(){return {stomp:{stuk:0,koms:0,lang:0,cancel:0,threads:0},express:0,gordon:0,gordonMiss:0,labels:0,bestZone:0,looks:0,tickets:0,owned:[0],wear:0,shopV:2,death:{fall:0,stuk:0,koms:0,lang:0,cancel:0,threads:0},runs:0,steerN:0,fakes:0,minus:0,threads:0,met:{}}}
+let STATS=blankStats(),ACH_HAVE={},legacyShop=false;
+try{const s=JSON.parse(localStorage.getItem('redkaStats')||'null');legacyShop=s?(s.shopV|0)<2:best>0;if(s)STATS=Object.assign(blankStats(),s,{stomp:Object.assign(blankStats().stomp,s.stomp||{}),death:Object.assign(blankStats().death,s.death||{}),met:Object.assign({},s.met||{})})}catch(e){}
 try{ACH_HAVE=JSON.parse(localStorage.getItem('redkaAch')||'{}')||{}}catch(e){}
 function lookOwned(i){return i===0||(STATS.owned||[]).indexOf(i)>=0}
 function migrateLooks(){
   STATS.tickets=STATS.tickets|0;
   if(!Array.isArray(STATS.owned))STATS.owned=[0];
   if(STATS.owned.indexOf(0)<0)STATS.owned.push(0);
-  const n=Math.max(0,STATS.looks|0,lookAt(best));
-  for(let i=1;i<=n&&i<LOOKS.length;i++)if(STATS.owned.indexOf(i)<0)STATS.owned.push(i);
+  if(legacyShop){
+    const n=Math.max(0,STATS.looks|0,lookAt(best));
+    for(let i=1;i<=n&&i<LOOKS.length;i++)if(STATS.owned.indexOf(i)<0)STATS.owned.push(i);
+  }
+  STATS.shopV=2;
   if(!lookOwned(STATS.wear))STATS.wear=0;
 }
-migrateLooks();
+migrateLooks();if(legacyShop)try{localStorage.setItem('redkaStats',JSON.stringify(STATS))}catch(e){}
 const ACH=[
   {id:'joke',name:'Скасований з першого жарту',hint:'Впади, не набравши 1 000',test:(r)=>r.fromOver&&r.causeKind==='fall'&&r.score<1000},
   {id:'abyss',name:'Відкрий для себе прірву',hint:'Впади в прірву хоч раз',test:(r,S)=>r.fromOver&&(S.death.fall||0)>=1},
@@ -1171,7 +1176,7 @@ function wardAct(){
   if(st==='own'){
     STATS.wear=i;lookIdx=i;saveStats();paintHero();paintShop();hop();
     try{SFX.unlock()}catch(e){}buzz(12);
-    ph('look_wear',{look:L.name,cost:0});return;
+    ph('look_wear',{look:L.name,look_idx:i,cost:0,tickets_left:STATS.tickets|0,owned_n:ownedN()});return;
   }
   if((STATS.tickets|0)>=c){
     STATS.tickets-=c;STATS.owned.push(i);STATS.wear=i;lookIdx=i;
@@ -1187,7 +1192,7 @@ function wardAct(){
       paintHero();paintShop();hop();checkAch(false);
       confetti($('mannequin'),44,50,58);
     },760);
-    ph('look_buy',{look:L.name,cost:c});ph('look_wear',{look:L.name,cost:c});return;
+    ph('look_buy',{look:L.name,look_idx:i,cost:c,tickets_left:STATS.tickets|0,owned_n:ownedN()});ph('look_wear',{look:L.name,look_idx:i,cost:c,tickets_left:STATS.tickets|0,owned_n:ownedN()});return;
   }
   for(const el of [$('wardTix'),$('wardAct')]){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),500)}
   try{SFX.minus()}catch(e){}buzz(40);
@@ -2226,7 +2231,7 @@ function start(){runTokFetch();try{redkaChar(STATS.wear||0,SPX,null,'side');redk
   runT0=performance.now();playAcc=0;playMark=runT0;
   mode='play';colBack='start';input.l=input.r=false;pointers.clear();$('startScr').hidden=true;$('colScr').hidden=true;$('pauseScr').hidden=true;$('overScr').hidden=true;$('yellScr').hidden=true;showPlayHud(true);$('score').textContent='0';$('combo').hidden=true;$('combo').textContent='';paintBestHud();paintTickets();steerDone=false;armSteer();showSteer();pushToast('Етап 1 / '+ZONES.length,ZONES[0].name);syncBgm();
   const L=LOOKS[STATS.wear]||LOOKS[0];
-  ph('play_start',{from:playFrom,look:L.name,runs:STATS.runs|0,returning:(STATS.runs|0)>0});
+  ph('play_start',{from:playFrom,look:L.name,look_idx:STATS.wear|0,owned_n:ownedN(),tickets_have:STATS.tickets|0,runs:STATS.runs|0,returning:(STATS.runs|0)>0});
 }
 let yellT=null;
 function showYell(){
@@ -2309,6 +2314,7 @@ document.querySelectorAll('.tabs').forEach(t=>{
     const b=e.target.closest('.tab');if(!b)return;
     t.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
     syncTabs(t);try{SFX.spawn()}catch(err){}
+    if(b.dataset.tab==='ward'&&b.closest('#colScr'))ph('ward_open',{from:colBack,tickets:STATS.tickets|0,owned_n:ownedN(),afford:nextBuyable()>=0});
   });
   syncTabs(t);
 });
