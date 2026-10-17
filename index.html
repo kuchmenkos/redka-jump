@@ -26,7 +26,7 @@ window.POSTHOG_HOST='https://eu.i.posthog.com';
 })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&family=Press+Start+2P&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&family=Oswald:wght@500;700&family=PT+Serif:ital,wght@0,700;1,400&family=Press+Start+2P&display=swap">
 <style>
 /* «Вишита нашивка»: кремова тканина, пунктирний шов, жирна нижня «товщина», пружні появи. Один набір компонентів на всі екрани. */
 :root{
@@ -2113,10 +2113,15 @@ function loadEnds(){
   for(const k of ['fall','stuk','threads','lang','cancel','koms'])END_ART[k]=loadImg('art/ends/'+k+'.webp');
 }
 function scene(kind,li){
-  const c=document.createElement('canvas'),Wd=320,Hd=200,k=2;c.width=Wd*k;c.height=Hd*k;const g=c.getContext('2d');g.scale(k,k);g.imageSmoothingEnabled=false;
   const art=END_ART[kind];
-  if(art&&art.naturalWidth){g.imageSmoothingEnabled=true;g.drawImage(art,0,0,Wd,Hd);g.imageSmoothingEnabled=false}
-  else bgCrop(g,zoneIdx,0,0,Wd,Hd,'rgba(255,248,236,.22)');
+  if(art&&art.naturalWidth){ // нові ілюстрації 2,4:1 — кадр результатів у співвідношенні картинки, штамп як у «Редька Times»
+    const cv=document.createElement('canvas'),g2=cv.getContext('2d');cv.width=960;cv.height=Math.round(960*art.naturalHeight/art.naturalWidth);
+    g2.imageSmoothingEnabled=true;g2.imageSmoothingQuality='high';g2.drawImage(art,0,0,cv.width,cv.height);
+    newsStamp(g2,(NEWS[kind]||NEWS.fall).stamp,{x:0,y:0,w:cv.width,h:cv.height},.7);
+    return cv;
+  }
+  const c=document.createElement('canvas'),Wd=320,Hd=200,k=2;c.width=Wd*k;c.height=Hd*k;const g=c.getContext('2d');g.scale(k,k);g.imageSmoothingEnabled=false;
+  bgCrop(g,zoneIdx,0,0,Wd,Hd,'rgba(255,248,236,.22)');
   const R=redkaChar(li,3,'felix-fail');
   const spr=(im,x,y,sc,rot)=>{g.save();g.translate(x,y);g.rotate(rot||0);g.scale(sc,sc);g.drawImage(im,-im.width/2,-im.height/2);g.restore()};
   const sprRedka=(x,y,sc,rot,flip)=>drawChar(g,R,x,y,(flip?-1:1)*sc*SSX/SSC,sc,'center',rot);
@@ -2124,15 +2129,6 @@ function scene(kind,li){
   const stamp=(t,x,y,rot)=>{g.save();g.translate(x,y);g.rotate(rot);g.font='800 15px Manrope, sans-serif';const w=g.measureText(t).width+18;g.strokeStyle='#c42626';g.lineWidth=3;g.strokeRect(-w/2,-14,w,28);g.fillStyle='#c42626';g.textAlign='center';g.textBaseline='middle';g.fillText(t,0,1);g.restore()};
   const bubble=(t,x,y)=>{g.font='800 11px Manrope, sans-serif';const w=g.measureText(t).width+14;const bx=Math.max(4,Math.min(Wd-w-4,x-w/2));g.fillStyle='#fff';g.fillRect(bx,y,w,20);g.strokeStyle='#1a141a';g.lineWidth=2;g.strokeRect(bx,y,w,20);g.fillStyle='#b02020';g.textAlign='center';g.textBaseline='middle';g.fillText(t,bx+w/2,y+10.5)};
   const sign=(t,x,y,w)=>{g.fillStyle='#2a1722';g.fillRect(x,y,w,28);g.fillStyle='#f8f1e3';g.fillRect(x+2,y+2,w-4,24);g.fillStyle='#2a1722';g.font='800 11px Manrope, sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,x+w/2,y+14,w-8)};
-  if(art&&art.naturalWidth){
-    if(kind==='fall'){stamp('СКАСОВАНО',246,22,-.18);sign('ПРІРВА СКАСУВАННЯ, глибина: ∞',16,168,288)}
-    else if(kind==='stuk'){bubble('Я ще й у Мінкульт написав',248,8);stamp('СКАРГУ ПРИЙНЯТО',90,22,-.12)}
-    else if(kind==='threads'){bubble('Зберігаю скріни',250,8);stamp('1/47',70,22,-.1)}
-    else if(kind==='lang'){bubble('Ще раз «шо»!',70,8);stamp('ШТРАФ',246,22,.12)}
-    else if(kind==='cancel'){bubble('Повернути квитки',250,8);stamp('СКАСОВАНО',160,168,0)}
-    else{stamp('ЗБОРИ',70,22,-.08);bubble('ГАНЬБА',160,8)}
-    return c;
-  }
   if(kind==='fall'){
     g.fillStyle='#2a1722';g.fillRect(50,138,220,8);
     for(let i=1;i<5;i++){const w=220-i*i*6;g.fillRect(160-w/2,138+i*8,w,8)}
@@ -2432,112 +2428,146 @@ $('lbSkip').onclick=()=>{$('lbEntry').hidden=true};
 $('lbSend').onclick=lbSubmit;
 $('lbName').addEventListener('input',e=>{const v=lbNameClean(e.target.value);if(v!==e.target.value)e.target.value=v;$('lbCnt').textContent=v.length+'/'+lbMax()});
 $('lbName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lbSubmit()}});
-/* ---------- картка для шерингу: аркадний «GAME OVER» + хайскор, 1080×1350 ---------- */
+/* ---------- картка шерингу «Редька Times» (макет Figma, 1080×1350) ---------- */
 const CARD_W=1080,CARD_H=1350;
-const END_FOCUS={fall:[.5,.5],stuk:[.5,.45],threads:[.5,.45],lang:[.5,.45],cancel:[.5,.5],koms:[.5,.4]};
-const END_STAMP={fall:'СКАСОВАНО',cancel:'СКАСОВАНО',stuk:'СКАРГУ ПРИЙНЯТО',threads:'ТРЕД 1/47',lang:'ШТРАФ',koms:'ЗБОРИ'};
+const NEWS={ // рубрика, заголовок і штамп за причиною фіналу
+  cancel:{rub:'Скандал',head:'Концерт скасовано. Все зламано',stamp:'Скасовано'},
+  fall:{rub:'Провал',head:'Впав у прірву скасування',stamp:'Скасовано'},
+  koms:{rub:'Збори',head:'Комсомол проти!',stamp:'Збори'},
+  lang:{rub:'Мовне питання',head:'Перекричала мовна інспекторка',stamp:'Штраф'},
+  stuk:{rub:'Донос',head:'На тебе настукали',stamp:'Скаргу прийнято'},
+  threads:{rub:'Треди',head:'Тебе затредили',stamp:'Тред 1/47'}
+};
+const CARD_FONTS=['500 18px Oswald','700 24px Oswald','700 84px Oswald','700 118px "PT Serif"','italic 400 19px "PT Serif"','700 30px "PT Serif"','28px "Press Start 2P"'];
+const NP={paper:'#efe6d2',ink:'#161310',red:'#b8231b',gold:'#f2c230',cream:'#fbf6ea'};
+const NDAYS=['Неділя','Понеділок','Вівторок','Середа','Четвер','Пʼятниця','Субота'];
+const NMONTHS=['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+let cardQa=null,CARD_LOGO=null;
+function loadCardAssets(){CARD_LOGO=loadImg('art/share/logo.png')}
+const CARD_SAMPLE='АаБбВвГгДдЕеЄєЖжЗзИиІіЇїЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЬьЮюЯяʼ№×0123456789 AaTimes'; // без кириличного зразка вантажиться лише латинський підсет
+function cardFontsReady(){return Promise.all(CARD_FONTS.map(f=>document.fonts.load(f,CARD_SAMPLE).catch(()=>null)))}
 function drawCover(g,im,x,y,w,h,fx,fy){
   const iw=im.naturalWidth||im.width,ih=im.naturalHeight||im.height,k=Math.max(w/iw,h/ih),sw=w/k,sh=h/k;
   g.drawImage(im,(iw-sw)*(fx==null?.5:fx),(ih-sh)*(fy==null?.5:fy),sw,sh,x,y,w,h);
 }
-// текст картки: fam 'p' — піксельний, 'm' — Manrope 800; px автозменшується до maxW; shadow — [[dx,dy,колір],…] (екструзія як у логотипі)
-function cText(g,t,x,y,o){
-  let px=o.px;const fam=o.fam==='m'?'800 %px% Manrope, sans-serif':'%px% "Press Start 2P", monospace',F=n=>fam.replace('%px%',Math.round(n)+'px');
-  g.save();g.font=F(px);g.textAlign=o.align||'center';g.textBaseline='middle';g.lineJoin='round';g.miterLimit=2;
-  if(o.maxW){const w=g.measureText(t).width;if(w>o.maxW){px=px*o.maxW/w;g.font=F(px)}}
-  for(const [dx,dy,c] of (o.shadow||[])){g.fillStyle=c;if(o.stroke){g.strokeStyle=c;g.lineWidth=o.sw;g.strokeText(t,x+dx,y+dy)}g.fillText(t,x+dx,y+dy)}
-  if(o.stroke){g.strokeStyle=o.stroke;g.lineWidth=o.sw;g.strokeText(t,x,y)}
-  g.fillStyle=o.fill||'#f8f1e3';g.fillText(t,x,y);g.restore();return px;
+// текст за правилами CSS: y — верх рядкового боксу, lh — висота рядка (за замовчуванням «normal»), ls — трекінг, upper — caps
+const nSpaced='letterSpacing' in CanvasRenderingContext2D.prototype;
+function nMetrics(g,font,lh){
+  g.font=font;const m=g.measureText('Хg'),px=parseFloat(font.match(/([\d.]+)px/)[1]);
+  const asc=m.fontBoundingBoxAscent!=null?m.fontBoundingBoxAscent:px*1.05,desc=m.fontBoundingBoxDescent!=null?m.fontBoundingBoxDescent:px*.28,box=lh||(asc+desc);
+  return {asc,desc,box,base:(box-(asc+desc))/2+asc};
 }
-function cPlate(g,x,y,w,h,fill,edge,depth){
-  g.fillStyle='#120a10';g.fillRect(x,y+(depth||6),w,h);g.fillStyle=edge;g.fillRect(x,y,w,h);g.fillStyle=fill;g.fillRect(x+4,y+4,w-8,h-8);
+function nWidth(g,t,font,ls){
+  g.save();g.font=font;let w;
+  if(ls&&nSpaced){g.letterSpacing=ls+'px';w=g.measureText(t).width}else w=g.measureText(t).width+(ls||0)*[...t].length;
+  g.restore();return w;
 }
-function cBolts(g,x,y,w,h,c){g.fillStyle=c;for(const [bx,by] of [[x+8,y+8],[x+w-18,y+8],[x+8,y+h-18],[x+w-18,y+h-18]])g.fillRect(bx,by,10,10)}
-function cStamp(g,t,cx,cy,rot,col,k){
-  const o=document.createElement('canvas'),og=o.getContext('2d');o.width=620;o.height=170;
-  og.textAlign='center';og.textBaseline='middle';og.font='800 56px Manrope, sans-serif';
-  const w=Math.min(580,og.measureText(t).width+60),x0=(620-w)/2;
-  og.strokeStyle=col;og.lineWidth=9;og.strokeRect(x0,20,w,130);og.lineWidth=3;og.strokeRect(x0+14,34,w-28,102);
-  og.fillStyle=col;og.fillText(t,310,86,w-60);
-  og.globalCompositeOperation='destination-out';let r=7;for(let i=0;i<70;i++){r=(r*16807)%2147483647;const px=r%620;r=(r*16807)%2147483647;const py=r%170;og.fillRect(px,py,3+(px%5),2+(py%4))}
-  g.save();g.translate(cx,cy);g.rotate(rot);g.scale(k||1,k||1);g.globalAlpha=.92;g.drawImage(o,-310,-85);g.restore();
+function nText(g,t,x,y,o){
+  const ls=o.ls||0;if(o.upper)t=t.toLocaleUpperCase('uk');
+  const w=nWidth(g,t,o.font,ls),mt=nMetrics(g,o.font,o.lh),by=y+mt.base;
+  let x0=x;if(o.align==='right')x0=x-w;else if(o.align==='center')x0=x-w/2;
+  g.save();g.font=o.font;g.textBaseline='alphabetic';g.textAlign='left';
+  const put=(dx,dy,col)=>{
+    g.fillStyle=col;
+    if(ls&&nSpaced){g.letterSpacing=ls+'px';g.fillText(t,x0+dx,by+dy)}
+    else if(ls){let cx=x0+dx;for(const ch of t){g.fillText(ch,cx,by+dy);cx+=g.measureText(ch).width+ls}}
+    else g.fillText(t,x0+dx,by+dy);
+  };
+  if(o.shadow)put(o.shadow[0],o.shadow[1],o.shadow[2]);
+  put(0,0,o.fill||NP.ink);g.restore();return w;
 }
+function nWrap(g,t,font,maxW){
+  const words=t.toLocaleUpperCase('uk').split(' '),lines=[];let cur='';
+  g.font=font;
+  for(const w of words){const test=cur?cur+' '+w:w;if(cur&&g.measureText(test).width>maxW){lines.push(cur);cur=w}else cur=test}
+  if(cur)lines.push(cur);return lines;
+}
+// штамп: рамка 6 px, відступи 22/4/6, Oswald Bold 44, трекінг 2.64, −7°; cx/cy — центр; k — масштаб відносно макета
+function newsStamp(g,text,rbox,k){
+  const font='700 '+(44*k)+'px Oswald',ls=2.64*k,mt=nMetrics(g,font),t=text.toLocaleUpperCase('uk');
+  const tw=nWidth(g,t,font,ls),w=tw+(44+12)*k,h=mt.box+(10+12)*k,rot=-7*Math.PI/180;
+  const bw=w*Math.cos(-rot)+h*Math.sin(-rot),bh=w*Math.sin(-rot)+h*Math.cos(-rot);
+  const cx=rbox.x+rbox.w-29.67*k-bw/2,cy=rbox.y+rbox.h-28.65*k-bh/2;
+  g.save();g.translate(cx,cy);g.rotate(rot);
+  g.fillStyle='rgba(239,230,210,.82)';g.fillRect(-w/2,-h/2,w,h);
+  g.strokeStyle=NP.red;g.lineWidth=6*k;g.strokeRect(-w/2+3*k,-h/2+3*k,w-6*k,h-6*k);
+  nText(g,t,-w/2+(6+22)*k,-h/2+(6+4)*k,{font,ls,fill:NP.red});
+  g.restore();
+}
+function newsDate(d){return NDAYS[d.getDay()]+', '+d.getDate()+' '+NMONTHS[d.getMonth()]+' '+d.getFullYear()}
 function makeCard(sc,s){
   const W=CARD_W,H=CARD_H,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
-  const GOLD='#f5c542',CREAM='#f8f1e3',RED='#e0473a',INK='#2a1722',DARK='#140c19';
-  // фон: майже чорний із пікселями-сіткою та золотим світінням від маркізи
-  g.fillStyle=DARK;g.fillRect(0,0,W,H);
-  g.fillStyle='#1d1325';for(let y=12;y<H;y+=24)for(let x=12;x<W;x+=24)g.fillRect(x,y,3,3);
-  let gr=g.createRadialGradient(W/2,90,20,W/2,90,720);gr.addColorStop(0,'rgba(245,197,66,.20)');gr.addColorStop(1,'rgba(245,197,66,0)');g.fillStyle=gr;g.fillRect(0,0,W,H);
-  gr=g.createRadialGradient(W/2,H,20,W/2,H,620);gr.addColorStop(0,'rgba(224,71,58,.22)');gr.addColorStop(1,'rgba(224,71,58,0)');g.fillStyle=gr;g.fillRect(0,0,W,H);
-  g.save();g.shadowColor=GOLD;g.shadowBlur=18;g.strokeStyle=GOLD;g.lineWidth=6;g.strokeRect(14,14,W-28,H-28);g.restore();
-  g.strokeStyle=RED;g.lineWidth=3;g.strokeRect(26,26,W-52,H-52);
-  // маркіза з лампочками
-  cPlate(g,54,40,972,100,INK,GOLD,6);
-  for(let x=78;x<1010;x+=34){g.fillStyle=(x/34|0)%2?CREAM:GOLD;g.fillRect(x,52,10,10);g.fillRect(x,118,10,10)}
-  const t1='РЕДЬКА ',t2='ДЖАМП';g.font='62px "Press Start 2P", monospace';const w1=g.measureText(t1).width,w2=g.measureText(t2).width,tx=W/2-(w1+w2)/2;
-  cText(g,t1,tx,92,{px:62,align:'left',fill:CREAM,stroke:INK,sw:14,shadow:[[0,8,'#8c1a1e']]});
-  cText(g,t2,tx+w1,92,{px:62,align:'left',fill:'#ffd23a',stroke:INK,sw:14,shadow:[[0,8,'#8c1a1e']]});
-  // вікно з ілюстрацією
-  const wx=60,wy=162,ww=960,wh=556,art=END_ART[causeKind],fo=END_FOCUS[causeKind]||[.5,.5];
-  g.fillStyle='#120a10';g.fillRect(wx-14,wy-14,ww+28,wh+28);g.fillStyle='#4a3446';g.fillRect(wx-14,wy-14,ww+28,6);g.fillRect(wx-14,wy-14,6,wh+28);
-  g.save();g.beginPath();g.rect(wx,wy,ww,wh);g.clip();
-  g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
-  if(art&&art.complete&&art.naturalWidth)drawCover(g,art,wx,wy,ww,wh,fo[0],fo[1]);else drawCover(g,sc,wx,wy,ww,wh,.5,.5);
-  g.fillStyle='rgba(0,0,0,.13)';for(let y=wy;y<wy+wh;y+=4)g.fillRect(wx,y,ww,1);
-  gr=g.createRadialGradient(W/2,wy+wh/2,wh*.35,W/2,wy+wh/2,ww*.62);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(10,4,14,.5)');g.fillStyle=gr;g.fillRect(wx,wy,ww,wh);
-  if(isRecord){ // діагональна золота стрічка в лівому верхньому куті
-    g.save();g.translate(wx+86,wy+86);g.rotate(-Math.PI/4);g.fillStyle='#8c1a1e';g.fillRect(-190,-6,380,64);g.fillStyle=GOLD;g.fillRect(-190,-12,380,60);
-    cText(g,'РЕКОРД!',0,19,{px:24,fill:INK});g.restore()}
+  const news=NEWS[causeKind]||NEWS.fall,art=END_ART[causeKind],X=48,CW=984;
+  const OSW=(w,px)=>w+' '+px+'px Oswald',SER=(st,px)=>st+' '+px+'px "PT Serif"',PIX=px=>px+'px "Press Start 2P"';
+  g.fillStyle=NP.paper;g.fillRect(0,0,W,H);
+  // службовий рядок: №, дата, етап і прогрес
+  const issue=String((cardQa&&cardQa.issue)||Math.max(1,STATS.runs|0)).padStart(3,'0'),when=(cardQa&&cardQa.date)||new Date();
+  nText(g,'№'+issue+' · '+newsDate(when),X,40,{font:OSW(500,18),ls:1.44,upper:1});
+  const nz=ZONES.length,sq=[];
+  const stage='Етап '+(zoneIdx+1)+'/'+nz+' · '+ZONES[zoneIdx].name;
+  const sqW=nz*12+(nz-1)*4,sqX=X+CW-sqW,stW=nWidth(g,stage.toLocaleUpperCase('uk'),OSW(500,18),1.44);
+  nText(g,stage,sqX-10-stW,40,{font:OSW(500,18),ls:1.44,upper:1});
+  for(let i=0;i<nz;i++){
+    const x=sqX+i*16,y=47.5;
+    if(i<zoneIdx){g.fillStyle=NP.ink;g.fillRect(x,y,12,12)}
+    else if(i===zoneIdx){g.fillStyle=NP.red;g.fillRect(x,y,12,12)}
+    else{g.strokeStyle=NP.ink;g.lineWidth=1;g.strokeRect(x+.5,y+.5,11,11)}
+  }
+  g.fillStyle=NP.ink;g.fillRect(X,77,CW,2);
+  // шапка: лого + «Редька Times»
+  if(CARD_LOGO&&CARD_LOGO.complete&&CARD_LOGO.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(CARD_LOGO,118,100)}
+  const tf=SER('bold',118),tl=-2.36,w1=nWidth(g,'Редька ',tf,tl),w2=nWidth(g,'Times',tf,tl);
+  nText(g,'Редька ',206.5,91,{font:tf,ls:tl,lh:112.1});
+  nText(g,'Times',206.5+w1,91,{font:tf,ls:tl,lh:112.1,fill:NP.red});
+  // слоган: подвійна лінія, три підписи space-between
+  g.fillStyle=NP.ink;g.fillRect(X,211,CW,4);g.fillRect(X,255,CW,1);
+  const sl=SER('italic',19),sf=PIX(23),mid=isRecord?'НОВИЙ РЕКОРД!':'GAME OVER';
+  const t1='Головні новини скасування',t3='Сьогодні знову падаємо',w1s=nWidth(g,t1,sl,0),w3s=nWidth(g,t3,sl,0),wm=nWidth(g,mid,sf,0),gap=(CW-w1s-w3s-wm)/2;
+  nText(g,t1,X,223,{font:sl});nText(g,t3,X+CW,223,{font:sl,align:'right'});
+  nText(g,mid,X+w1s+gap,224,{font:sf,fill:isRecord?NP.red:NP.ink});
+  // новина: рубрика + заголовок на 1–2 рядки
+  const rf=OSW(700,24),rt=news.rub.toLocaleUpperCase('uk'),rw=nWidth(g,rt,rf,2.88)+28;
+  g.fillStyle=NP.red;g.fillRect(X,274,rw,45);nText(g,rt,X+14,278,{font:rf,ls:2.88,fill:NP.cream});
+  const hf=OSW(700,84),lines=nWrap(g,news.head,hf,CW);
+  lines.forEach((ln,i)=>nText(g,ln,X,331+i*79.8,{font:hf,lh:79.8}));
+  const py=lines.length>1?505:425,ph=930-py;
+  // фото: cover із заходом 26 px під нижній край, рамка 2 px, штамп
+  g.fillStyle=NP.ink;g.fillRect(X,py,CW,ph);
+  g.save();g.beginPath();g.rect(X,py,CW,ph);g.clip();g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+  if(art&&art.complete&&art.naturalWidth)drawCover(g,art,X,py,CW,ph+26,.5,.5);else if(sc)drawCover(g,sc,X,py,CW,ph+26,.5,.5);
   g.restore();
-  cBolts(g,wx-14,wy-14,ww+28,wh+28,CREAM);
-  cStamp(g,END_STAMP[causeKind]||'СКАСОВАНО',wx+ww-226,wy+wh-84,.1,RED,.72);
-  const top=hateTop().slice(0,3),sum=hateSum();
-  if(top.length){ // ярлик головного хейту — латка-наліпка, як платформи в грі
-    const lab='«'+top[0][0]+'» ×'+top[0][1];g.save();g.font='800 46px Manrope, sans-serif';const lw=Math.min(500,g.measureText(lab).width+72),lh=84,lx=wx+26,ly=wy+wh-lh-30;g.restore();
-    g.save();g.translate(lx+lw/2,ly+lh/2);g.rotate(-.05);g.translate(-lw/2,-lh/2);
-    g.fillStyle='rgba(0,0,0,.55)';g.fillRect(8,10,lw,lh);g.fillStyle='#1d7a30';g.fillRect(0,0,lw,lh);g.fillStyle='#2ea043';g.fillRect(0,0,lw,lh-8);
-    g.setLineDash([12,9]);g.strokeStyle='#ffffff';g.lineWidth=4;g.strokeRect(9,9,lw-18,lh-26);g.setLineDash([]);
-    cText(g,lab,lw/2,lh/2-6,{px:46,fam:'m',fill:'#ffffff',maxW:lw-60});g.restore();
-  }
-  // GAME OVER + причина + рахунок
-  cText(g,'GAME OVER',W/2,766,{px:38,fill:RED,stroke:INK,sw:12,shadow:[[0,6,'#000000']]});
-  cText(g,cause,W/2,812,{px:32,fam:'m',fill:CREAM,maxW:940});
-  cText(g,fmt(s),W/2,904,{px:120,fill:'#ffd23a',stroke:INK,sw:20,shadow:[[0,12,'#8c1a1e']],maxW:930});
-  cText(g,'ПІДПИСНИКІВ НА ХЕЙТІ',W/2,982,{px:28,fam:'m',fill:'#b9a9b8',maxW:900});
-  // хайскор-таблиця «ТОП ХЕЙТУ» з аватаром
-  const ty=1004,th=160;cPlate(g,60,ty,960,th,'#0f0a12','#3a2a3a',6);
-  const R=redkaChar(lookIdx,3,'felix-fail'),m=170/(R.c.height*SSC/R.k);
-  drawChar(g,R,150,ty+th-8,SSX*m,SSC*m,'feet',0);
-  cText(g,'ТОП ХЕЙТУ',268,ty+26,{px:15,align:'left',fill:'#8a7a8a'});
-  if(lbRankLast){const rt='#'+lbRankLast+' У СВІТІ';g.font='18px "Press Start 2P", monospace';const rw=g.measureText(rt).width+30;
-    g.save();g.translate(1000-rw/2,ty+26);g.rotate(.03);cPlate(g,-rw/2,-17,rw,34,GOLD,INK,4);cText(g,rt,0,1,{px:18,fill:INK});g.restore()}
-  if(!top.length){cText(g,'ХЕЙТ ЩЕ НЕ НАЛИП',620,ty+th/2+14,{px:26,fill:'#6f5a62',maxW:700})}
-  else top.forEach(([l,n],i)=>{
-    const ry=ty+62+i*40,col=['#ffd23a','#cfd5df','#d9a574'][i];
-    cText(g,['1ST','2ND','3RD'][i],268,ry,{px:20,align:'left',fill:col});
-    const nw=cText(g,l,362,ry,{px:32,fam:'m',align:'left',fill:CREAM,maxW:420});g.font='800 '+nw+'px Manrope, sans-serif';const ew=g.measureText(l).width;
-    const cx=1000;g.font='24px "Press Start 2P", monospace';const cw=g.measureText('×'+n).width;
-    g.fillStyle='#5c4a55';for(let x=362+ew+16;x<cx-cw-16;x+=14)g.fillRect(x,ry+8,4,4);
-    cText(g,'×'+n,cx,ry,{px:24,align:'right',fill:col});
+  g.strokeStyle=NP.ink;g.lineWidth=2;g.strokeRect(X+1,py+1,CW-2,ph-2);
+  g.save();g.beginPath();g.rect(X,py,CW,ph);g.clip();newsStamp(g,news.stamp,{x:X+2,y:py+2,w:CW-4,h:ph-4},1);g.restore();
+  // плашка рахунку
+  g.fillStyle=NP.ink;g.fillRect(X+6,944+6,978,161);
+  g.fillStyle=NP.gold;g.fillRect(X,944,978,161);g.strokeStyle=NP.ink;g.lineWidth=3;g.strokeRect(X+1.5,945.5,975,158);
+  const scoreTxt=fmt(s);let sfz=PIX(86);
+  nText(g,scoreTxt,X+3+24+462,961,{font:sfz,ls:-1.72,align:'center',shadow:[5,5,NP.red]});
+  nText(g,'підписників на хейті'+(lbRankLast?' · №'+lbRankLast+' у світі':''),X+3+24+462,1057,{font:OSW(500,22),ls:3.08,align:'center',upper:1});
+  // підвал: топ хейту | нагорода номера
+  g.fillStyle=NP.ink;g.fillRect(X+492.5,1119,1,123);
+  nText(g,'Топ хейту',X,1119,{font:OSW(700,18),ls:2.16,upper:1});
+  const top=hateTop().slice(0,2);
+  if(!top.length)nText(g,'Хейт ще не налип',X,1154,{font:OSW(700,28),lh:40,upper:1,fill:'#7a6e5c'});
+  top.forEach(([l,n],i)=>{
+    const ry=1154+i*48,idx=(i+1)+'.',nf=OSW(700,28),cf=PIX(18),colr=i?'#3a322a':NP.red;
+    const iw=nWidth(g,idx,PIX(13),0);nText(g,idx,X,ry,{font:PIX(13),lh:40,fill:colr});
+    const nx=X+iw+8,name=l.toLocaleUpperCase('uk'),maxN=468.5-iw-8-60-16;let nfz=28,nfont=nf;
+    while(nWidth(g,name,nfont,0)>maxN&&nfz>16){nfz--;nfont=OSW(700,nfz)}
+    const nw=nText(g,name,nx,ry,{font:nfont,lh:40}),cnt='×'+n,cw=nWidth(g,cnt,cf,0);
+    nText(g,cnt,X+468.5,ry,{font:cf,lh:40,align:'right'});
+    g.strokeStyle=NP.ink;g.lineWidth=2;g.setLineDash([2,3]);g.beginPath();g.moveTo(nx+nw+8,ry+20+1);g.lineTo(X+468.5-cw-8,ry+20+1);g.stroke();g.setLineDash([]);
   });
-  // звання
-  cPlate(g,60,1180,960,50,'#e2b33a','#8f5f08',5);
-  cText(g,'ЗВАННЯ: '+runRank,W/2,1205,{px:30,fam:'m',fill:INK,maxW:900});
-  // трек етапів + ачивки
-  for(let i=0;i<ZONES.length;i++){
-    const x=62+i*42,done=i<zoneIdx,cur=i===zoneIdx;g.fillStyle='#120a10';g.fillRect(x,1236,34,34);
-    g.fillStyle=cur?RED:done?GOLD:'#3a2a3a';g.fillRect(x+4,1240,26,26);
-    if(cur){g.fillStyle=CREAM;g.fillRect(x+13,1249,8,8)}
-  }
-  cText(g,'ЕТАП '+(zoneIdx+1)+'/'+ZONES.length+' · '+ZONES[zoneIdx].name.toUpperCase(),372,1254,{px:26,fam:'m',align:'left',fill:CREAM,maxW:440});
-  const ach=newAchs.slice(0,3).filter(a=>ACH_IMGS[a.id]&&ACH_IMGS[a.id].complete);
-  ach.forEach((a,i)=>{const x=1020-(ach.length-i)*66+10,y=1228;g.fillStyle='#120a10';g.fillRect(x-4,y-4,60,60);g.fillStyle=GOLD;g.fillRect(x-2,y-2,56,56);g.imageSmoothingEnabled=false;g.drawImage(ACH_IMGS[a.id],x,y,52,52)});
-  // CTA з посиланням: картинка живе без підпису
-  g.fillStyle='#120a10';g.fillRect(60,1286,960,52);g.fillStyle='#8c1a1e';g.fillRect(60,1286,960,46);
-  g.fillStyle=CREAM;g.beginPath();g.moveTo(84,1298);g.lineTo(84,1322);g.lineTo(104,1310);g.fill();
-  cText(g,'ПОБИЙ МІЙ РЕКОРД',122,1310,{px:22,align:'left',fill:CREAM});
-  cText(g,liveGameUrl().replace(/^https?:\/\//,'').replace(/\/$/,'').toUpperCase(),1000,1310,{px:22,align:'right',fill:'#ffd23a'});
+  const rx=X+493.5+22,m=/^(.*?)\s*\((.*)\)\s*$/.exec(runRank||''),rtitle=m?m[1]:(runRank||''),rsub=m?'('+m[2]+')':'';
+  nText(g,'Нагорода номера',rx,1119,{font:OSW(700,18),ls:2.16,upper:1});
+  let rz=30,rfnt=SER('bold',rz);while(nWidth(g,rtitle,rfnt,0)>490.5-22-8&&rz>20){rz--;rfnt=SER('bold',rz)}
+  nText(g,rtitle,rx,1152,{font:rfnt,lh:40});
+  if(rsub)nText(g,rsub,rx,1198,{font:SER('italic',19),fill:NP.red});
+  // CTA
+  g.fillStyle=NP.ink;g.fillRect(X,1256,CW,54);
+  g.fillStyle=NP.gold;g.beginPath();g.moveTo(X+22,1274);g.lineTo(X+38,1283);g.lineTo(X+22,1292);g.closePath();g.fill();
+  nText(g,'Побий мій рекорд',X+22+30,1274,{font:PIX(18),fill:NP.paper,upper:1});
+  nText(g,liveGameUrl().replace(/^https?:\/\//,'').replace(/\/$/,''),X+CW-22,1274,{font:PIX(18),fill:NP.gold,align:'right',upper:1});
   return c;
 }
 const GAME_LINK='https://redkajump.fun/';
@@ -2564,10 +2594,10 @@ async function copyShareText(){
   try{const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();if(ok){shareHint('Текст скопійовано');return true}}catch(e){}
   shareHint('Не вдалося скопіювати');return false;
 }
-function shareEvt(method){ph('share',{score:phScore(),zone:phZone(),cause:causeKind,method,format:'4x5',card_v:2,rank:lbRankLast|0})}
+function shareEvt(method){ph('share',{score:phScore(),zone:phZone(),cause:causeKind,method,format:'4x5',card_v:3,rank:lbRankLast|0})}
 $('shareBtn').onclick=async function(){
   if(!shareCard)return;
-  try{await Promise.all([document.fonts.load('28px "Press Start 2P"'),document.fonts.load('800 28px Manrope')])}catch(e){}
+  try{await cardFontsReady()}catch(e){}
   if(lastScene)shareCard=makeCard(lastScene,lastScore);
   const blob=await cardBlob();if(!blob)return;
   const old=$('shareCardImg').dataset.u;if(old)URL.revokeObjectURL(old);
@@ -2679,7 +2709,7 @@ document.addEventListener('visibilitychange',()=>{
   }else syncBgm();
 });
 
-loadFaces();loadEnds();loadAchs();loadBackgrounds();
+loadFaces();loadEnds();loadCardAssets();loadAchs();loadBackgrounds();cardFontsReady();
 resize();reset();draw();attractInit();paintBestHud();paintAchCount();paintTickets();paintHero();showBestStart();
 if(/\bqa=1\b/.test(location.search)){
   function jumpTo(gs){
@@ -2698,7 +2728,7 @@ if(/\bqa=1\b/.test(location.search)){
     }
     STATS.runs=keepRuns;STATS.gordonRun=keepGR;reset();return res;
   }
-  window.__g={gordonSim,get gordonDbg(){return {path:gordonPath,src:!!gordonSrc,ac:AC&&AC.state,off:AC&&gordonSrc?(AC.currentTime-gordonT0)*GORDON_RATE:null,want:gordonBuf&&player?gordonOffset(player):null,fly:player&&player.fly,flyMax:player&&player.flyMax,heard:gordonHeard,buf:!!gordonBuf,muted}},acSuspend:()=>AC.suspend(),acResume:()=>AC.resume(),toggleMute:()=>toggleMute(),cardTest:o=>{causeKind=o.kind;cause=o.cause||'Впав у прірву скасування';zoneIdx=o.zone|0;lookIdx=o.look|0;isRecord=!!o.rec;runRank=o.rank||'Зрадник місяця (втретє поспіль)';lbRankLast=o.place|0;newAchs=(o.achs||[]).map(id=>ACH.find(a=>a.id===id));hateLog=o.hate||{};return makeCard(scene(causeKind,lookIdx),o.score).toDataURL()},startDogs,stopDogs,gameOver,get dogsT(){return dogsAudio?[dogsAudio.currentTime,dogsAudio.paused]:null},get att(){return att},get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get runs(){return STATS.runs},set runs(v){STATS.runs=v|0},get steerN(){return STATS.steerN|0},set steerN(v){STATS.steerN=v|0;saveStats()},get steerOn(){const el=$('steerHint');return !!(el&&!el.hidden&&el.classList.contains('on'))},get steerArmed(){return steerArmed},hideSteer,showSteer,armSteer,get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get muted(){return muted},get bgm(){return bgmAudio},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r;if(mode==='play')noteSteer()}};
+  window.__g={gordonSim,get gordonDbg(){return {path:gordonPath,src:!!gordonSrc,ac:AC&&AC.state,off:AC&&gordonSrc?(AC.currentTime-gordonT0)*GORDON_RATE:null,want:gordonBuf&&player?gordonOffset(player):null,fly:player&&player.fly,flyMax:player&&player.flyMax,heard:gordonHeard,buf:!!gordonBuf,muted}},acSuspend:()=>AC.suspend(),acResume:()=>AC.resume(),toggleMute:()=>toggleMute(),cardTest:o=>{causeKind=o.kind;cause=o.cause||'Впав у прірву скасування';zoneIdx=o.zone|0;lookIdx=o.look|0;isRecord=!!o.rec;runRank=o.rank||'Зрадник місяця (втретє поспіль)';lbRankLast=o.place|0;cardQa=o.qa?{issue:o.qa.issue,date:new Date(o.qa.y,o.qa.m,o.qa.d)}:null;newAchs=(o.achs||[]).map(id=>ACH.find(a=>a.id===id));hateLog=o.hate||{};return makeCard(scene(causeKind,lookIdx),o.score).toDataURL()},startDogs,stopDogs,gameOver,get dogsT(){return dogsAudio?[dogsAudio.currentTime,dogsAudio.paused]:null},get att(){return att},get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get runs(){return STATS.runs},set runs(v){STATS.runs=v|0},get steerN(){return STATS.steerN|0},set steerN(v){STATS.steerN=v|0;saveStats()},get steerOn(){const el=$('steerHint');return !!(el&&!el.hidden&&el.classList.contains('on'))},get steerArmed(){return steerArmed},hideSteer,showSteer,armSteer,get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get muted(){return muted},get bgm(){return bgmAudio},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r;if(mode==='play')noteSteer()}};
 }
 let last=performance.now();
 function loop(now){const dt=Math.min(2.5,(now-last)/16.667);last=now;if(mode==='play'){update(dt);draw()}else if(mode==='start'){attractFrame(dt)}requestAnimationFrame(loop)}

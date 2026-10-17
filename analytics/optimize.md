@@ -32,7 +32,7 @@ MCP у Cloud Agent не логіниться. SQL нижче — якщо тре
 | `zone_enter` | де відвалюються |
 | `express` / `gordon` / `ticket` / `stomp` | чи бонуси взагалі трапляються |
 | `look_buy` / `look_wear` / `ach` | чи гардероб живе |
-| `share` | дія в листі-превʼю картки: `method` (native/download/copy), `format`, `card_v`, `rank`, `score`, `zone`, `cause` |
+| `share` | дія в листі-превʼю картки: `method` (native/download/copy), `format`, `card_v` (3 = «Редька Times»), `rank`, `score`, `zone`, `cause` |
 | `share_open` | відкрито лист-превʼю картки |
 | `threads_click` | чіп у «Про гру» |
 
