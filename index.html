@@ -924,10 +924,8 @@ let ticketsRun=0,lastTicketStep=-99;
 let lastGap=100,lastHaterStep=-99;
 let gordonLuck=false;
 function rollGordonLuck(){
-  // ≈1 забіг із 4–5 має Гордона в запасі, але до нього дожиє менше половини; якщо він був у попередньому забігу, шанс падає до 6%
-  const recent=STATS.gordonRun!==undefined&&(STATS.runs|0)-STATS.gordonRun<=1;
-  gordonLuck=Math.random()<(recent?.06:.22);
-  gordonNextGs=gordonLuck?Math.min(1200000,60000-Math.log(1-Math.random())*180000):1e12;gordonNeed=0;gordonPendStep=-1;
+  // Гордон є в кожному забігу: випадкова мета 300–390k очок, один візит (див. genStep)
+  gordonLuck=true;gordonNextGs=300000+rnd(0,90000);gordonNeed=0;gordonPendStep=-1;
 }
 let shield=0,shieldGrace=0,shieldN=0,shieldSaved=0,lastShieldStep=-99,chainN=0,chainT=0,chainMax=0,heat=0,gordonNextGs=0,gordonNeed=30,gordonPendStep=-1,gordonCount=0,gordonMode='',gordonLive=0,gordonLiveT=0;
 let runT0=0,playAcc=0,playMark=0,pauseN=0,playFrom='cta',comboMax=1;
@@ -1408,10 +1406,9 @@ function genStep(){
   plats.push(p);
   // Гордон — рідка пасхалка. Жереб на забіг (gordonLuck) і випадкова мета в очках (gordonNextGs, довгий хвіст);
   // як тільки забіг її минув, гість з'являється на першій придатній латці в трохи різному місці. Без попередження й дедлайнів.
-  if(gordonLuck&&!gordonDecided&&player.fly<=0&&(type==='normal'||type==='moving')&&!calm&&gs>=gordonNextGs&&stepN-lastHaterStep>=15&&!items.some(it=>it.kind==='gordon')){
+  if(gordonLuck&&!gordonDecided&&player.fly<=0&&(type==='normal'||type==='moving')&&!calm&&gs>=gordonNextGs&&(stepN-lastHaterStep>=15||gs>=gordonNextGs+60000)&&!items.some(it=>it.kind==='gordon')){
     const ix=Math.max(24,Math.min(W-24,p.x+p.w*rnd(.15,.85)+rnd(-40,40)));
     items.push({kind:'gordon',x:ix,y:topY-rnd(26,62),t:0});lastItemStep=stepN;gordonOffered=true;gordonDecided=true;gordonCount++;
-    STATS.gordonRun=STATS.runs|0;saveStats();
     ph('gordon',{result:'offered',score:Math.max(0,Math.floor(gs)),heat:Math.round(heat),nth:gordonCount});
   }
   if(player.flyKind!=='gordon'&&player.flyKind!=='express'&&!items.some(it=>it.kind==='express')&&!calm&&!p.vx&&type!=='minus'&&gs>=EXPRESS_FROM&&gs-lastExpressGs>EXPRESS_CD){
@@ -2719,14 +2716,20 @@ if(/\bqa=1\b/.test(location.search)){
     topY=player.y+FEET+2;while(topY>camY-280)genStep();
   }
   function gordonSim(n,maxGs){ // Монте-Карло директора Гордона на справжньому генераторі латок (без рендера й гравця)
-    const keepRuns=STATS.runs,keepGR=STATS.gordonRun,res=[];STATS.runs=100;STATS.gordonRun=undefined;
+    const keepRuns=STATS.runs,res=[];STATS.runs=100;
     for(let i=0;i<n;i++){
       STATS.runs++;reset();
       let hit=null;
-      for(let k=0;k<6000&&!hit;k++){genStep();const g=items.find(it=>it.kind==='gordon');if(g)hit={gs:Math.max(0,player0-(plats[plats.length-1].y))*SC,x:Math.round(g.x),dy:Math.round(plats[plats.length-1].y-g.y)};if(Math.max(0,player0-plats[plats.length-1].y)*SC>maxGs)break}
+      for(let k=0;k<6000;k++){
+        genStep();const top=plats[plats.length-1].y,gs=Math.max(0,player0-top)*SC;
+        const g=!hit&&items.find(it=>it.kind==='gordon');
+        if(g)hit={gs,x:Math.round(g.x),dy:Math.round(top-g.y)};
+        if(gs>maxGs)break;
+      }
+      if(hit)hit.n=gordonCount;
       res.push(hit);
     }
-    STATS.runs=keepRuns;STATS.gordonRun=keepGR;reset();return res;
+    STATS.runs=keepRuns;reset();return res;
   }
   window.__g={gordonSim,get gordonDbg(){return {path:gordonPath,src:!!gordonSrc,ac:AC&&AC.state,off:AC&&gordonSrc?(AC.currentTime-gordonT0)*GORDON_RATE:null,want:gordonBuf&&player?gordonOffset(player):null,fly:player&&player.fly,flyMax:player&&player.flyMax,heard:gordonHeard,buf:!!gordonBuf,muted}},acSuspend:()=>AC.suspend(),acResume:()=>AC.resume(),toggleMute:()=>toggleMute(),cardTest:o=>{causeKind=o.kind;cause=o.cause||'Впав у прірву скасування';zoneIdx=o.zone|0;lookIdx=o.look|0;isRecord=!!o.rec;runRank=o.rank||'Зрадник місяця (втретє поспіль)';lbRankLast=o.place|0;cardQa=o.qa?{issue:o.qa.issue,date:new Date(o.qa.y,o.qa.m,o.qa.d)}:null;newAchs=(o.achs||[]).map(id=>ACH.find(a=>a.id===id));hateLog=o.hate||{};return makeCard(scene(causeKind,lookIdx),o.score).toDataURL()},startDogs,stopDogs,gameOver,get dogsT(){return dogsAudio?[dogsAudio.currentTime,dogsAudio.paused]:null},get att(){return att},get mode(){return mode},get player(){return player},score,start,reset,openPause,resumePlay,quitToStart,openCol,beginGordon:()=>beginGordon(player),jumpTo,genStep,scene,goPlay,finishYell,stompHater,enemyChar,lookOwned,LOOKS,ACH,get stomps(){return stomps},get causeKind(){return causeKind},get camY(){return camY},set camY(v){camY=v},get zoneIdx(){return zoneIdx},get lookIdx(){return lookIdx},get items(){return items},get enemies(){return enemies},get plats(){return plats},get ticketsRun(){return ticketsRun},get tickets(){return STATS.tickets},set tickets(v){STATS.tickets=v|0;saveStats();paintTickets()},get owned(){return STATS.owned},get wear(){return STATS.wear},get runs(){return STATS.runs},set runs(v){STATS.runs=v|0},get steerN(){return STATS.steerN|0},set steerN(v){STATS.steerN=v|0;saveStats()},get steerOn(){const el=$('steerHint');return !!(el&&!el.hidden&&el.classList.contains('on'))},get steerArmed(){return steerArmed},hideSteer,showSteer,armSteer,get gordonDecided(){return gordonDecided},get gordonBits(){return gordonBits},get gordonReady(){return !!gordonBuf},get gordonSrc(){return !!gordonSrc},get gordonEl(){return gordonAudio},get gordonPrimed(){return gordonPrimed},get bgmOn(){return bgmOn},get muted(){return muted},get bgm(){return bgmAudio},SFX,pushAchPop,setInput(l,r){input.l=!!l;input.r=!!r;if(mode==='play')noteSteer()}};
 }
