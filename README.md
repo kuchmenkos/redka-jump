@@ -6,7 +6,7 @@
 
 Онлайн: [https://redkajump.fun/](https://redkajump.fun/). Живий хост — **Cloudflare Pages** (проєкт `redkajump`). Push у `main` деплоїть через Actions job `cloudflare-pages` (`wrangler pages deploy`). «Поділитись» додає `https://redkajump.fun/` (або поточний origin, якщо відкрито не з localhost).
 
-Аналітика — PostHog EU (`https://eu.i.posthog.com`). Події в `index.html`: `play_start`, `game_over` / `run_abandon` (знімок катки: `duration_s`, `score`, `zone`, механіки), віхи (`zone_enter`, `express`, `gordon`, `ticket`, `stomp`, `look_buy` / `look_wear` (з `look_idx`), `ward_open`, `ach`, `share`, `threads_click`, `hater_met`, `lb_open`, `lb_submit`, `dock`). На `?qa=1` події не шлються, на redkajump.fun йдуть через `/ingest` (Pages Function).
+Аналітика — PostHog EU (`https://eu.i.posthog.com`). Події в `index.html`: `play_start`, `game_over` / `run_abandon` (знімок катки: `duration_s`, `score`, `zone`, механіки), віхи (`zone_enter`, `express`, `gordon`, `ticket`, `stomp`, `look_buy` / `look_wear` (з `look_idx`), `ward_open`, `ach`, `share`, `threads_click`, `ext_click` (Telegram / Threads / банка), `hater_met`, `lb_open`, `lb_submit`, `dock`). На `?qa=1` події не шлються, на redkajump.fun йдуть через `/ingest` (Pages Function).
 
 Два дашборди в PostHog EU (проєкт redkajump, період 30 днів):
 
