@@ -18,7 +18,7 @@ MCP у Cloud Agent не логіниться. SQL нижче — якщо тре
 
 | Подія | Навіщо для балансу |
 |---|---|
-| `play_start` | `from` cta/again, `look`, `returning` |
+| `play_start` | `from` cta/again, `look`, `look_idx`, `owned_n`, `tickets_have`, `returning` |
 | `game_over` | знімок катки: `duration_s`, `score`, `zone`, `cause`, механіки |
 | `run_abandon` | вихід з паузи (`cause=quit`) або закрита вкладка посеред забігу (`cause=closed`); багато vs смерті — здаються, не вмирають |
 | `hater_met` | вперше зустрінутий хейтер | 
@@ -31,14 +31,18 @@ MCP у Cloud Agent не логіниться. SQL нижче — якщо тре
 | `dock` | кнопки дока на інтро (`btn`: achs, ward, help) |
 | `zone_enter` | де відвалюються |
 | `express` / `gordon` / `ticket` / `stomp` | чи бонуси взагалі трапляються |
-| `look_buy` / `look_wear` / `ach` | чи гардероб живе |
+| `look_buy` / `look_wear` | купівля / одягання костюма: `look`, `look_idx`, `cost`, `tickets_left`, `owned_n` (з 2026-10-17 костюми відкриваються лише купівлею, ціни ×2) |
+| `ward_open` | відкрито вкладку «Гардероб»: `from`, `tickets`, `owned_n`, `afford` (чи вистачає на новий костюм) |
+| `ach` | досягнення |
 | `share` | дія в листі-превʼю картки: `method` (native/download/copy), `format`, `card_v` (3 = «Редька Times»), `rank`, `score`, `zone`, `cause` |
 | `share_open` | відкрито лист-превʼю картки |
 | `threads_click` | чіп у «Про гру» |
 
+Примітка: у `look` старих подій нульовий костюм називався «Без піджака», потім «Жебрак» — для групування по костюму краще `look_idx` (є з 2026-10-17). Дашборд «баланс» має блок «Костюми»: забіги за вибором, таблиця забіги/гравці/p50, купівлі й одягання, розподіл `owned_n`, воронка `ward_open → look_buy`.
+
 Примітка: назви етапів (`zone`) без років з 2026-10-16 («Суми», не «Суми · 2022»); старі події мають роки — групуй за `zone_idx`.
 
-`game_over` / `run_abandon` поля: `cause`, `score`, `zone`, `zone_idx`, `duration_s` (без паузи), `wall_s`, `look`, `tickets`, `express`, `gordon` (caught/missed/none), `stomps`, `stomp_*`, `combo_max`, `minus`, `fakes`, `threads`, `labels`, `idle_s`, `record`, `million`, `pauses`.
+`game_over` / `run_abandon` поля: `cause`, `score`, `zone`, `zone_idx`, `duration_s` (без паузи), `wall_s`, `look`, `look_idx`, `owned_n`, `tickets_have` (баланс квитків на кінець), `tickets` (зібрано за забіг), `express`, `gordon` (caught/missed/none), `stomps`, `stomp_*`, `combo_max`, `minus`, `fakes`, `threads`, `labels`, `idle_s`, `record`, `million`, `pauses`.
 
 ## Пороги в коді (орієнтири)
 
